@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="expend/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="expend/sqlite-jdbc-3.7.2.jar"/>
+	<classpathentry kind="lib" path="expend/beautyeye_lnf.jar"/>
+	<classpathentry kind="lib" path="expend/poi-3.11-20141221.jar"/>
+	<classpathentry kind="lib" path="expend/poi-ooxml-3.11-20141221.jar"/>
+	<classpathentry kind="lib" path="expend/xmlbeans-2.6.0.jar"/>
+	<classpathentry kind="lib" path="expend/poi-ooxml-schemas-3.11-20141221.jar"/>
+	<classpathentry kind="lib" path="expend/mail.jar"/>
+	<classpathentry kind="lib" path="expend/activation.jar"/>
+	<classpathentry kind="lib" path="expend/org.eclipse.swt.win32.win32.x86_64-4.2.jar"/>
+	<classpathentry kind="lib" path="expend/jsoup-1.11.2.jar"/>
+	<classpathentry kind="lib" path="expend/commons-codec-1.9.jar"/>
+	<classpathentry kind="lib" path="expend/djnativeswing-swt.jar"/>
+	<classpathentry kind="lib" path="expend/djnativeswing.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

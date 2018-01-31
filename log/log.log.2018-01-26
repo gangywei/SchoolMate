@@ -1,0 +1,2 @@
+2018-01-26 20:16:56  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错no such column: s_id
+2018-01-26 20:22:27  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错database is locked

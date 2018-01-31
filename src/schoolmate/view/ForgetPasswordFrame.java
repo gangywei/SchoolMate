@@ -1,0 +1,132 @@
+package schoolmate.view;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
+
+import schoolmate.control.Helper;
+import schoolmate.database.StudentLog;
+import schoolmate.database.UserLog;
+import schoolmate.model.User;
+
+public class ForgetPasswordFrame extends JInternalFrame implements ActionListener{
+	private PencilMain pencilMain;
+	protected JPanel loginContent;
+	private String education[] = {"  请选择设置的密保问题  ","我的账号","最喜欢的成语","其他数字密码","好朋友的名字"};
+	private JTextField userCount = new JTextField(15);
+	private JComboBox<String> userPro = new JComboBox<String>(education);
+	private JPasswordField userAns = new JPasswordField(15); 
+    private JPasswordField userPwd = new JPasswordField(15);  
+    private JPasswordField confirmUserPwd = new JPasswordField(15);
+    private JLabel userLabel = new JLabel("账     号： ");  
+    private JLabel proLabel = new JLabel("问     题： ");  
+    private JLabel ansLabel = new JLabel("答     案： "); 
+    private JLabel pwdLabel = new JLabel("新 密 码： ");
+    private JLabel confirmPwdLabel = new JLabel("确认密码：");
+    private JButton confirm = new JButton("确    认");  
+    private JButton cancel = new JButton("取    消");
+	public ForgetPasswordFrame(PencilMain pencil){
+		initPanel();
+		pencilMain = pencil;
+	}
+	public void initPanel(){
+		setTitle("忘记密码");
+		FlowLayout layout = new FlowLayout(1,20,20);
+        loginContent = new JPanel();
+        loginContent.setLayout(layout);
+        loginContent.setBackground(Color.WHITE);
+        loginContent.setPreferredSize(new Dimension(360, 180));    
+        confirm.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
+        confirm.setForeground(Color.white);  
+        confirm.addActionListener(this);
+        cancel.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
+        cancel.setForeground(Color.white);  
+        cancel.addActionListener(this);
+        confirm.setPreferredSize(new Dimension(150, 35));
+        cancel.setPreferredSize(new Dimension(150, 35));
+        loginContent.add(userLabel);  
+        loginContent.add(userCount);  
+        loginContent.add(ansLabel);  
+        loginContent.add(userAns); 
+        loginContent.add(proLabel);  
+        loginContent.add(userPro); 
+        loginContent.add(pwdLabel);  
+        loginContent.add(userPwd); 
+        loginContent.add(confirmPwdLabel);
+        loginContent.add(confirmUserPwd);  
+        loginContent.add(confirm); 
+        loginContent.add(cancel);
+        setSize(400, 400);
+        setLocation((PencilMain.showWidth-450)/2, (PencilMain.showHeight-240)/2);
+        add(loginContent);
+		setVisible(true);
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		JButton btn = (JButton)e.getSource();
+		if(btn==confirm){
+			String uname = userCount.getText();
+			int index = userPro.getSelectedIndex();
+			String answer = new String(userAns.getPassword());
+			String upwd = new String(userPwd.getPassword());
+			String confirmUpwd = new String(confirmUserPwd.getPassword());
+			if(uname.trim().equals("")||upwd.trim().equals("")||confirmUpwd.trim().equals("")){
+				JOptionPane.showMessageDialog(null, "用户名或密码不能为空");
+				return;
+			}else if(!uname.trim().equals("")){
+				try {
+					if(!upwd.trim().equals(confirmUpwd.trim())){
+						JOptionPane.showMessageDialog(null, "密码不一致");
+						return;
+					}else{
+						try {
+							boolean result = UserLog.SelectUser(uname,index,answer);
+							if(result){
+								if(UserLog.alterPwd(uname.trim(), upwd.trim(),index,answer)){
+									PencilMain.nowUser = new User(uname, upwd);
+									JOptionPane.showMessageDialog(null, "修改成功,即将返回登陆页面");
+									setVisible(false);
+									pencilMain.showLogin();
+								}else{
+									JOptionPane.showMessageDialog(null, "修改密码失败，请重新操作");
+									return;
+								}
+							}else{
+								JOptionPane.showMessageDialog(null, "用户名或者密保问题输入错误，修改失败");
+								return;
+							}
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		}else if(btn==cancel){
+			setVisible(false);
+			try {
+				pencilMain.showLogin();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+}
