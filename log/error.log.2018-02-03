@@ -1,0 +1,6 @@
+2018-01-30 16:11:24  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错no such column: s_id
+2018-01-30 16:31:35  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错database is locked
+2018-01-30 16:35:12  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错database is locked
+2018-02-02 16:38:41  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错database is locked
+2018-02-03 14:33:46  [ Thread-4:0 ] - [ ERROR ]  邮件群发出现异常Unknown SMTP host: smtp.163.com
+2018-02-03 14:34:41  [ Thread-6:55465 ] - [ ERROR ]  邮件群发出现异常Unknown SMTP host: smtp.163.com

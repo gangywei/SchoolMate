@@ -46,11 +46,17 @@ public class Student {
 	}
 	
 	public String judgeStudent(){
+		String regNo = "[\\d]{10}";
+		if(s_name.equals(""))
+			return "姓名不可以为空";
+		if(!s_no.equals(""))
+			if(!Helper.matchRegular(s_no, regNo))
+				return "学号输入错误";
 		String regPerson = "^[0-9]{17}[0-9Xx]{1}$";
 		if(!s_person.equals(""))
 			if(!Helper.matchRegular(s_person, regPerson))
 				return "身份证号输入错误";
-		String regPhone = "^[1][0-9]{10}$";
+		String regPhone = "^1([358][0-9]|4[579]|66|7[0135678]|9[89])[0-9]{8}$";
 		if(!s_phone.equals(""))
 			if(!Helper.matchRegular(s_phone, regPhone))
 				return "手机号输入错误";
@@ -64,20 +70,11 @@ public class Student {
 		return null;
 	}
 	
-	public String getNo(){	//保证数据库no字段的唯一性约束。
-		String str;
-		if(s_no.equals("")){
-			str = null;
-		}else{
-			str = "'"+s_no+"'";
-		}
-		return str;
-	}
-	
 	public String[] toArray(){
-		String temp[] = {s_no,s_name,s_sex,s_person,s_birth,s_hometown,s_faculty,s_major,s_class,s_nation,s_education,
-				s_enter,s_graduate,s_province,s_city,s_workspace,s_work,s_worktitle,s_workphone,s_homephone,s_phone,
-				s_tphone,s_address,s_postcode,s_email,s_qq,s_weixin,s_remark1,s_remark2,s_remark3,s_remark4,s_remark5,""};	//添加一个错误信息字段
+		String temp[] = {"",s_no,s_name,s_sex,s_birth,s_person,s_hometown,s_faculty,s_major,s_class,
+				s_education,s_enter,s_graduate,s_nation,s_province,s_city,s_workspace,s_work,s_worktitle,s_workphone,
+				s_homephone,s_phone,s_tphone,s_address,s_postcode,s_email,s_qq,s_weixin,s_remark1,s_remark2,
+				s_remark3,s_remark4,s_remark5,""};	//添加一个错误信息字段
 		return temp;
 	}
 	public int s_id;

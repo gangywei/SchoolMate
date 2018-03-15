@@ -18,8 +18,11 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
+import javax.swing.JOptionPane;
 
 import com.sun.mail.util.MailSSLSocketFactory;
+
+import schoolmate.view.PencilMain;
 
 /**
  * 邮件管理器
@@ -33,10 +36,9 @@ public class EmailManager {
 	private static String smtpHost = "smtp.163.com";
 	private static String userName = "18439331592@163.com";
 	private static String userPwd = "ab121961";
-	private static String sendName = "jiangang";
+	private static String sendName = "河南师范大学校友办";
 	private static Session session;
 	
-
 	public EmailManager() {  
 		Properties prop=new Properties();  // 配置  
 		prop.put("mail.host",smtpHost);  // 设置邮件服务器主机名，这里是163  
@@ -97,7 +99,11 @@ public class EmailManager {
 			transport.sendMessage(mimeMsg, mimeMsg.getAllRecipients());  
 			transport.close();  
 		} catch (MessagingException e) {
+			if(e.getMessage().indexOf("SMTP host")>0){
+				JOptionPane.showMessageDialog(null, "连接不上网络，检查网络连接是否正确！");
+			}
 			System.out.println(e.getMessage());
+			PencilMain.logger.error("邮件群发出现异常"+e.getMessage());
 		}
 	}
 }

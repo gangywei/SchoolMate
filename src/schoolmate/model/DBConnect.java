@@ -2,11 +2,8 @@ package schoolmate.model;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Statement;
-
 import javax.swing.JOptionPane;
-
 import schoolmate.view.PencilMain;
 
 public class DBConnect {
@@ -16,7 +13,7 @@ public class DBConnect {
     	if(conn==null){
     		try {
     			Class.forName("org.sqlite.JDBC");
-    			conn = DriverManager.getConnection(PencilMain.dbPath);
+    			conn = DriverManager.getConnection(PencilMain.dbPath,"root","121961");
     			conn.setAutoCommit(false);
 	        } catch ( Exception e ) {
 	        	JOptionPane.showMessageDialog(null,"没有找到数据库文件");

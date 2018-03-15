@@ -1,5 +1,6 @@
 package schoolmate.view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ import java.util.Date;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
@@ -24,7 +26,11 @@ import javax.swing.JTextField;
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
 
 public class BackupsDataFrame extends JInternalFrame implements ActionListener{
-	public JPanel BackupsPanel;
+	public JPanel BackupsPanel,interPanel;
+	String str = new String(
+			"<strong>数据备份功能</strong><br/><hr>"
+			+ "<p>备份当前数据库里的所有数据,利用数据还原可以恢复备份的数据！</p>");
+	JEditorPane editPane = new JEditorPane("text/html", str);
 	private String filePath;
 	public int sheetCount=0,totleRow;
 	private InputStream input;
@@ -44,19 +50,25 @@ public class BackupsDataFrame extends JInternalFrame implements ActionListener{
 	}
 
 	public void Backups() {
+		interPanel = new JPanel(new BorderLayout(20,5));
+		interPanel.setBackground(Color.WHITE);
+		editPane.setEnabled(false);
+		interPanel.add(editPane);
+		add(interPanel,BorderLayout.NORTH);
     	setClosable(true);//提供关闭按钮
     	setTitle("数据备份功能");
-    	SelectPath.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
+    	SelectPath.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
     	SelectPath.setForeground(Color.white);  
     	SelectPath.addActionListener(this);
-    	startBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
+    	startBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
     	startBtn.setForeground(Color.white);  
     	startBtn.addActionListener(this);
     	startBtn.setEnabled(false);
     	BackupsPanel = new JPanel();
+    	BackupsPanel.setBackground(Color.white);
     	GroupLayout layout = new GroupLayout(BackupsPanel);
     	BackupsPanel.setLayout(layout);
-		setSize(450, 250);
+		setSize(450, 300);
 		setLocation((PencilMain.showWidth-400)/2, 0);
 		setVisible(true);
 		//创建GroupLayout的水平连续组，，越先加入的ParallelGroup，优先级级别越高。几列
@@ -92,9 +104,6 @@ public class BackupsDataFrame extends JInternalFrame implements ActionListener{
             input = new FileInputStream(beginFilename);
             File file = new File(endFilename);
             //判断文件夹是否存在,如果不存在则创建文件夹
-            if (!file.exists()) {
-            	file.mkdir();
-            }
             output = new FileOutputStream(endFilename);
             // 获取文件长度
             try {
@@ -119,6 +128,7 @@ public class BackupsDataFrame extends JInternalFrame implements ActionListener{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                startBtn.setEnabled(false);
                 BackupsStatus.setText("备份成功，可以关闭窗口啦!");
             }
 
@@ -165,6 +175,6 @@ public class BackupsDataFrame extends JInternalFrame implements ActionListener{
 		}
 	}
 	public void doDefaultCloseAction() {  
-	    this.setVisible(false);// 我们只让该JInternalFrame隐藏，并不是真正的关闭  
+	    dispose();
 	}
 }

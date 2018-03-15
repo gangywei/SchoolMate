@@ -1,0 +1,6 @@
+2018-02-24 19:26:46  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错[SQLITE_ERROR] SQL error or missing database (no such column: nation)
+2018-02-24 19:26:46  [ AWT-EventQueue-0:28 ] - [ ERROR ]  删除省份信息抛错null
+2018-02-26 11:54:28  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学院标签抛错database is locked
+2018-02-26 19:14:37  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错database is locked
+2018-02-26 20:01:11  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除用户信息抛错database is locked
+2018-02-26 20:06:10  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学院标签抛错database is locked

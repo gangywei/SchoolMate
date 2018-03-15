@@ -29,9 +29,8 @@ import schoolmate.model.User;
 public class ForgetPasswordFrame extends JInternalFrame implements ActionListener{
 	private PencilMain pencilMain;
 	protected JPanel loginContent;
-	private String education[] = {"  请选择设置的密保问题  ","我的账号","最喜欢的成语","其他数字密码","好朋友的名字"};
 	private JTextField userCount = new JTextField(15);
-	private JComboBox<String> userPro = new JComboBox<String>(education);
+	private JComboBox<String> userPro = new JComboBox<String>(PencilMain.education);
 	private JPasswordField userAns = new JPasswordField(15); 
     private JPasswordField userPwd = new JPasswordField(15);  
     private JPasswordField confirmUserPwd = new JPasswordField(15);
@@ -63,18 +62,18 @@ public class ForgetPasswordFrame extends JInternalFrame implements ActionListene
         cancel.setPreferredSize(new Dimension(150, 35));
         loginContent.add(userLabel);  
         loginContent.add(userCount);  
-        loginContent.add(ansLabel);  
-        loginContent.add(userAns); 
         loginContent.add(proLabel);  
         loginContent.add(userPro); 
+        loginContent.add(ansLabel);  
+        loginContent.add(userAns); 
         loginContent.add(pwdLabel);  
         loginContent.add(userPwd); 
         loginContent.add(confirmPwdLabel);
         loginContent.add(confirmUserPwd);  
         loginContent.add(confirm); 
         loginContent.add(cancel);
-        setSize(400, 400);
-        setLocation((PencilMain.showWidth-450)/2, (PencilMain.showHeight-240)/2);
+        setSize(360, 360);
+        setLocation((PencilMain.showWidth-360)/2, (PencilMain.showHeight-360)/2);
         add(loginContent);
 		setVisible(true);
 	}
@@ -82,44 +81,46 @@ public class ForgetPasswordFrame extends JInternalFrame implements ActionListene
 	public void actionPerformed(ActionEvent e) {
 		JButton btn = (JButton)e.getSource();
 		if(btn==confirm){
-			String uname = userCount.getText();
+			String uname = userCount.getText().trim();
 			int index = userPro.getSelectedIndex();
-			String answer = new String(userAns.getPassword());
-			String upwd = new String(userPwd.getPassword());
-			String confirmUpwd = new String(confirmUserPwd.getPassword());
-			if(uname.trim().equals("")||upwd.trim().equals("")||confirmUpwd.trim().equals("")){
+			String answer = new String(userAns.getPassword()).trim();
+			String upwd = new String(userPwd.getPassword()).trim();
+			String confirmUpwd = new String(confirmUserPwd.getPassword()).trim();
+			
+			if(uname.equals("")||upwd.equals("")||confirmUpwd.equals("")){
 				JOptionPane.showMessageDialog(null, "用户名或密码不能为空");
 				return;
-			}else if(!uname.trim().equals("")){
-				try {
-					if(!upwd.trim().equals(confirmUpwd.trim())){
-						JOptionPane.showMessageDialog(null, "密码不一致");
-						return;
-					}else{
-						try {
-							boolean result = UserLog.SelectUser(uname,index,answer);
-							if(result){
-								if(UserLog.alterPwd(uname.trim(), upwd.trim(),index,answer)){
-									PencilMain.nowUser = new User(uname, upwd);
-									JOptionPane.showMessageDialog(null, "修改成功,即将返回登陆页面");
-									setVisible(false);
-									pencilMain.showLogin();
-								}else{
-									JOptionPane.showMessageDialog(null, "修改密码失败，请重新操作");
-									return;
-								}
-							}else{
-								JOptionPane.showMessageDialog(null, "用户名或者密保问题输入错误，修改失败");
-								return;
-							}
-						} catch (Exception e1) {
-							e1.printStackTrace();
-						}
-					}
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
+			}else if(index==0){
+				JOptionPane.showMessageDialog(null, "请选择并填写密保问题！");
+				return;
+			}else if(!Helper.matchRegular(answer, PencilMain.regular[index])){
+				JOptionPane.showMessageDialog(null, "密保问题不符合要求！");
+				return;
+			}else if(!upwd.trim().equals(confirmUpwd.trim())){
+				JOptionPane.showMessageDialog(null, "密码不一致");
+				return;
 			}
+
+			try {
+				boolean result = UserLog.SelectUser(uname,index,answer);
+				if(result){
+					if(UserLog.alterPwd(uname.trim(), upwd.trim(),index,answer)){
+						PencilMain.nowUser = new User(uname, upwd);
+						JOptionPane.showMessageDialog(null, "修改成功,即将返回登陆页面");
+						setVisible(false);
+						pencilMain.showLogin();
+					}else{
+						JOptionPane.showMessageDialog(null, "修改密码失败，请重新操作");
+						return;
+					}
+				}else{
+					JOptionPane.showMessageDialog(null, "用户名或者密保问题输入错误，找不到该用户");
+					return;
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+
 		}else if(btn==cancel){
 			setVisible(false);
 			try {

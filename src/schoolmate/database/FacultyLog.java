@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import schoolmate.model.DBConnect;
+import schoolmate.view.PencilMain;
 
 public class FacultyLog {
 	private static Connection connect=DBConnect.getConnection();
@@ -50,18 +51,58 @@ public class FacultyLog {
 		return null;
 	}
 	
-	public static void insertFaculty(String faculty,Statement stmt) throws SQLException{
-		boolean pool = false;	//新建数据库通道
+	@SuppressWarnings("unused")
+	public static boolean insertFaculty(String faculty,Statement stmt) throws SQLException{
 		if(stmt==null)
-			pool = true;	//新建通道
-		if(pool)
 			stmt = connect.createStatement();
 		String sql = "INSERT INTO faculty (f_name) VALUES ('"+faculty+"');";
-		stmt.executeUpdate(sql);
-		connect.commit();
-		if(pool){
+		int res = stmt.executeUpdate(sql);
+		if(stmt==null){
 			connect.commit();
 			stmt.close();
 		}
+		if(res>0)
+			return true;
+		else
+			return false;
+	}
+	/*
+	 * inter：根据学院的字段，删除对应的学院信息，并通过delMajorFac方法删除学院下的专业。
+	 * time:2018/03/15
+	 */
+	public static boolean deleteFaculty(String name){
+		try {
+			stmt = connect.createStatement();
+			String sql = "delete from faculty where f_name='"+name+"'";
+			StudentLog.delStuFromEdu("where s_faculty='"+name, stmt);
+			MajorLog.delMajorFac(name,stmt);
+			stmt.executeUpdate(sql);
+			connect.commit();
+			stmt.close();
+		} catch (SQLException e) {
+			PencilMain.logger.error("删除学院标签抛错"+e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	/*
+	 * inter：根据原来学院的字段，更新对应的学院信息，并通过updMajorFac更新专业的信息
+	 * time:2018/03/15
+	 */
+	public static boolean updateFactlty(String[] old, String[] now) {
+		try {
+			stmt = connect.createStatement();
+			String sql = "update faculty set f_name='"+now[0]+"' where f_name='"+old[0]+"'";
+			MajorLog.updMajorFac(now[0],old[0],stmt);
+			EducationLog.updateEdu(old, now, stmt, 1);
+			stmt.executeUpdate(sql);
+			connect.commit();
+			stmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 }

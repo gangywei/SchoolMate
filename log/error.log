@@ -1,3 +1,4 @@
-2018-01-30 16:11:24  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错no such column: s_id
-2018-01-30 16:31:35  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错database is locked
-2018-01-30 16:35:12  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错database is locked
+2018-03-14 11:54:51  [ Thread-7:0 ] - [ ERROR ]  邮件群发出现异常IOException while sending message
+2018-03-15 18:54:25  [ AWT-EventQueue-0:0 ] - [ ERROR ]  更改学院标签抛错database is locked
+2018-03-15 20:46:59  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除专业标签抛错database is locked
+2018-03-15 20:48:04  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除专业标签抛错database is locked

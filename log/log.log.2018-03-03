@@ -1,0 +1,5 @@
+2018-03-03 08:48:28  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错[SQLITE_ERROR] SQL error or missing database (near "中国": syntax error)
+2018-03-03 08:48:28  [ AWT-EventQueue-0:15 ] - [ ERROR ]  删除省份信息抛错null
+2018-03-03 08:52:40  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错[SQLITE_ERROR] SQL error or missing database (near "中国": syntax error)
+2018-03-03 08:52:40  [ AWT-EventQueue-0:7 ] - [ ERROR ]  删除省份信息抛错null
+2018-03-03 08:53:40  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除省份信息抛错null

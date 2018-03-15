@@ -29,7 +29,6 @@ import schoolmate.database.StudentLog;
 
 public class RemarksFrame extends JInternalFrame implements ActionListener{
 	public JPanel BackupsPanel;
-	public JPanel BtnPanel;
 	public int sheetCount=0,totleRow;
 	String[] RemarksDate = new String[5];
     private JLabel RemarksLabel[] = new JLabel[5];
@@ -44,44 +43,42 @@ public class RemarksFrame extends JInternalFrame implements ActionListener{
 			RemarksLabel[i] = new JLabel("备注"+(i+1)+" :");
 			Remarks[i] = new JTextField();
 		}
+		setTitle("修改备注字段");
     	setClosable(true);//提供关闭按钮
-    	Update.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
+    	Update.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
     	Update.setForeground(Color.white);  
     	Update.addActionListener(this);
-    	Back.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
+    	Back.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
     	Back.setForeground(Color.white);  
     	Back.addActionListener(this);
     	BackupsPanel = new JPanel();
-    	BtnPanel = new JPanel();
-    	BtnPanel.setLayout(null);
+    	BackupsPanel.setBackground(Color.WHITE);
     	GroupLayout layout = new GroupLayout(BackupsPanel); 
     	BackupsPanel.setLayout(layout);
-    	Back.setBounds(80, 0, 80, 40);
-    	BtnPanel.add(Back);
-		setSize(400, 550);
-		setLocation((PencilMain.showWidth-600)/2, (PencilMain.showHeight-700)/2);
+		setSize(400, 400);
+		setLocation((PencilMain.showWidth-400)/2, 0);
 		setVisible(true);
 		//创建GroupLayout的水平连续组，，越先加入的ParallelGroup，优先级级别越高。几列
 		GroupLayout.SequentialGroup hGroup = layout.createSequentialGroup();
-		hGroup.addGap(50);//添加间隔
+		hGroup.addGap(30);//添加间隔
 		hGroup.addGroup(layout.createParallelGroup().addComponent(RemarksLabel[0])
 				.addComponent(RemarksLabel[1]).addComponent(RemarksLabel[2]).addComponent(RemarksLabel[3])
 		.addComponent(RemarksLabel[4]).addComponent(Update));
-		hGroup.addGap(50); 
+		hGroup.addGap(20); 
 		hGroup.addGroup(layout.createParallelGroup().addComponent(Remarks[0])
 				.addComponent(Remarks[1]).addComponent(Remarks[2]).addComponent(Remarks[3])
-		.addComponent(Remarks[4]).addComponent(BtnPanel));
-		hGroup.addGap(50);
+		.addComponent(Remarks[4]).addComponent(Back));
+		hGroup.addGap(30);
 		layout.setHorizontalGroup(hGroup);//设置水平组
 		//创建GroupLayout的垂直连续组，，越先加入的ParallelGroup，优先级级别越高。几行
 		GroupLayout.SequentialGroup vGroup = layout.createSequentialGroup();
 		vGroup.addGap(20);//添加间隔
 		for(int i=0;i<5;i++){
 			vGroup.addGroup(layout.createParallelGroup().addComponent(RemarksLabel[i]).addComponent(Remarks[i]));
-			vGroup.addGap(38);
+			vGroup.addGap(20);
 		}
-		vGroup.addGroup(layout.createParallelGroup().addComponent(Update).addComponent(BtnPanel));
-		vGroup.addGap(50);
+		vGroup.addGroup(layout.createParallelGroup().addComponent(Update).addComponent(Back));
+		vGroup.addGap(30);
 		layout.setVerticalGroup(vGroup);//设置垂直组
 		add(BackupsPanel);
 		try {
@@ -110,13 +107,20 @@ public class RemarksFrame extends JInternalFrame implements ActionListener{
 				}
 			}
 			if(update){
-				JOptionPane.showMessageDialog(null, "修改成功！请重启该系统更新数据O(∩_∩)O");
-				dispose();
+				int res = JOptionPane.showConfirmDialog(null, "修改成功！请重启该系统更新数据O(∩_∩)O","提示",JOptionPane.YES_NO_OPTION);
+				if(res==0)
+					System.exit(0);
+				else
+					dispose();
 			}else{
 				JOptionPane.showMessageDialog(null, "您没有改变原数据！");
 			}
 		}else if(btn == Back){
 			dispose();
 		}
+	}
+	
+	public void doDefaultCloseAction() {
+		dispose();
 	}
 }

@@ -23,25 +23,29 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 
 public class MyTextField extends JTextField implements FocusListener{
-	private int state = 0;	//1->输入了内容	0->提示
+	private int state = 0;	//1->输入了内容	 0->提示  2->正在输入内容
+	private int index = -1;	//焦点的坐标
 	private String showText;
 	private MyPopupMenu popupMenu;
 	private List<Object> model;
-	private boolean isCaretListener = false;
-	public MyTextField(String text,int column,List<Object> model){
+	private boolean isCaretListener = false;	//启动对输入内容的监听，点弹出的一项时去除监听
+	public MyTextField(String text,int column){
 		super(text,column);
 		showText = text;
 		setForeground(Color.GRAY);
 		addFocusListener(this);
+	}
+	
+	public void setMenu(List<Object> model){
 		if(model!=null){
-			this.model = model;
+			this.model = model; 
 			popupMenu = new MyPopupMenu();
-			addCaretListener(new MyCaretListener());
+			addCaretListener(new MyCaretListener(this));
 		}
 	}
 	//getText方法的重写
 	public String getText(){
-		if(this.state==1){
+		if(this.state>=1){
 			return super.getText();
 		}
 		return "";
@@ -56,35 +60,33 @@ public class MyTextField extends JTextField implements FocusListener{
 	}
 	//鼠标点击事件
     public void focusGained(FocusEvent e) {
-        if(state==0){
-        	state = 1;
+    	isCaretListener = true;
+    	if(state==0)
             this.setText("");
-            setForeground(Color.BLACK);
-        }
-        isCaretListener = true;
+        state = 2;
     }
     //失去焦点事件
     public void focusLost(FocusEvent e) {
-    	isCaretListener = false;
-        String temp = getText();
-        if(temp.equals("")){
-            setForeground(Color.GRAY);
+	    isCaretListener = false;
+    	String temp = getText();
+    	if(temp.equals("")){
+        	state = 0;
+        	index = -1;
             this.setText(showText);
-            state = 0;
+            setForeground(Color.GRAY);
         }else{
+        	state = 1;
         	this.setText(temp);
-        }
+        } 
     }
-    //显示事件
+    //显示列表事件
     public void popupList(String key) {
 		int count = popupMenu.updataPopupMenu(key);
-		int hight = this.getHeight()*count;
 		if(count>0){
-				popupMenu.setPopupSize(this.getWidth(),100);
+			popupMenu.setPopupSize(this.getWidth(),150);
 			if(isShowing()){
 				popupMenu.show(this, 0,this.getHeight());
-				if(isCaretListener)
-					requestFocus();
+				requestFocus();
 			}
 		}else{
 			popupMenu.setVisible(false);
@@ -92,17 +94,20 @@ public class MyTextField extends JTextField implements FocusListener{
 	}
     //输入框里的内容发生了变化
     private class MyCaretListener implements CaretListener {
-		int index = 0;
+    	MyTextField textFile;
+    	public MyCaretListener(MyTextField textFile){
+    		this.textFile = textFile;
+    	}
 		public void caretUpdate(CaretEvent e) {
-			if(isCaretListener&&index!=e.getDot())
-			{
+			if(isCaretListener&&index!=e.getDot()){
 				try {
 					popupList(getText(0, e.getDot()));
 				} catch (BadLocationException e1) {
 					e1.printStackTrace();
 				}
 				index = e.getDot();
-			}			
+				System.out.println(index);
+			}
 		}
 	}
     public void setTextValue(String str){
@@ -110,7 +115,7 @@ public class MyTextField extends JTextField implements FocusListener{
 	}
 	private void setVisibleFalseAndLostFocus(){
 		popupMenu.setVisible(false);
-		isCaretListener = false;
+		state = 1;
 	}
     //要显示的弹出菜单
     private class MyPopupMenu extends JPopupMenu{

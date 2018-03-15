@@ -44,11 +44,7 @@ public class TableLeftMouse extends JPopupMenu implements ActionListener{
 				for(int i=1;i<length;i++){
 					student[i] = panel.studentModel.getCell(row, i).toString();
 				}
-				try {
-					panel.pencil.addStudent(student);
-				} catch (PropertyVetoException | SQLException e1) {
-					e1.printStackTrace();
-				}
+				panel.pencil.studentDetail(student,1);
 			}else{
 				JOptionPane.showMessageDialog(null, "正在导入数据，不允许该操作");
 			}
@@ -58,26 +54,25 @@ public class TableLeftMouse extends JPopupMenu implements ActionListener{
 				int res =JOptionPane.showConfirmDialog(panel,"删除这条记录的所有信息","删除信息提示",JOptionPane.YES_NO_OPTION);
 				if(res==0){
 					boolean result = StudentLog.deleteStudent(sNo);
-					if(result)
+					if(result){
 						panel.updateTabel(null,null,panel.searchType);
-					else
+					}else
 						JOptionPane.showMessageDialog(null, "删除学生失败！");
 				}
 			}else{
 				JOptionPane.showMessageDialog(null, "正在导入数据，不允许该操作");
 			}
 		}else if(item==detailItem){
-			//DataFormatter formatter = new DataFormatter();
 			if(PencilMain.dbControl){
 				if(PencilMain.dbControl){
+					DataFormatter formatter = new DataFormatter();
 					for(int i=1;i<length;i++){
-						student[i] = panel.studentModel.getCell(row, i).toString();
+						if(panel.studentModel.getCell(row, i)==null)
+							student[i] = "";	//防止数据库出现为空的字段
+						else
+							student[i] = panel.studentModel.getCell(row, i).toString();
 					}
-					try {
-						panel.pencil.studentDetail(student);
-					} catch (SQLException e1) {
-						e1.printStackTrace();
-					}
+					panel.pencil.studentDetail(student,0);
 				}else{
 					JOptionPane.showMessageDialog(null, "正在导入数据，不允许该操作");
 				}

@@ -1,5 +1,6 @@
 package schoolmate.view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
@@ -23,7 +25,11 @@ import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
 import schoolmate.view.element.MyFileFilter;
 
 public class ReNewFrame extends JInternalFrame implements ActionListener{
-	public JPanel BackupsPanel;
+	public JPanel BackupsPanel,interPanel;
+	String str = new String(
+			"<strong>数据还原功能</strong><br/><hr>"
+			+ "<p>清空当前数据<strong>并恢复备份数据库的数据！</strong></p>");
+	JEditorPane editPane = new JEditorPane("text/html", str);
 	private String filePath;
 	public int sheetCount=0,totleRow;
 	private InputStream input;
@@ -39,18 +45,24 @@ public class ReNewFrame extends JInternalFrame implements ActionListener{
 		Backups();
 	}
 	public void Backups() {
+		interPanel = new JPanel(new BorderLayout(20,5));
+		editPane.setEnabled(false);
+		interPanel.add(editPane);
+		add(interPanel,BorderLayout.NORTH);
     	setClosable(true);//提供关闭按钮
     	setTitle("数据恢复功能");
-    	SelectPath.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
+    	SelectPath.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
     	SelectPath.setForeground(Color.white);  
     	SelectPath.addActionListener(this);
-    	startBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
+    	startBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
     	startBtn.setForeground(Color.white);  
     	startBtn.addActionListener(this);
+    	startBtn.setEnabled(false);
     	BackupsPanel = new JPanel();
+    	BackupsPanel.setBackground(Color.WHITE);
     	GroupLayout layout = new GroupLayout(BackupsPanel);
     	BackupsPanel.setLayout(layout);
-		setSize(450, 200);
+		setSize(450, 280);
 		setLocation((PencilMain.showWidth-450)/2, 0);
 		setVisible(true);
 		//创建GroupLayout的水平连续组，，越先加入的ParallelGroup，优先级级别越高。几列
@@ -74,7 +86,6 @@ public class ReNewFrame extends JInternalFrame implements ActionListener{
 		vGroup.addGap(20);
 		layout.setVerticalGroup(vGroup);//设置垂直组
 		add(BackupsPanel);
-    
 	}
 
 
@@ -107,7 +118,11 @@ public class ReNewFrame extends JInternalFrame implements ActionListener{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                BackupsStatus.setText("恢复成功，可以关闭窗口啦!");
+                int res = JOptionPane.showConfirmDialog(null, "恢复成功！请重启该系统更新数据O(∩_∩)O","提示",JOptionPane.YES_NO_OPTION);
+				if(res==0)
+					System.exit(0);
+				else
+					dispose();
             }
 
         }
@@ -126,10 +141,15 @@ public class ReNewFrame extends JInternalFrame implements ActionListener{
 	        fileChoose.setFileHidingEnabled(false);
 	        fileChoose.setAcceptAllFileFilterUsed(false);
 	        int returnValue = fileChoose.showOpenDialog(null);
-	        if (returnValue == JFileChooser.APPROVE_OPTION)
-	        {  
-	        	filePath = fileChoose.getSelectedFile().toString();
-	        	fileText.setText(filePath);
+	        if (returnValue == JFileChooser.APPROVE_OPTION){  
+	        	File file = fileChoose.getSelectedFile();
+	        	if(file.exists()){
+		        	filePath = file.toString();
+		        	fileText.setText(filePath);
+		        	startBtn.setEnabled(true);
+	        	}else{
+	        		JOptionPane.showMessageDialog(null, "不存在该目录，请重新选择目录!");
+	        	}
 	        }
 		}else if(btn == startBtn){
 			if(filePath==null){
@@ -137,15 +157,16 @@ public class ReNewFrame extends JInternalFrame implements ActionListener{
 				return;
 			}else{
 				try {
-					fileCopy(filePath,"E:\\assess\\schoolmates.db");
+					int res =JOptionPane.showConfirmDialog(this,"清空当前数据并还原备份的数据","数据恢复提示",JOptionPane.YES_NO_OPTION);
+					if(res==0)
+						fileCopy(filePath,"E:\\assess\\schoolmates.db");
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
 			}
 		}
 	}
-	
 	public void doDefaultCloseAction() {  
-	    this.setVisible(false);		//我们只让该JInternalFrame隐藏，并不是真正的关闭  
+	    dispose();
 	}
 }

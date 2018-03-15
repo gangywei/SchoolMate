@@ -163,7 +163,6 @@ public class DateChooser extends JPanel {
 		this.setBackground(Color.WHITE);
 		this.add(showDate, BorderLayout.CENTER);
 		this.setPreferredSize(new Dimension(90, 25));
-		this.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		showDate.addMouseListener(new MouseAdapter() {
 			public void mouseEntered(MouseEvent me) {
 				if (showDate.isEnabled()) {

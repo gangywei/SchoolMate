@@ -1,0 +1,28 @@
+2018-02-04 16:00:03  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错near "where": syntax error
+2018-02-04 16:00:03  [ AWT-EventQueue-0:8 ] - [ ERROR ]  删除国家信息抛错no such column: 中国
+2018-02-04 16:01:04  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错near "where": syntax error
+2018-02-04 16:24:20  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错[SQLITE_ERROR] SQL error or missing database (no such column: province)
+2018-02-04 16:24:20  [ AWT-EventQueue-0:4 ] - [ ERROR ]  删除省份信息抛错null
+2018-02-04 16:25:30  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错[SQLITE_ERROR] SQL error or missing database (no such column: p_name)
+2018-02-04 16:25:30  [ AWT-EventQueue-0:8 ] - [ ERROR ]  删除省份信息抛错null
+2018-02-04 16:27:29  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错[SQLITE_ERROR] SQL error or missing database (no such column: p_name)
+2018-02-04 16:27:29  [ AWT-EventQueue-0:7 ] - [ ERROR ]  删除省份信息抛错null
+2018-02-04 16:28:40  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错[SQLITE_ERROR] SQL error or missing database (no such column: p_name)
+2018-02-04 16:28:40  [ AWT-EventQueue-0:4 ] - [ ERROR ]  删除省份信息抛错null
+2018-02-04 16:39:49  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除省份信息抛错no such column: c_name
+2018-02-04 19:15:16  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除省份信息抛错database is locked
+2018-02-04 19:29:30  [ AWT-EventQueue-0:0 ] - [ ERROR ]  多选删除学生信息抛错[SQLITE_ERROR] SQL error or missing database (no such column: f_name)
+2018-02-04 19:29:30  [ AWT-EventQueue-0:4 ] - [ ERROR ]  删除省份信息抛错null
+2018-02-04 19:47:26  [ AWT-EventQueue-0:1 ] - [ ERROR ]  删除省份信息抛错database is locked
+2018-02-04 19:54:57  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错database is locked
+2018-02-04 19:59:15  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除省份信息抛错database is locked
+2018-02-04 20:01:10  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除省份信息抛错database is locked
+2018-02-04 20:05:46  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错database is locked
+2018-02-05 08:18:45  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错database is locked
+2018-02-05 08:26:34  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错database is locked
+2018-02-05 09:18:54  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错database is locked
+2018-02-05 10:33:10  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错database is locked
+2018-02-05 11:04:33  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错database is locked
+2018-02-05 11:16:11  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错database is locked
+2018-02-05 11:34:23  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除学生信息抛错database is locked
+2018-02-10 15:51:26  [ AWT-EventQueue-0:0 ] - [ ERROR ]  删除省份信息抛错database is locked

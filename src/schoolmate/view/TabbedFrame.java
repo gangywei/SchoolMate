@@ -1,6 +1,7 @@
 package schoolmate.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -23,6 +24,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
+
 import schoolmate.database.AddressLog;
 import schoolmate.database.FacultyLog;
 import schoolmate.database.MajorLog;
@@ -31,8 +35,8 @@ import schoolmate.view.element.MyCheckList;
 
 public class TabbedFrame extends JInternalFrame implements ActionListener,ChangeListener,ItemListener{
 	private JPanel[] panels = new JPanel[7];
-	private String[] condition = new String[8];
-	private String[] dbCondition = new String[8];
+	private String[] condition = new String[8];	//对其他数据库检索的数组
+	private String[] dbCondition = new String[8];	//学生表检索条件的数组
 	private JLabel sexLabel,educationLabel,inLabel,outLabel;
 	private JPanel sexPanel,educationPanel,btnPanel,yearPanel;
 	private boolean[] conditionState = new boolean[7];
@@ -53,8 +57,8 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 	private CollectDataFrame collect;
 	private String[] inArray,outArray;
 	public TabbedFrame(CollectDataFrame collect){
-		init();
 		this.collect = collect;
+		init();
 	}
 	
 	public void init(){
@@ -65,15 +69,27 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
     	setResizable(true);  //允许自由调整大小 
     	setTitle("组合搜索功能");
     	
-    	GridLayout layout = new GridLayout(10,10);
+    	GridLayout layout = new GridLayout(15,20);
 		for(int i=0;i<labelName.length;i++){
-			panels[i] = new JPanel();
-			if(i!=0)
-				panels[i].setLayout(layout);
-			else{
-				panels[i].setLayout(new FlowLayout(FlowLayout.CENTER));
+			if(collect.user.u_role==1){	//普通用户权限(初始化查询条件)
+				condition[1] = "f_name in "+collect.limitTemp;
+				dbCondition[1] = "s_faculty in "+collect.limitTemp;
+				panels[i] = new JPanel();
+				if(i!=0)
+					panels[i].setLayout(layout);
+				else{
+					panels[i].setLayout(new FlowLayout(FlowLayout.CENTER));
+				}
+				jTabbed.add(panels[i],labelName[i]);
+			}else if(collect.user.u_role>=2){	//管理员用户权限
+				panels[i] = new JPanel();
+				if(i!=0)
+					panels[i].setLayout(layout);
+				else{
+					panels[i].setLayout(new FlowLayout(FlowLayout.CENTER));
+				}
+				jTabbed.add(panels[i],labelName[i]);
 			}
-			jTabbed.add(panels[i],labelName[i]);
 		}
 		
 		yearPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -105,11 +121,15 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		educationPanel.add(educationBox[2]);
 		educationPanel.add(educationBox[3]);
 		
-		btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT,20,5));
+		btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT,10,5));
 		searchBtn.addActionListener(this);
+		searchBtn.setForeground(Color.WHITE);
+		searchBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
 		searchAllBtn.addActionListener(this);
+		searchAllBtn.setForeground(Color.WHITE);
+		searchAllBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
 		
-		btnPanel.add(searchBtn);
+		//btnPanel.add(searchBtn);
 		btnPanel.add(searchAllBtn);
 		
 		
@@ -120,30 +140,22 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		
 		add(jTabbed);
 		add(btnPanel,BorderLayout.SOUTH);
-		setSize(670, 460);
+		setSize(800, 600);
 		setLocation((PencilMain.showWidth-670)/2, 0);
 		jTabbed.addChangeListener(this);
 		setVisible(true);
 	}
 	//得到检索条件
-	public String getCondition(){
-		
-		String str = "";
-//		if(conditionState[1]&&conditionState[2]){
-//			JOptionPane.showMessageDialog(null, "院系的数据更新，请重新选择专业字段");
-//			return null;
-//		}else if(conditionState[3]&&conditionState[4]){
-//			JOptionPane.showMessageDialog(null, "工作国家的数据更新，请重新选择工作省份和工作市区字段");
-//			return null;
-//		}else if(conditionState[4]&&conditionState[5]){
-//			JOptionPane.showMessageDialog(null, "工作省份的数据更新，请重新选择工作市区");
-//			return null;
-//		}
+	public String[] getCondition(){
+		String str = "";	//联合查询的条件
+		String str2 = "";	//对于教育记录的索引条件
 		int i;
 		//性别
 		dbCondition[0] = null;
+		boolean res = false;
 		for(i=0;i<sexRadio.length;i++){
 			if(i<2&&sexRadio[i].isSelected()){
+				res = true;
 				dbCondition[0] = "(s_sex='"+sexRadio[i].getText()+"')";
 			}
 		}
@@ -152,14 +164,32 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		for(i=0;i<educationBox.length;i++){
 			if(educationBox[i].isSelected()){
 				if(dbCondition[7]==null){
-					dbCondition[7] = "(s_education='"+educationBox[i].getText()+"'";
+					dbCondition[7] = "(e.s_education='"+educationBox[i].getText()+"'";
 				}else{
-					dbCondition[7] += " or s_education='"+educationBox[i].getText()+"'";
+					dbCondition[7] += " or e.s_education='"+educationBox[i].getText()+"'";
 				}
 			}
 		}
 		if(dbCondition[7]!=null)
 			dbCondition[7]+=')';
+		//学院
+		if(collect.user.u_role>1){
+			dbCondition[1] = null;
+			for(i=0;(facultyBox!=null)&&i<facultyBox.length;i++){
+				if(facultyBox[i].isSelected()){
+					if(dbCondition[1]==null){
+						if(collect.user.u_role==1)
+							dbCondition[1] += "and (s_faculty='"+facultyBox[i].getText()+"'";
+						else
+							dbCondition[1] = "(s_faculty='"+facultyBox[i].getText()+"'";
+					}else{
+						dbCondition[1] += " or s_faculty='"+facultyBox[i].getText()+"'";
+					}
+				}
+			}
+			if(dbCondition[1]!=null)
+				dbCondition[1]+=')';
+		}
 		//专业
 		dbCondition[2] = null;
 		for(i=0;(majorBox!=null)&&i<majorBox.length;i++){
@@ -173,6 +203,19 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		}
 		if(dbCondition[2]!=null)
 			dbCondition[2]+=')';
+		//省份
+		dbCondition[4] = null;
+		for(i=0;(provinceBox!=null)&&i<provinceBox.length;i++){
+			if(provinceBox[i].isSelected()){
+				if(dbCondition[4]==null){
+					dbCondition[4] = "(s_province='"+provinceBox[i].getText()+"'";
+					}else{
+						dbCondition[4] += " or s_province='"+provinceBox[i].getText()+"'";
+					}
+			}
+		}
+		if(dbCondition[4]!=null)
+			dbCondition[4]+=')';
 		//市区
 		dbCondition[5] = null;
 		for(i=0;(cityBox!=null)&&i<cityBox.length;i++){
@@ -199,204 +242,166 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		}
 		if(dbCondition[6]!=null)
 			dbCondition[6]+=')';
+		//组织检索条件
 		for(i=0;i<dbCondition.length;i++){
 			if(dbCondition[i]!=null){
-				if(str.equals("")){
-					str = "where "+dbCondition[i];
+				if(i==7||i==1||i==2){
+					if(str2.equals("")){
+						str2 = "where "+dbCondition[i];
+					}else{
+						str2 += " and "+dbCondition[i];
+					}
 				}else{
-					str += " and "+dbCondition[i];
+					if(str.equals("")){
+						str = "where "+dbCondition[i];
+					}else{
+						str += " and "+dbCondition[i];
+					}
 				}
 			}
 		}
-		//入学和毕业时间
+		//入学和毕业时间检索条件
 		inArray = inList.getSelectVal();
 		String inCondition = null;
 		for(i=0;i<inArray.length;i++){
 			if(inCondition==null){
-				inCondition="(s_graduate='"+inArray[i]+"'";
+				inCondition="(e.s_enter='"+inArray[i]+"'";
 			}else{
-				inCondition+=" or s_graduate='"+inArray[i]+"'";
+				inCondition+=" or e.s_enter='"+inArray[i]+"'";
 			}
 		}
 		if(inCondition!=null){
 			inCondition+=')';
-			if(str.equals("")){
-				str = "where "+inCondition;
+			if(str2.equals("")){
+				str2 = "where "+inCondition;
 			}else{
-				str+="and "+inCondition;
+				str2+="and "+inCondition;
 			}
 		}
-		outArray = inList.getSelectVal();
+		outArray = outList.getSelectVal();
 		String outCondition = null;
-		for(i=0;i<inArray.length;i++){
+		for(i=0;i<outArray.length;i++){
 			if(outCondition==null){
-				outCondition="(s_graduate='"+inArray[i]+"'";
+				outCondition="(e.s_graduate='"+outArray[i]+"'";
 			}else{
-				outCondition+=" or s_graduate='"+inArray[i]+"'";
+				outCondition+=" or e.s_graduate='"+outArray[i]+"'";
 			}
 		}
 		if(outCondition!=null){
 			outCondition+=')';
-			if(str.equals("")){
-				str = "where "+outCondition;
+			if(str2.equals("")){
+				str2 = "where "+outCondition;
 			}else{
-				str+="and "+outCondition;
+				str2+="and "+outCondition;
 			}
 		}
-		System.out.println(str);
-		return str;
+		String[] strAry = {str,str2};//{学生表条件，教育记录条件}
+		return strAry;
 	}
 	//{"其他","学院","专业","国家","省份","市区","职务"};
 	public void stateChanged(ChangeEvent e) {
 		selectIndex = jTabbed.getSelectedIndex();
 		switch(selectIndex){
-		case 1:	//学院
-			if(facultyBox==null){
-				faculty = FacultyLog.allFaculty();
-				int length = faculty.length;
-				facultyBox = new JCheckBox[length];
-				for(int i=0;i<length;i++){
-					facultyBox[i] = new JCheckBox(faculty[i]);
-					facultyBox[i].addItemListener(this);
-					panels[selectIndex].add(facultyBox[i]);
-				}
-			}
-			break;
-		case 2:	//专业
-			if(majorBox==null||conditionState[1]==true){
-				majorBox = null;
-				condition[1] = null;
-				panels[selectIndex].removeAll();
-				for(int i=0;(facultyBox!=null)&&i<facultyBox.length;i++){
-					if(facultyBox[i].isSelected()){
-						if(condition[1]==null){
-							condition[1] = "f_name='"+facultyBox[i].getText()+"'";
-							dbCondition[1] = "s_faculty='"+facultyBox[i].getText()+"'";
-	 					}else{
-	 						condition[1] += " or f_name='"+facultyBox[i].getText()+"'";
-	 						dbCondition[1] += " or s_faculty='"+facultyBox[i].getText()+"'";
-	 					}
+			case 1:	//学院
+				if(facultyBox==null){
+					if(collect.user.u_role==3)
+						faculty = FacultyLog.allFaculty();
+					else{
+						faculty = collect.user.faculty.split(",");
+					}
+					int length = faculty.length;
+					facultyBox = new JCheckBox[length];
+					for(int i=0;i<length;i++){
+						facultyBox[i] = new JCheckBox(faculty[i]);
+						facultyBox[i].addItemListener(this);
+						panels[selectIndex].add(facultyBox[i]);
 					}
 				}
-				String str = "";
-				if(condition[1]!=null)
-					str = "where "+condition[1];	
-				major = MajorLog.allMajor(str);
-				int length = major.length;
-				majorBox = new JCheckBox[length];
-				for(int i=0;i<length;i++){
-					majorBox[i] = new JCheckBox(major[i]);
-					majorBox[i].addItemListener(this);
-					panels[selectIndex].add(majorBox[i]);
-				}
-				conditionState[1]=false;
-				conditionState[2]=false;
-			}
-			break;
-		case 3:	//国家
-			if(nationBox==null){
-				nation = AddressLog.allNation();
-				int length = nation.length;
-				nationBox = new JCheckBox[length];
-				for(int i=0;i<length;i++){
-					nationBox[i] = new JCheckBox(nation[i]);
-					nationBox[i].addItemListener(this);
-					panels[selectIndex].add(nationBox[i]);
-				}
-			}
-			break;
-		case 4:	//省份
-			if(provinceBox==null||conditionState[3]==true){
-				provinceBox = null;
-				condition[3] = null;
-				panels[selectIndex].removeAll();
-				for(int i=0;(provinceBox!=null)&&i<nationBox.length;i++){
-					if(nationBox[i].isSelected()){
-						if(condition[3]==null){
-							condition[3] = "n_name='"+nationBox[i].getText()+"'";
-							dbCondition[3] = "s_nation='"+nationBox[i].getText()+"'";
-	 					}else{
-	 						condition[3] += " or n_name='"+nationBox[i].getText()+"'";
-	 						dbCondition[3] += " or s_nation='"+nationBox[i].getText()+"'";
-	 					}
+				break;
+			case 2:	//专业
+				if(majorBox==null){
+					String str = "";
+					if(condition[1]!=null)
+						str = "where "+condition[1];	
+					major = MajorLog.allMajor(str);
+					int length = major.length;
+					majorBox = new JCheckBox[length];
+					for(int i=0;i<length;i++){
+						majorBox[i] = new JCheckBox(major[i]);
+						majorBox[i].addItemListener(this);
+						panels[selectIndex].add(majorBox[i]);
 					}
 				}
-				String str = "";
-				if(condition[3]!=null)
-					str = "where "+condition[3];
-				province = AddressLog.allProvince(str);
-				int length = province.length;
-				provinceBox = new JCheckBox[length];
-				for(int i=0;i<length;i++){
-					provinceBox[i] = new JCheckBox(province[i]);
-					provinceBox[i].addItemListener(this);
-					panels[selectIndex].add(provinceBox[i]);
-				}
-				conditionState[3]=false;
-				conditionState[4]=false;
-			}
-			break;
-		case 5:	//市区
-			if(cityBox==null||conditionState[4]==true){
-				cityBox = null;
-				condition[4] = null;
-				panels[selectIndex].removeAll();
-				for(int i=0;(provinceBox!=null)&&i<provinceBox.length;i++){
-					if(provinceBox[i].isSelected()){
-						if(condition[4]==null){
-							condition[4] = "p_name='"+provinceBox[i].getText()+"'";
-							dbCondition[4] = "s_province='"+provinceBox[i].getText()+"'";
-	 					}else{
-	 						condition[4] += " or p_name='"+provinceBox[i].getText()+"'";
-	 						dbCondition[4] += " or s_province='"+provinceBox[i].getText()+"'";
-	 					}
+				break;
+			case 3:	//国家
+				if(nationBox==null){
+					nation = AddressLog.allNation();
+					int length = nation.length;
+					nationBox = new JCheckBox[length];
+					for(int i=0;i<length;i++){
+						nationBox[i] = new JCheckBox(nation[i]);
+						nationBox[i].addItemListener(this);
+						panels[selectIndex].add(nationBox[i]);
 					}
 				}
-				String str = "";
-				if(condition[4]!=null)
-					str = "where "+condition[4];
-				city = AddressLog.allCity(str);
-				int length = city.length;
-				cityBox = new JCheckBox[length];
-				for(int i=0;i<length;i++){
-					cityBox[i] = new JCheckBox(city[i]);
-					cityBox[i].addItemListener(this);
-					panels[selectIndex].add(cityBox[i]);
+				break;
+			case 4:	//省份
+				if(provinceBox==null){
+					provinceBox = null;
+					String str = "";
+					province = AddressLog.allProvince(str);
+					int length = province.length;
+					provinceBox = new JCheckBox[length];
+					for(int i=0;i<length;i++){
+						provinceBox[i] = new JCheckBox(province[i]);
+						provinceBox[i].addItemListener(this);
+						panels[selectIndex].add(provinceBox[i]);
+					}
 				}
-				conditionState[4]=false;
-				conditionState[5]=false;
-			}
-			break;
-		case 6:	//职称
-			if(workBox==null){
-				work = StudentLog.allWorkTitle();
-				int length = work.length;
-				workBox = new JCheckBox[length];
-				for(int i=0;i<length;i++){
-					workBox[i] = new JCheckBox(work[i]);
-					workBox[i].addItemListener(this);
-					panels[selectIndex].add(workBox[i]);
+				break;
+			case 5:	//市区
+				if(cityBox==null){
+					String str = "";
+					city = AddressLog.allCity(str);
+					int length = city.length;
+					cityBox = new JCheckBox[length];
+					for(int i=0;i<length;i++){
+						cityBox[i] = new JCheckBox(city[i]);
+						cityBox[i].addItemListener(this);
+						panels[selectIndex].add(cityBox[i]);
+					}
 				}
-			}
-			break;
+				break;
+			case 6:	//职称
+				if(workBox==null){
+					work = StudentLog.allWorkTitle();
+					int length = work.length;
+					workBox = new JCheckBox[length];
+					for(int i=0;i<length;i++){
+						workBox[i] = new JCheckBox(work[i]);
+						workBox[i].addItemListener(this);
+						panels[selectIndex].add(workBox[i]);
+					}
+				}
+				break;
 		}
 		panels[selectIndex].repaint();
 	}
-	//{"其他","学院","专业","国家","省份","市区","职务"};
-	public void itemStateChanged(ItemEvent e) {
-		if(e.getSource() instanceof JCheckBox){
-			JCheckBox item = (JCheckBox)e.getSource();
-			conditionState[selectIndex] = true;
-		}
-	}
 	
-	public void doDefaultCloseAction() {  
-	    this.setVisible(false);// 我们只让该JInternalFrame隐藏，并不是真正的关闭  
+	public void doDefaultCloseAction() {
+		if(collect.user.u_role==1){
+			collect.eduContion = "where s_faculty in "+collect.limitTemp;
+		}
+		else{
+			collect.condition = "";
+			collect.eduContion = "";
+		}
+		dispose();
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		JButton btn = (JButton)e.getSource();
-		String str = getCondition();
+		String str[] = getCondition();
 		if(btn==searchBtn){
 			if(str!=null)
 				collect.updateTabel(str,null,true);
@@ -404,5 +409,7 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 			if(str!=null)
 				collect.updateTabel(str,null,false);
 		}
-	}  
+	}
+
+	public void itemStateChanged(ItemEvent e) {}  
 }
