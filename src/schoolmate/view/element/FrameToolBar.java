@@ -38,10 +38,11 @@ public class FrameToolBar extends JToolBar implements ActionListener{
 		add(poolBtn);
 		add(addBtn);
 		add(importBtn);
-		if(pencilMain.nowUser.u_role>=2){
+		if(pencilMain.nowUser.u_role==3){
 			add(remarks);
 			add(labels);
 		}
+		
 	}
 	
 	public void MenuControl(boolean state){
@@ -62,13 +63,9 @@ public class FrameToolBar extends JToolBar implements ActionListener{
 				e1.printStackTrace();
 			}
 		}else if(btn==importBtn){
-			try {
-				pencilMain.importExl();
-			} catch (PropertyVetoException e1) {
-				e1.printStackTrace();
-			}
+			pencilMain.importExl();
 		}else if(btn==remarks){
-			pencilMain.Remarks();
+			pencilMain.remarkFrame();
 		}else if(btn==labels){
 			try {
 				pencilMain.labelManage();

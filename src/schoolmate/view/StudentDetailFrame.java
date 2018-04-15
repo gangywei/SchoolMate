@@ -208,12 +208,17 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
         	workTabel = new WorkDetailPanel(pencil,0,this);
             eduTabel = new EduDetailPanel(pencil, 0,this);
         }else{
+        	if(pencil.nowUser.u_role==1){
+        		addWork.setEnabled(false);
+            	addEducation.setEnabled(false);
+        	}
         	workTabel = new WorkDetailPanel(pencil, Integer.parseInt(student[1]),this);
             eduTabel = new EduDetailPanel(pencil, Integer.parseInt(student[1]),this);
         }
         
         detailTabel = new JPanel(new BorderLayout());
-        detailTabel.add(centerPanel);
+        if(pencil.nowUser.u_role>1)
+        	detailTabel.add(centerPanel);
         detailTabel.add(workTabel,BorderLayout.WEST);
         detailTabel.add(eduTabel,BorderLayout.EAST);
 		add(detailPanel,BorderLayout.NORTH);
@@ -229,9 +234,6 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 		repaint();
 	}
 	
-	/*{"583","2001198405","1","男","19800506","1231","河南滑县","法学","法学院","法学1班","本科","2003",
-	"河南省","安阳市","内黄县公安局","科级","123123","0392-3325854","0392-3328569","13343727926",
-	"123123","河南安阳开发大道156号","451002","4491552@qq.com","44791552"};*/
 	public void setData(){
 		countInput.setText(student[2]);
 		nameInput.setText(student[3]);
@@ -281,17 +283,9 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 	public void actionPerformed(ActionEvent e) {
 		JButton btn = (JButton)e.getSource();
 		if(btn==addWork){
-			try {
-				pencil.addWorkLog(0,Integer.parseInt(student[1]),this,0);
-			} catch (PropertyVetoException e1) {
-				e1.printStackTrace();
-			}
+			pencil.addStudentLog(0,Integer.parseInt(student[1]),this,0);
 		}else if(btn==addEducation){
-			try {
-				pencil.addWorkLog(1,Integer.parseInt(student[1]),this,0);
-			} catch (PropertyVetoException e1) {
-				e1.printStackTrace();
-			}
+			pencil.addStudentLog(1,Integer.parseInt(student[1]),this,0);
 		}else if(btn==submitBtn){
 			if(type==2){
 				String name = nameInput.getText();

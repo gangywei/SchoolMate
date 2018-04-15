@@ -15,6 +15,10 @@ public class EducationLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
 	private static ResultSet res;
+	/* 
+	 * inter：searchEdu 判断是否存在该记录，在学生该学历信息不存在的情况下，插入该学历信息。
+	 * time:2018/03/15
+	 */
 	public static boolean insertEdu(Statement stmt,Education edu) throws SQLException{
 		boolean change = false;
 		if(stmt==null){
@@ -28,8 +32,7 @@ public class EducationLog {
 		}
 		String sql = "INSERT INTO Education (s_id,s_no,s_faculty,s_major,s_class,s_education,s_enter,s_graduate,update_time) VALUES "
 				+ "("+edu.s_id+",'"+edu.s_no+"','"+edu.s_faculty+"','"+edu.s_major+"','"+edu.s_class+"','"+edu.s_education+"','"+edu.s_enter+"','"+edu.s_graduate+"',"+Helper.dataTime(null)+");";
-		int res = 0;
-		res = stmt.executeUpdate(sql);
+		stmt.executeUpdate(sql);
 		if(change){
 			connect.commit();
 			stmt.close();
@@ -49,12 +52,20 @@ public class EducationLog {
 			sql = "update Education set s_faculty='"+now[0]+"' where s_faculty='"+old[0]+"';";
 		stmt.executeUpdate(sql);
 	}
-	
+	/* 
+	 * inter：searchEdu 判断是否存在该记录，学生不存在该教育信息的情况下，更新学生的教育信息。并查新学生表的修改时间
+	 * time:2018/03/15
+	 */
 	public static boolean updateEdu(Statement stmt,Education edu) throws SQLException{
 		boolean change = false;
 		if(stmt==null){
 			change = true;
 			stmt = connect.createStatement();
+		}
+		if(!searchEdu(stmt, edu.s_id, edu.s_education)){
+			if(change)
+				stmt.close();
+			return false;
 		}
 		long time = Helper.dataTime(null);
 		String sql = "update Education set s_faculty='"+edu.s_faculty+"',s_major='"+edu.s_major+"',s_class='"+edu.s_class+"',s_education='"+edu.s_education+
@@ -67,7 +78,10 @@ public class EducationLog {
 		}
 		return true;
 	}
-	
+	/* 
+	 * inter：删除学生时同时删除用户的教育信息。 用户id。
+	 * time:2018/03/15
+	 */
 	public static void deleteEdu(Statement stmt,int s_id) throws SQLException{
 		boolean change = false;
 		if(stmt==null){
@@ -81,7 +95,10 @@ public class EducationLog {
 			stmt.close();
 		}
 	}
-	
+	/* 
+	 * inter：根据教育记录的ID得到该教育记录的详细信息。
+	 * time:2018/03/15
+	 */
 	public static String[] searchEdu(int id){
 		String[] edu = null;
 		String sql;
@@ -106,12 +123,18 @@ public class EducationLog {
 		} 
 		return edu;
 	}
-	
+	/* 
+	 * inter：多选删除学生数据时，删除学生的教育记录。根据 in 查询删除教育数据。
+	 * time:2018/03/15
+	 */
 	public static void deleteManyEdu(Statement stmt,String count) throws SQLException{
 		String sql = "delete from Education where s_id in ("+count+");";
 		stmt.executeUpdate(sql);
 	}
-	
+	/* 
+	 * inter：在collectdataframe检索界面中，得到想要搜索的用户教育记录。在使用连接记录。
+	 * time:2018/03/15
+	 */
 	public static String getEid(String condition){
 		String strId = "";
 		try {
@@ -126,7 +149,10 @@ public class EducationLog {
 		}
 		return strId;
 	}
-	//true=数据库没有该记录，可以插入。
+	/* 
+	 * inter：判断是否存在该学生的该教育记录。
+	 * time:2018/03/15
+	 */
 	public static boolean searchEdu(Statement stmt,int s_id,String education) throws SQLException{
 		int count = 0;
 		String sql = "SELECT count(*) totle FROM Education where s_id="+s_id+" and s_education='"+education+"';";

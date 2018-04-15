@@ -21,10 +21,10 @@ public class UserModel extends BaseModel{
 		if(role==1){
 			return "普通用户";
 		}else if(role==2){
-			return "管理员";
+			return "学院管理者";
 		}else if(role==3){
 			return "系统管理者";
 		}
-		return null;
+		return "";
 	}
 }

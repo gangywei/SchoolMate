@@ -19,6 +19,7 @@ public class TableLeftMouse extends JPopupMenu implements ActionListener{
 	private JMenuItem detailItem,updateItem,deleteItem;
 	private CollectDataFrame panel;
 	public TableLeftMouse(CollectDataFrame panel){
+		this.panel = panel;
 		detailItem = new JMenuItem("详细信息");	
 		updateItem = new JMenuItem("修改信息");			
 		deleteItem = new JMenuItem("删除信息");	
@@ -26,9 +27,10 @@ public class TableLeftMouse extends JPopupMenu implements ActionListener{
 		updateItem.addActionListener(this);
 		deleteItem.addActionListener(this);
 		add(detailItem);
-		add(updateItem);
-		add(deleteItem);
-		this.panel = panel;
+		if(panel.user.u_role>1){
+			add(updateItem);
+			add(deleteItem);
+		}
 	}
 	public void actionPerformed(ActionEvent e) {
 		int length = PencilMain.COLUM;
@@ -55,7 +57,7 @@ public class TableLeftMouse extends JPopupMenu implements ActionListener{
 				if(res==0){
 					boolean result = StudentLog.deleteStudent(sNo);
 					if(result){
-						panel.updateTabel(null,null,panel.searchType);
+						panel.updateTabel(null,null);
 					}else
 						JOptionPane.showMessageDialog(null, "删除学生失败！");
 				}

@@ -29,7 +29,7 @@ public class LabelManageFrame  extends JInternalFrame implements ChangeListener{
 	public void initFrame(){
 		setResizable(true);  //允许自由调整大小 
 		setClosable(true);
-		setTitle("删除导入字段");
+		setTitle("修改导入字段");
 		panels[0] = new AllNationPanel(collectFrame);
 		panels[1] = new AllProvincePanel(collectFrame);
 		panels[2] = new AllCityPanel(collectFrame);

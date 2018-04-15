@@ -29,7 +29,7 @@ public class BackupsDataFrame extends JInternalFrame implements ActionListener{
 	public JPanel BackupsPanel,interPanel;
 	String str = new String(
 			"<strong>数据备份功能</strong><br/><hr>"
-			+ "<p>备份当前数据库里的所有数据,利用数据还原可以恢复备份的数据！</p>");
+			+ "<p>备份当前数据库里的所有数据！</p>");
 	JEditorPane editPane = new JEditorPane("text/html", str);
 	private String filePath;
 	public int sheetCount=0,totleRow;
@@ -40,9 +40,7 @@ public class BackupsDataFrame extends JInternalFrame implements ActionListener{
     SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
     private JTextField nameInput = new JTextField(df.format(new Date())+"数据备份");
     private JLabel pathLabel = new JLabel("文件路径：");
-    private JLabel fileText = new JLabel("点击选择地址按钮：");
-    private JLabel StatusJLabel = new JLabel("备份状态：");
-    private JLabel BackupsStatus = new JLabel("未备份");
+    private JLabel fileText = new JLabel("点击选择地址按钮");
     private JButton SelectPath = new JButton("选择地址");
     private JButton startBtn = new JButton("开  始");
 	public BackupsDataFrame() {
@@ -68,17 +66,15 @@ public class BackupsDataFrame extends JInternalFrame implements ActionListener{
     	BackupsPanel.setBackground(Color.white);
     	GroupLayout layout = new GroupLayout(BackupsPanel);
     	BackupsPanel.setLayout(layout);
-		setSize(450, 300);
-		setLocation((PencilMain.showWidth-400)/2, 0);
+		setSize(450, 260);
+		setLocation((PencilMain.showWidth-450)/2, 0);
 		setVisible(true);
 		//创建GroupLayout的水平连续组，，越先加入的ParallelGroup，优先级级别越高。几列
 		GroupLayout.SequentialGroup hGroup = layout.createSequentialGroup();
 		hGroup.addGap(20);//添加间隔
-		hGroup.addGroup(layout.createParallelGroup().addComponent(nameLabel).addComponent(pathLabel)
-				.addComponent(StatusJLabel).addComponent(SelectPath));
+		hGroup.addGroup(layout.createParallelGroup().addComponent(nameLabel).addComponent(pathLabel).addComponent(SelectPath));
 		hGroup.addGap(15);
-		hGroup.addGroup(layout.createParallelGroup().addComponent(nameInput).addComponent(fileText)
-				.addComponent(BackupsStatus).addComponent(startBtn));
+		hGroup.addGroup(layout.createParallelGroup().addComponent(nameInput).addComponent(fileText).addComponent(startBtn));
 		hGroup.addGap(20);
 		layout.setHorizontalGroup(hGroup);//设置水平组
 		//创建GroupLayout的垂直连续组，，越先加入的ParallelGroup，优先级级别越高。几行
@@ -87,8 +83,6 @@ public class BackupsDataFrame extends JInternalFrame implements ActionListener{
 		vGroup.addGroup(layout.createParallelGroup().addComponent(nameLabel).addComponent(nameInput));
 		vGroup.addGap(20);
 		vGroup.addGroup(layout.createParallelGroup().addComponent(pathLabel).addComponent(fileText));
-		vGroup.addGap(20);
-		vGroup.addGroup(layout.createParallelGroup().addComponent(StatusJLabel).addComponent(BackupsStatus));
 		vGroup.addGap(20);
 		vGroup.addGroup(layout.createParallelGroup().addComponent(SelectPath).addComponent(startBtn));
 		vGroup.addGap(20);
@@ -129,7 +123,8 @@ public class BackupsDataFrame extends JInternalFrame implements ActionListener{
                     e.printStackTrace();
                 }
                 startBtn.setEnabled(false);
-                BackupsStatus.setText("备份成功，可以关闭窗口啦!");
+                JOptionPane.showMessageDialog(this, "备份已完成");
+                dispose();
             }
 
         }
@@ -164,8 +159,8 @@ public class BackupsDataFrame extends JInternalFrame implements ActionListener{
 				return;
 			}else{
 				try {
-					fileCopy("E:\\assess\\schoolmates.db",
-							filePath+"\\"+nameInput.getText()+".db");
+					fileCopy("E:/assess/spy/mates.lite",
+							filePath+"\\"+nameInput.getText()+".temp");
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(null, "备份未成功！");
 					e1.printStackTrace();

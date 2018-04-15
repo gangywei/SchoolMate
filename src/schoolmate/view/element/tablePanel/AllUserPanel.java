@@ -12,7 +12,6 @@ import schoolmate.view.element.MyTable;
 import schoolmate.view.element.TabelPanel;
 
 public class AllUserPanel extends TabelPanel implements ActionListener{
-
 	public String role = "";
 	public AllUserPanel(PencilMain pencil){
 		super(pencil);
@@ -52,10 +51,10 @@ public class AllUserPanel extends TabelPanel implements ActionListener{
 			if(PencilMain.dbControl){
 				int res =JOptionPane.showConfirmDialog(this,"删除这条记录的所有信息","删除信息提示",JOptionPane.YES_NO_OPTION);
 				if(res==0){
-					int result = UserLog.delete(sNo);
-					if(result==1){
+					boolean result = UserLog.deleteUser(sNo);
+					if(result){
 						updateTabel();
-						collectFrame.refeshBtn.doClick();
+						pencil.collectDataFrame.refeshBtn.doClick();
 					}else
 						JOptionPane.showMessageDialog(null, "删除用户失败！");
 				}
@@ -63,7 +62,7 @@ public class AllUserPanel extends TabelPanel implements ActionListener{
 				JOptionPane.showMessageDialog(null, "正在导入数据，不允许该操作");
 			}
 		}else if(item==alterItem){
-			pencil.addUser(sNo);
+			pencil.addUser(this,sNo);
 		}
 	}
 }

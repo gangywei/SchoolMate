@@ -30,14 +30,13 @@ import sun.security.util.Pem;
 public class FrameMenubar implements ActionListener{
 	private JMenuBar MenuBar;
 	private JMenu mainMenu,dataMenu,userMenu;
-	private JButton submitBtn;
+	private JButton submitBtn,cancelBtn;
 	private JDialog alterDialog;
 	JPasswordField pwdInput,tpwdInput;
 	private JMenuItem exitItem,userItem,chPwdItem;
 	private JMenuItem backupItem,renewItem,outputItem;
 	private JMenuItem addUserItem,manUserItem;
 	private PencilMain pencilMain;
-	
 	JComboBox<String> userPro = new JComboBox<String>(PencilMain.education);
 	JPasswordField userAns = new JPasswordField(15);
 	public FrameMenubar(PencilMain pencil){
@@ -50,11 +49,15 @@ public class FrameMenubar implements ActionListener{
 		submitBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
 		submitBtn.setForeground(Color.white);  
 		submitBtn.addActionListener(this);
+		cancelBtn = new JButton("关    闭");
+		cancelBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
+		cancelBtn.setForeground(Color.white);  
+		cancelBtn.addActionListener(this);
 		MenuBar = new JMenuBar();
 		
 		mainMenu = new JMenu("主菜单");
 		mainMenu.setIcon(icon);
-		exitItem = new JMenuItem("关闭系统 ");
+		exitItem = new JMenuItem("退出登录 ");
 		userItem = new JMenuItem("用户信息");
 		chPwdItem = new JMenuItem("修改密码");
 		userItem.addActionListener(this);
@@ -77,8 +80,9 @@ public class FrameMenubar implements ActionListener{
 		dataMenu.add(outputItem);
 		dataMenu.setIcon(backIcon);
 		MenuBar.add(mainMenu);
-		MenuBar.add(dataMenu);
-		
+		if(pencilMain.nowUser.u_role>1)
+			MenuBar.add(dataMenu);
+
 		ImageIcon userIcon=new ImageIcon("resource/img/user.png");
 		userMenu =  new JMenu("用户管理");
 		addUserItem = new JMenuItem("添加用户");
@@ -88,7 +92,7 @@ public class FrameMenubar implements ActionListener{
 		userMenu.setIcon(userIcon);
 		userMenu.add(addUserItem);
 		userMenu.add(manUserItem);
-		if(pencilMain.nowUser.u_role>=2){
+		if(pencilMain.nowUser.u_role>2){
 			MenuBar.add(userMenu);
 		}
 		return MenuBar;
@@ -124,7 +128,7 @@ public class FrameMenubar implements ActionListener{
                 .addComponent(tpwdLabel).addComponent(submitBtn));
 		hGroup.addGap(10);//添加间隔
 		hGroup.addGroup(layout.createParallelGroup().addComponent(userPro).addComponent(userAns).addComponent(pwdInput)
-                .addComponent(tpwdInput));
+                .addComponent(tpwdInput).addComponent(cancelBtn));
 		hGroup.addGap(10);
 		layout.setHorizontalGroup(hGroup);//设置水平组
 		
@@ -139,7 +143,7 @@ public class FrameMenubar implements ActionListener{
         vGroup.addGap(10);
         vGroup.addGroup(layout.createParallelGroup().addComponent(tpwdLabel).addComponent(tpwdInput));
         vGroup.addGap(10);
-        vGroup.addGroup(layout.createParallelGroup().addComponent(submitBtn));
+        vGroup.addGroup(layout.createParallelGroup().addComponent(submitBtn).addComponent(cancelBtn));
         vGroup.addGap(10);
         layout.setVerticalGroup(vGroup);//设置垂直组
         alterPanel.setLayout(layout);
@@ -155,17 +159,21 @@ public class FrameMenubar implements ActionListener{
 		tpwd = new String(tpwdInput.getPassword());
 		if(index>0){
 			if(!Helper.matchRegular(answer, PencilMain.regular[index])){
-				JOptionPane.showMessageDialog(null, "密保回答不符合要求！");
+				JOptionPane.showMessageDialog(null, "密保回答位6-12位数字字母的组合");
 				return;
 			}
 			if(!pwd.equals("")&&!tpwd.equals("")){
+				if(!Helper.matchRegular(pwd, PencilMain.regular[1])){
+					JOptionPane.showMessageDialog(null, "密码位6-12位数字字母的组合");
+					return;
+				}
 				if(pwd.equals(tpwd)){
 					boolean res = UserLog.alterPwd(PencilMain.nowUser.u_count,pwd,index,answer);
 					if(res){
 						JOptionPane.showMessageDialog(null, "修改成功");
 						alterDialog.dispose();
 					}else{
-						JOptionPane.showMessageDialog(null, "修改失败");
+						JOptionPane.showMessageDialog(null, "请检查账号，密保信息是否输入正确");
 					}
 				}else{
 					JOptionPane.showMessageDialog(null, "输入的密码不相同");
@@ -183,7 +191,7 @@ public class FrameMenubar implements ActionListener{
 		if(temp instanceof JMenuItem){
 			temp = (JMenuItem)temp;
 			if(temp==exitItem){
-				System.exit(0);
+				pencilMain.quitLogin();
 			}else if(temp==chPwdItem){
 				showDialog();
 			}else if(temp==userItem){
@@ -193,23 +201,23 @@ public class FrameMenubar implements ActionListener{
 			}else if(temp==renewItem){
 				pencilMain.reNewFrame();
 			}else if(temp==addUserItem){
-				pencilMain.addUser(0);
+				pencilMain.addUser(null,0);
 			}else if(temp==manUserItem){
 				pencilMain.allUser();
 			}else if(temp==outputItem){
 				pencilMain.backupUpdate();
 			}
 		}else if(temp instanceof JButton){
-			if((JButton)temp==submitBtn){
+			JButton btn = (JButton)temp;
+			if(temp==submitBtn){
 				try {
 					alterPwd();
-				} catch (NoSuchAlgorithmException e1) {
-					e1.printStackTrace();
-				} catch (UnsupportedEncodingException e1) {
-					e1.printStackTrace();
-				} catch (SQLException e1) {
+				} catch (NoSuchAlgorithmException | UnsupportedEncodingException | SQLException e1) {
 					e1.printStackTrace();
 				}
+			}else if(temp==cancelBtn){
+				if(alterDialog!=null)
+					alterDialog.dispose();
 			}
 		}
 	}

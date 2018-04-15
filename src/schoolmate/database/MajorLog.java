@@ -12,6 +12,10 @@ public class MajorLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
 	private static ResultSet res;
+	/* 
+	 * inter：插入全文检索信息
+	 * time:2018/03/15
+	 */
 	public static boolean searchMajor(String major,String faculty) throws SQLException{
 		int count = 0;
 		stmt = connect.createStatement();
@@ -26,7 +30,10 @@ public class MajorLog {
 			return true;
 		return false;
 	}
-	//筛选条件
+	/* 
+	 * inter：得到所有的专业名
+	 * time:2018/03/15
+	 */
 	public static String[] allMajor(String condition){
 		int count = 0;
 		try {
@@ -50,7 +57,10 @@ public class MajorLog {
 		}
 		return null;
 	}
-	
+	/* 
+	 * inter：null=在同一事务下，在一个新的事务下插入一个学院信息。
+	 * time:2018/03/15
+	 */
 	public static void insertMajor(String major,String faculty,Statement stmt) throws SQLException{
 		boolean pool = false;	//新建数据库通道
 		if(stmt==null)

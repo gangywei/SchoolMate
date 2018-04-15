@@ -77,6 +77,8 @@ public class AlterLabelFrame extends JInternalFrame implements ActionListener{
 		ParallelGroup textGroup = layout.createParallelGroup();
 		for(int i=0;i<labSize;i++)
 			textGroup.addComponent(textAry[i]);
+		for(int i=0;i<labSize-1;i++)	//设置只可以修改当前标签页的字段
+			textAry[i].setEditable(false);
 		hGroup.addGroup(textGroup);
 		layout.setHorizontalGroup(hGroup);//设置水平组
 		GroupLayout.SequentialGroup vGroup = layout.createSequentialGroup();

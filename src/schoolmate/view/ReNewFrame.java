@@ -27,18 +27,16 @@ import schoolmate.view.element.MyFileFilter;
 public class ReNewFrame extends JInternalFrame implements ActionListener{
 	public JPanel BackupsPanel,interPanel;
 	String str = new String(
-			"<strong>数据还原功能</strong><br/><hr>"
-			+ "<p>清空当前数据<strong>并恢复备份数据库的数据！</strong></p>");
+			"<strong>数据还原功能</strong><br/>"
+			+ "<p>清空当前数据<strong>并恢复备份数据库的数据，恢复完成要重启该系统！</strong></p>");
 	JEditorPane editPane = new JEditorPane("text/html", str);
 	private String filePath;
 	public int sheetCount=0,totleRow;
 	private InputStream input;
     private OutputStream output;
     private static int length;
-    private JLabel pathLabel = new JLabel("文件路径：");
-    private JLabel fileText = new JLabel("点击选择地址按钮：");
-    private JLabel StatusJLabel = new JLabel("状态：");
-    private JLabel BackupsStatus = new JLabel("未恢复");
+    private JLabel pathLabel = new JLabel("文件地址：");
+    private JLabel fileText = new JLabel("空");
     private JButton SelectPath = new JButton("选择地址");
     private JButton startBtn = new JButton("开  始");
 	public ReNewFrame() {
@@ -62,25 +60,21 @@ public class ReNewFrame extends JInternalFrame implements ActionListener{
     	BackupsPanel.setBackground(Color.WHITE);
     	GroupLayout layout = new GroupLayout(BackupsPanel);
     	BackupsPanel.setLayout(layout);
-		setSize(450, 280);
+		setSize(450, 200);
 		setLocation((PencilMain.showWidth-450)/2, 0);
 		setVisible(true);
 		//创建GroupLayout的水平连续组，，越先加入的ParallelGroup，优先级级别越高。几列
 		GroupLayout.SequentialGroup hGroup = layout.createSequentialGroup();
 		hGroup.addGap(20);//添加间隔
-		hGroup.addGroup(layout.createParallelGroup().addComponent(pathLabel)
-				.addComponent(StatusJLabel).addComponent(SelectPath));
+		hGroup.addGroup(layout.createParallelGroup().addComponent(pathLabel).addComponent(SelectPath));
 		hGroup.addGap(15);
-		hGroup.addGroup(layout.createParallelGroup().addComponent(fileText)
-				.addComponent(BackupsStatus).addComponent(startBtn));
+		hGroup.addGroup(layout.createParallelGroup().addComponent(fileText).addComponent(startBtn));
 		hGroup.addGap(20);
 		layout.setHorizontalGroup(hGroup);//设置水平组
 		//创建GroupLayout的垂直连续组，，越先加入的ParallelGroup，优先级级别越高。几行
 		GroupLayout.SequentialGroup vGroup = layout.createSequentialGroup();
 		vGroup.addGap(20);//添加间隔
 		vGroup.addGroup(layout.createParallelGroup().addComponent(pathLabel).addComponent(fileText));
-		vGroup.addGap(20);
-		vGroup.addGroup(layout.createParallelGroup().addComponent(StatusJLabel).addComponent(BackupsStatus));
 		vGroup.addGap(20);
 		vGroup.addGroup(layout.createParallelGroup().addComponent(SelectPath).addComponent(startBtn));
 		vGroup.addGap(20);
@@ -118,7 +112,7 @@ public class ReNewFrame extends JInternalFrame implements ActionListener{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                int res = JOptionPane.showConfirmDialog(null, "恢复成功！请重启该系统更新数据O(∩_∩)O","提示",JOptionPane.YES_NO_OPTION);
+                int res = JOptionPane.showConfirmDialog(this, "恢复成功！请重启该系统更新数据","提示",JOptionPane.YES_NO_OPTION);
 				if(res==0)
 					System.exit(0);
 				else
@@ -131,7 +125,7 @@ public class ReNewFrame extends JInternalFrame implements ActionListener{
 		JButton btn = (JButton)e.getSource();
 		if(btn == SelectPath){
 			JFileChooser fileChoose = new JFileChooser("F:");
-			String[] arg = {"db"};
+			String[] arg = {"temp"};
 			MyFileFilter filter = new MyFileFilter(arg);
 	        //是否可多选   
 			fileChoose.addChoosableFileFilter(filter);//导入可选择的文件的后缀名类型
@@ -159,7 +153,7 @@ public class ReNewFrame extends JInternalFrame implements ActionListener{
 				try {
 					int res =JOptionPane.showConfirmDialog(this,"清空当前数据并还原备份的数据","数据恢复提示",JOptionPane.YES_NO_OPTION);
 					if(res==0)
-						fileCopy(filePath,"E:\\assess\\schoolmates.db");
+						fileCopy(filePath,"E:/assess/spy/mates.lite");
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}

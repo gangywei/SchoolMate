@@ -39,7 +39,7 @@ public class UserDetailFrame extends JInternalFrame implements ActionListener{
     private JLabel roleLabel = new JLabel("角     色： "); 
     private JLabel ansLabel = new JLabel("答     案： "); 
     private JLabel roleShow = new JLabel("");
-    private JButton confirm = new JButton("修改信息"); 
+    private JButton confirm = new JButton("修改信息"),cancel = new JButton("关    闭"); 
     public UserDetailFrame(PencilMain pencil){
 		pencilMain = pencil;
 		user = pencilMain.nowUser;
@@ -56,6 +56,9 @@ public class UserDetailFrame extends JInternalFrame implements ActionListener{
         confirm.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
         confirm.setForeground(Color.white);
         confirm.addActionListener(this);
+        cancel.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
+        cancel.setForeground(Color.white);
+        cancel.addActionListener(this);
         nameShow.setText(user.u_name);
         userShow.setText(user.u_count);
         userAns.setText(user.u_answer);
@@ -70,7 +73,7 @@ public class UserDetailFrame extends JInternalFrame implements ActionListener{
   				.addComponent(proLabel).addComponent(ansLabel).addComponent(confirm));
   		hGroup.addGap(15);
   		hGroup.addGroup(layout.createParallelGroup().addComponent(nameShow).addComponent(facultyShow).addComponent(userShow).addComponent(roleShow)
-  				.addComponent(userPro).addComponent(userAns));
+  				.addComponent(userPro).addComponent(userAns).addComponent(cancel));
   		hGroup.addGap(20);
   		layout.setHorizontalGroup(hGroup);//设置水平组
   		//创建GroupLayout的垂直连续组，，越先加入的ParallelGroup，优先级级别越高。几行
@@ -88,7 +91,7 @@ public class UserDetailFrame extends JInternalFrame implements ActionListener{
   		vGroup.addGap(20);
   		vGroup.addGroup(layout.createParallelGroup().addComponent(ansLabel).addComponent(userAns));
   		vGroup.addGap(20);
-  		vGroup.addGroup(layout.createParallelGroup().addComponent(confirm));
+  		vGroup.addGroup(layout.createParallelGroup().addComponent(confirm).addComponent(cancel));
   		vGroup.addGap(20);
   		layout.setVerticalGroup(vGroup);//设置垂直组
         setSize(400, 380);
@@ -103,12 +106,16 @@ public class UserDetailFrame extends JInternalFrame implements ActionListener{
 			String ans = new String(userAns.getPassword());
 			int index = userPro.getSelectedIndex();
 			if(index>0){
-				if(!Helper.matchRegular(ans, PencilMain.regular[index])){
-					JOptionPane.showMessageDialog(this, "密保问题不符合要求！");
+				if(nameShow.getText().trim().equals("")){
+					JOptionPane.showMessageDialog(this, "姓名不允许为空！");
 					return;
 				}
-				if(user.u_problem==index&&user.u_answer.equals(ans)){
-					JOptionPane.showMessageDialog(this, "密保问题没有修改，请重新设置！");
+				if(!Helper.matchRegular(ans, PencilMain.regular[index])){
+					JOptionPane.showMessageDialog(this, "密保问题位6-12位数字字母的集合！");
+					return;
+				}
+				if(user.u_problem==index&&user.u_answer.equals(ans)&&user.u_name.equals(nameShow.getText())){
+					JOptionPane.showMessageDialog(this, "信息没有修改，请重新设置！");
 					return;
 				}else{
 					boolean res = UserLog.updateAns(pencilMain.nowUser.u_count, index, ans,nameShow.getText(),facultyShow.getText());
@@ -125,6 +132,8 @@ public class UserDetailFrame extends JInternalFrame implements ActionListener{
 				
 			}else 
 				JOptionPane.showMessageDialog(null, "请选择密保问题！");
+		}else if(btn==cancel){
+			dispose();
 		}
 	}
 }

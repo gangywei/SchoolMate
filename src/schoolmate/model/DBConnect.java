@@ -13,10 +13,10 @@ public class DBConnect {
     	if(conn==null){
     		try {
     			Class.forName("org.sqlite.JDBC");
-    			conn = DriverManager.getConnection(PencilMain.dbPath,"root","121961");
+    			conn = DriverManager.getConnection(PencilMain.dbPath,"root","121965");
     			conn.setAutoCommit(false);
 	        } catch ( Exception e ) {
-	        	JOptionPane.showMessageDialog(null,"没有找到数据库文件");
+	        	JOptionPane.showMessageDialog(null,"连接不上数据库");
 	        	System.exit(0);
 	        }
     	}

@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 
@@ -73,7 +74,10 @@ public class BackupUpdateFrame extends JInternalFrame implements ActionListener{
 		add(interPanel,BorderLayout.NORTH);
     	setClosable(true);//提供关闭按钮
     	setTitle("导出更新数据功能");
-    	endInput.setText(df.format(new Date()));
+    	Calendar calen = Calendar.getInstance();	//得到下一天
+    	calen.setTime(new Date());
+    	calen.add(Calendar.DAY_OF_MONTH, 1);
+    	endInput.setText(df.format(calen.getTime()));
     	endChoose.register(endInput);
     	beginChoose.register(beginInput);
     	selectPath.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
@@ -121,9 +125,9 @@ public class BackupUpdateFrame extends JInternalFrame implements ActionListener{
 
 
 	//导出EXCEL文件（文件路径，文件名）
-    public void outputExcel(String path,String name,long beginTime) throws IOException{
+    public void outputExcel(String path,String name,long beginTime,long endTime) throws IOException{
     	try {
-			studentLog = StudentLog.getUpdate(beginTime,pencil.collectDataFrame.limitStr);
+			studentLog = StudentLog.getUpdate(beginTime,endTime,pencil.collectDataFrame.limitStr);
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 			JOptionPane.showMessageDialog(this, "导入信息错误");
@@ -241,7 +245,7 @@ public class BackupUpdateFrame extends JInternalFrame implements ActionListener{
 						JOptionPane.showMessageDialog(null, "结束时间小于开始时间。");
 						return;
 					}
-					outputExcel(filePath,nameInput.getText(),btime);
+					outputExcel(filePath,nameInput.getText(),btime,ntime);
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(null, "备份未成功！");
 					e1.printStackTrace();

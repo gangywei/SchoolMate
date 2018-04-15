@@ -40,9 +40,9 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 	public User user;
 	private RowListener rowLis;
 	private JLabel pageLabel;	//页码标签
-	public boolean searchType = true;	//true=分页,false=不分页;默认为分页
-	public String instant="",condition="",eduContion="",limitStr = "",	//模糊查询和组合查询的条件
-			limitTemp;	//用户的权限字段
+	public String instant="",condition="",//模糊查询和组合查询的条件
+			eduContion="",	//教育表的筛选条件
+			limitStr = "",	limitTemp;	//用户的权限字段
 	public StudentModel studentModel;
 	public Vector<Object[]> data = new Vector<Object[]>();
 	private JPanel topPanel,bottomPanel;
@@ -51,22 +51,20 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 	private JButton groupBtn = new JButton("组合查询");
 	private JLabel collectLabel = new JLabel("");
 	public JLabel collectText = new JLabel("数据统计");
-	private JPanel bottomLeft = new JPanel(),
-			bottomRight = new JPanel();
+	private JPanel bottomLeft = new JPanel();
 	private JButton exportBtn = new JButton("导出数据");
 	private JButton deleteBtn = new JButton("删除数据");
 	private JButton emailBtn = new JButton("邮件群发");
 	public JButton refeshBtn = new JButton("刷新");
 	private JButton allBtn = new JButton("全部选中");
 	private TableLeftMouse tableLeftMouse;	//右键
-	private JButton[] pageList = {new JButton("首页"),new JButton("上一页"),new JButton("下一页"),new JButton("尾页")};
 	public PencilMain pencil;
 	public TabbedFrame tabbedFrame;
 	private BlurSearchFrame blurSearchFrame;
 	public CollectDataFrame(PencilMain pencil) throws Exception{
 		this.pencil = pencil;
 		this.user = PencilMain.nowUser;
-		if(user.u_role==1){
+		if(user.u_role<=2){
 			String[] res = user.faculty.split(",");
 			limitTemp = "(";
 			for(int i=0;i<res.length;i++){
@@ -110,11 +108,6 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		instantBtn.addActionListener(this);
 		instantBtn.setForeground(Color.white);  
 		instantBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));
-		for(int i=0;i<4;i++){
-			pageList[i].addActionListener(this);
-			pageList[i].setForeground(Color.white);  
-			pageList[i].setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));
-		}
 		topPanel.setLayout(new BorderLayout());
 		bottomPanel = new JPanel();
 		bottomPanel.setBackground(Color.WHITE);
@@ -124,11 +117,10 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		
 		//初始化Table显示
 		studentModel = new StudentModel(data,0);
-		updateTabel(null,null,false);
+		updateTabel(null,null);
 		
 		rowLis = new RowListener();
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		//table.setAutoCreateRowSorter(true);
 		table.setFillsViewportHeight(true);
 		tableLeftMouse = new TableLeftMouse(this);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);	//表格只允许单选
@@ -144,12 +136,15 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		scroll.setBackground(Color.WHITE);
 		conditionPanel.add(groupBtn);
 		conditionPanel.add(instantBtn);
-		conditionPanel.add(allBtn);
+		if(PencilMain.nowUser.u_role>1)
+			conditionPanel.add(allBtn);
 		conditionPanel.add(refeshBtn);
+		if(PencilMain.nowUser.u_role>1){
+			searchPanel.add(exportBtn);
+			searchPanel.add(deleteBtn);
+			searchPanel.add(emailBtn);
+		}
 		
-		searchPanel.add(exportBtn);
-		searchPanel.add(deleteBtn);
-		searchPanel.add(emailBtn);
 		searchPanel.setLayout(new FlowLayout(FlowLayout.LEFT,10,5));
 		topPanel.add(searchPanel,BorderLayout.EAST);
 		topPanel.add(conditionPanel,BorderLayout.WEST);
@@ -162,7 +157,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		add(topPanel,BorderLayout.NORTH);
 		add(scroll);
 		add(bottomPanel,BorderLayout.SOUTH);
-		setSize(pencil.showWidth,pencil.showHeight-75);
+		setSize(PencilMain.showWidth,PencilMain.showHeight-75);
 		setVisible(true);
 	}
 	
@@ -176,7 +171,6 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
             	nowSelect = event.getLastIndex();
             else
             	nowSelect = event.getFirstIndex();
-            //table.getValueAt(nowSelect, column);
         }
     }
 	//数据库一写多读
@@ -186,8 +180,6 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		refeshBtn.setEnabled(dbState);
 		groupBtn.setEnabled(dbState);
 		emailBtn.setEnabled(dbState);
-		for(int i=0;i<pageList.length;i++)
-			pageList[i].setEnabled(dbState);
 		repaint();
 	}
 	/* 查询完成后更新底部的汇总信息和分页按钮
@@ -197,56 +189,30 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		if(type<2){
 			btnNum = 1;
 			nowIndex = 1;
-			bottomRight.removeAll();
 			dataTotle = StudentLog.getNumber(sql);
 			collectText.setText(" 总记录数："+dataTotle);
 		}
 		if(type==1){
 			btnNum = Math.ceil((float)dataTotle/(float)dataNum);
-			for(int i=0;i<4;i++){
-				bottomRight.add(pageList[i]);
-			}
-			bottomPanel.add(bottomRight,BorderLayout.EAST);
 			nowIndex = 1;
-		}
-		if(type>0){
-			if(nowIndex==1){
-				pageList[0].setEnabled(false);
-				pageList[1].setEnabled(false);
-			}else{
-				pageList[0].setEnabled(true);
-				pageList[1].setEnabled(true);
-			}
-			if(nowIndex==btnNum){
-				pageList[3].setEnabled(false);
-				pageList[2].setEnabled(false);
-			}else{
-				pageList[3].setEnabled(true);
-				pageList[2].setEnabled(true);
-			}
-			if(btnNum<=1){
-				for(int i=0;i<pageList.length;i++)
-					pageList[i].setEnabled(false);
-			}
 		}
 		pageLabel.setText("当前页："+nowIndex+" 总页面："+(int)btnNum);
 		allBtn.setText("全部选中");
-		bottomRight.updateUI();
 		table.updateUI();
 		this.updateUI();
 	}
 	
-	//根据条件更新数据 condition=聚合查询（null不更新数据）	instant=模糊查询（null不更新数据）	type=true分页查询，false查询全部
-	//得到不重复的s_id，得到不重复的e_id，合并。
-	public void updateTabel(String condTemp[],String insTemp,boolean type){
-		searchType = type;
+	/*
+	 * inter：联合查询3个表得到符合条件的学生记录，并显示
+	 */
+	public void updateTabel(String condTemp[],String insTemp){
 		try {
 			String eId = "";
 			if(insTemp!=null&&!insTemp.equals(""))
 				instant = "join (select s_id from fullsearch where fs_content match '"+insTemp+"') as fs on fs.s_id=s.s_id";
 			if(condTemp!=null){	//当数据为null时，表示不更新搜索条件。	
 				condition = condTemp[0];	//student表的检索条件
-				eId = EducationLog.getEid(condTemp[1]);
+				eId = EducationLog.getEid(condTemp[1]);	//得到符合条件的所有学历信息id
 				if(eId!="")	//组装了对两个表的搜索条件
 					if(limitStr.equals(""))
 						eduContion = "join (select * from education where e_id in ("+eId+"))";
@@ -256,9 +222,9 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 			//考虑权限定义的内容
 			if(eduContion.equals(""))
 				if(limitStr.equals(""))
-					eduContion = " join education "+eduContion;
+					eduContion = " join education ";
 				else
-					eduContion = " join (select * from education where "+limitStr+") "+eduContion;
+					eduContion = " join (select * from education where "+limitStr+") ";
 			//得到不重复的人，得到不重复的教育记录。
 			data = StudentLog.dao("select "+cell+" from (select * from student "+condition+") s "+eduContion+" e on s.s_id=e.s_id "+instant+" order by s.update_time desc;");
 			studentModel.setData(data);
@@ -286,7 +252,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 				allBtn.setText("全部选中");
 			this.updateUI();
 		}else if(btn==refeshBtn){
-			updateTabel(null,null,searchType);
+			updateTabel(null,null);
 		}else if(btn==groupBtn){
 			if(tabbedFrame==null||tabbedFrame.isClosed()){
 				tabbedFrame = new TabbedFrame(this);
@@ -310,7 +276,8 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 						boolean result = StudentLog.deleteMany(selectIndex);
 						if(!result)
 							JOptionPane.showMessageDialog(null, "删除失败！");
-						updateTabel(null,null,searchType);
+						else
+							updateTabel(null,null);
 						selectIndex=null;
 					}
 				} catch (Exception e1) {
@@ -325,46 +292,6 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		}else if(btn==exportBtn){
 			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 			pencil.outputExl(studentModel,1,df.format(new Date())+"导出Excel");
-		}else if(btn==pageList[0]){
-			try {
-				nowIndex = 1;
-				data = StudentLog.dao("select * from (select "+cell+" from student s "+eduContion+" e on s.s_id=e.s_id) as stu "+instant+" limit "+dataNum+" offset "+(nowIndex-1)*dataNum);
-				studentModel.setData(data);
-				table = new MyTable(studentModel);
-				updateBottom(null,2);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-		}else if(btn==pageList[1]){
-			try {
-				nowIndex--;
-				data = StudentLog.dao("select * from (select "+cell+" from student s "+eduContion+" e on s.s_id=e.s_id) as stu "+instant+" limit "+dataNum+" offset "+(nowIndex-1)*dataNum);
-				studentModel.setData(data);
-				table = new MyTable(studentModel);
-				updateBottom(null,2);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-		}else if(btn==pageList[2]){
-			try {
-				nowIndex++;
-				data = StudentLog.dao("select * from (select "+cell+" from student s "+eduContion+" e on s.s_id=e.s_id) as stu "+instant+" limit "+dataNum+" offset "+(nowIndex-1)*dataNum);
-				studentModel.setData(data);
-				table = new MyTable(studentModel);
-				updateBottom(null,2);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-		}else if(btn==pageList[3]){
-			try {
-				nowIndex = (int) btnNum;
-				data = StudentLog.dao("select * from (select "+cell+" from student s "+eduContion+" e on s.s_id=e.s_id) as stu "+instant+" limit "+dataNum+" offset "+(nowIndex-1)*dataNum);
-				studentModel.setData(data);
-				table = new MyTable(studentModel);
-				updateBottom(null,2);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
 		}
 	}
 }

@@ -20,7 +20,7 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
 	public JPanel interPanel,contentPanel,bottomPanel;
 	String str = new String(
 			"<strong>模糊查询功能</strong><br/><hr>"
-			+ "<p>支持对<strong>学号、姓名、手机号、QQ、微信、职务、职称、工作单位、通讯地址</strong>字段进行模糊查找，</p>");
+			+ "<p>支持对<strong>学号、姓名、手机号、QQ、微信、职务、职称、工作单位、通讯地址</strong><br/>字段进行模糊查找，</p>");
 	JEditorPane editPane = new JEditorPane("text/html", str);
 	JTextField instantInput = new JTextField(20);
 	JLabel instantLabel = new JLabel("模糊查询字段");
@@ -61,23 +61,27 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
     	add(contentPanel,BorderLayout.CENTER);
     	
     	setVisible(true);
-    	setSize(640, 275);
-		setLocation((PencilMain.showWidth-670)/2, 0);
+    	setSize(560, 260);
+		setLocation((PencilMain.showWidth-560)/2, 0);
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		String text = instantInput.getText().trim();
 		JButton btn = (JButton)e.getSource();
 		if(btn==searchBtn){
-			collect.updateTabel(null,text,true);
+			collect.updateTabel(null,text);
 		}else if(btn==searchAllBtn){
-			collect.updateTabel(null,text,false);
+			if(text.equals("")){
+				JOptionPane.showMessageDialog(this, "查询不可以为空");
+				return;
+			}
+			collect.updateTabel(null,text);
 		}
 	}
 	
 	public void doDefaultCloseAction() {  
 		collect.instant = "";
 		instantInput.setText("");
-	    this.setVisible(false);// 我们只让该JInternalFrame隐藏，并不是真正的关闭  
+	    dispose();
 	}
 }

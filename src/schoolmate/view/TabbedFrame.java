@@ -9,24 +9,17 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Calendar;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
-
 import schoolmate.database.AddressLog;
 import schoolmate.database.FacultyLog;
 import schoolmate.database.MajorLog;
@@ -34,12 +27,12 @@ import schoolmate.database.StudentLog;
 import schoolmate.view.element.MyCheckList;
 
 public class TabbedFrame extends JInternalFrame implements ActionListener,ChangeListener,ItemListener{
+	private static final long serialVersionUID = -97852095904032076L;
 	private JPanel[] panels = new JPanel[7];
 	private String[] condition = new String[8];	//对其他数据库检索的数组
 	private String[] dbCondition = new String[8];	//学生表检索条件的数组
 	private JLabel sexLabel,educationLabel,inLabel,outLabel;
 	private JPanel sexPanel,educationPanel,btnPanel,yearPanel;
-	private boolean[] conditionState = new boolean[7];
 	private JButton searchBtn = new JButton("分页查询");
 	private JButton searchAllBtn = new JButton("查询所有");
 	private JRadioButton[] sexRadio = {new JRadioButton("男"),new JRadioButton("女"),new JRadioButton("无")};
@@ -73,7 +66,7 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		for(int i=0;i<labelName.length;i++){
 			if(collect.user.u_role==1){	//普通用户权限(初始化查询条件)
 				condition[1] = "f_name in "+collect.limitTemp;
-				dbCondition[1] = "s_faculty in "+collect.limitTemp;
+				dbCondition[1] = collect.limitStr;
 				panels[i] = new JPanel();
 				if(i!=0)
 					panels[i].setLayout(layout);
@@ -140,22 +133,22 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		
 		add(jTabbed);
 		add(btnPanel,BorderLayout.SOUTH);
-		setSize(800, 600);
-		setLocation((PencilMain.showWidth-670)/2, 0);
+		setSize(700, 450);
+		setLocation((PencilMain.showWidth-700)/2, 0);
 		jTabbed.addChangeListener(this);
 		setVisible(true);
 	}
-	//得到检索条件
+	/*
+	 * 遍历所有标签页，得到数据库的筛选条件。返回数组[联合查询条件+学生教育记录的查询条件]->提高查询效率
+	 */
 	public String[] getCondition(){
 		String str = "";	//联合查询的条件
 		String str2 = "";	//对于教育记录的索引条件
 		int i;
 		//性别
 		dbCondition[0] = null;
-		boolean res = false;
 		for(i=0;i<sexRadio.length;i++){
 			if(i<2&&sexRadio[i].isSelected()){
-				res = true;
 				dbCondition[0] = "(s_sex='"+sexRadio[i].getText()+"')";
 			}
 		}
@@ -242,6 +235,7 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		}
 		if(dbCondition[6]!=null)
 			dbCondition[6]+=')';
+		
 		//组织检索条件
 		for(i=0;i<dbCondition.length;i++){
 			if(dbCondition[i]!=null){
@@ -305,7 +299,7 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 			case 1:	//学院
 				if(facultyBox==null){
 					if(collect.user.u_role==3)
-						faculty = FacultyLog.allFaculty();
+						faculty = FacultyLog.allFaculty("");
 					else{
 						faculty = collect.user.faculty.split(",");
 					}
@@ -389,13 +383,8 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 	}
 	
 	public void doDefaultCloseAction() {
-		if(collect.user.u_role==1){
-			collect.eduContion = "where s_faculty in "+collect.limitTemp;
-		}
-		else{
-			collect.condition = "";
-			collect.eduContion = "";
-		}
+		collect.condition = "";
+		collect.eduContion = "";
 		dispose();
 	}
 
@@ -404,10 +393,10 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		String str[] = getCondition();
 		if(btn==searchBtn){
 			if(str!=null)
-				collect.updateTabel(str,null,true);
+				collect.updateTabel(str,null);
 		}else if(btn==searchAllBtn){
 			if(str!=null)
-				collect.updateTabel(str,null,false);
+				collect.updateTabel(str,null);
 		}
 	}
 

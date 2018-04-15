@@ -31,7 +31,7 @@ public class BaseModel  extends DefaultTableModel{
 	}
 	
 	public Object getValueAt(int row, int col) {
-		return data.elementAt(row)[col];	//隐藏数据库中的ID字段。
+		return data.elementAt(row)[col];
 	}
 	
 	public Object getCell(int row,int col){

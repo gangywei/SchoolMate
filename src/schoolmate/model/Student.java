@@ -46,7 +46,7 @@ public class Student {
 	}
 	
 	public String judgeStudent(){
-		String regNo = "[\\d]{10}";
+		String regNo = "[\\d]{8,15}";
 		if(s_name.equals(""))
 			return "姓名不可以为空";
 		if(!s_no.equals(""))

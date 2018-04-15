@@ -12,6 +12,10 @@ public class FacultyLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
 	private static ResultSet res;
+	/* 
+	 * inter：判断该学院是否存在。 true=存在 false=不存在。
+	 * time:2018/03/15
+	 */
 	public static boolean searchFaculty(String faculty) throws SQLException{
 		int count = 0;
 		stmt = connect.createStatement();
@@ -26,18 +30,22 @@ public class FacultyLog {
 			return true;
 		return false;
 	}
-	
-	public static String[] allFaculty(){
+	/* 
+	 * inter：得到所有的学院名称，用来提示用户输入数据。
+	 * time:2018/03/15
+	 */
+	public static String[] allFaculty(String limit){
 		int count = 0;
 		try {
 			stmt = connect.createStatement();
-			String sql = "select count(*) totle from faculty;";
+			String sql = "select count(*) totle from faculty "+limit+";";
+			
 			res = stmt.executeQuery(sql);
 			while (res.next()) {
 				count = res.getInt("totle");
 			}
 			String data[] = new String[count];
-			sql = "select * from faculty";
+			sql = "select * from faculty "+limit+";";
 			res = stmt.executeQuery(sql);
 			int i=0;
 			while (res.next()) {
@@ -52,6 +60,10 @@ public class FacultyLog {
 	}
 	
 	@SuppressWarnings("unused")
+	/* 
+	 * inter：新加学院信息
+	 * time:2018/03/15
+	 */
 	public static boolean insertFaculty(String faculty,Statement stmt) throws SQLException{
 		if(stmt==null)
 			stmt = connect.createStatement();

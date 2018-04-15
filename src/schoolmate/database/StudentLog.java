@@ -21,14 +21,16 @@ public class StudentLog {
 	private static ResultSet res;
 	private static PreparedStatement pStat;
 	
-	//推测是否为同一个人。
+	/* 
+	 * inter：判断是否为同一个人，根据 姓名、学院、毕业年份、学历判断。count=1 得到学生ID，返回count（推测为同一个人的人数）
+	 * time:2018/03/15
+	 */
 	public static int uniqueStu(Student stu,Statement stmt) throws SQLException{
 		int count = 0;
 		String s_person = stu.s_person;
 		String s_phone = stu.s_phone;
 		if(s_person.equals(""))
 			s_person = "*****";
-		
 		if(s_phone.equals(""))
 			s_phone = "*****";
 		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_person='"+s_person+"' or (s_name='"+stu.s_name+"' and s_faculty='"+stu.s_faculty+"' and s_graduate='"+stu.s_graduate+"' and s_education='"+stu.s_education+"');";
@@ -43,7 +45,10 @@ public class StudentLog {
 		return count;
 	}
 	
-	//插入或者更新用户信息时，更新其他表格的数据(学院、系别、国家、省、市)
+	/* 
+	 * inter：插入学生记录时，判断数据库是否存在学生的基本信息，国家、省份、市区、学院、专业。不存在在同一个事务下插入基本记录。
+	 * time:2018/03/15
+	 */
 	public static void insertOption(String faculty,String major,String nation,String province,String city,Statement stmt) throws SQLException{
 		if(!faculty.equals("")){
 			boolean faclutyRes = FacultyLog.searchFaculty(faculty);
@@ -76,7 +81,10 @@ public class StudentLog {
 			}
 		}
 	}
-	
+	/* 
+	 * inter：判断是否存在该账号的用户。 count=该账号的人数
+	 * time:2018/03/15
+	 */
 	public static int searchSno(String sno,Statement stmt) throws SQLException{
 		if(stmt==null){
 			stmt = connect.createStatement();
@@ -89,7 +97,10 @@ public class StudentLog {
 		}
 		return count;
 	}
-	//不需要太多判断（判断学生的基本信息，学号是否存在）。
+	/* 
+	 * inter：判断输入的信息格式是否正确，并插入该信息。学生姓名不为空就可以插入。
+	 * time:2018/03/15
+	 */
 	public static String insertStudent(Student stu) throws SQLException{
 		String result = stu.judgeStudent();
 		try{
@@ -137,9 +148,10 @@ public class StudentLog {
 		stmt.close();
 		return null;
 	}
-	//type =0 正常导入，推测为一个人的检查。
-	//1 跳过推测为一个人的检查， 直接导入数据。
-	//2 导入推测为一个人的重复信息。当推测的人数为2时同样导入不成功。
+	/* 0 正常导入，推测为一个人的检查。1 跳过推测为一个人的检查， 直接导入学生数据。2 导入推测为一个人的学历数据。当推测的人数为2时同样导入不成功。
+	 * inter：Excel表导入学生记录，
+	 * time:2018/03/15
+	 */
 	public static String importExl(Statement stmt,Student stu,int type) throws SQLException{
 		String result = stu.judgeStudent();
 		try{
@@ -208,8 +220,8 @@ public class StudentLog {
 		}
 		return null;
 	}
-	/* 对学生信息的更新操作，并更新索引表
-	 * Boolean true=>更新工作信息，false=>不更新工作信息。
+	/* 对学生基本信息的更新操作，更新基本信息，并更新索引表（排除学历信息和工作信息）
+	 * time:2018/03/15
 	 */
 	public static String updateStudent(Student stu,int sId) throws SQLException{
 		String result = stu.judgeStudent();
@@ -245,12 +257,16 @@ public class StudentLog {
 		stmt.close();
 		return null;
 	}
-	
+	/* 在一个事务下刷新学生的修改日期
+	 * time:2018/03/15
+	 */
 	public static void updateTime(int id,Statement stmt,long time) throws SQLException{
 		String sql = "update student set update_time="+time+" where s_id="+id;
 		stmt.executeUpdate(sql);
 	}
-	
+	/* 在一个事务下刷新学生的修改日期
+	 * time:2018/03/15
+	 */
 	public static int getNumber(String sql) throws SQLException{
 		int count = 0;
 		stmt = connect.createStatement();
@@ -262,7 +278,9 @@ public class StudentLog {
 		}
 		return count;
 	}
-	
+	/* 得到所有的备注字段
+	 * time:2018/03/15
+	 */
 	public static String[] SelectRemarks() throws SQLException{
 		String[] str = new String[5];
 		stmt = connect.createStatement();
@@ -275,7 +293,9 @@ public class StudentLog {
 		}
 		return str;
 	}
-	 
+	/* 更新的备注字段
+	 * time:2018/03/15
+	 */
 	public static boolean updateRemarks(String str,int i) throws SQLException{
 		stmt = connect.createStatement();
 		String sql = "update remark set r_title = '"+str+"' where  r_id ="+(i+1);
@@ -287,7 +307,9 @@ public class StudentLog {
 		}
 		return false;
 	}
-	
+	/* 根据学生的id字段，删除学生记录并删除教育、工作、全文检索记录
+	 * time:2018/03/15
+	 */
 	public static boolean deleteStudent(int sId){
 		try {
 			stmt = connect.createStatement();
@@ -299,7 +321,6 @@ public class StudentLog {
 			connect.commit();
 			stmt.close();
 		} catch (SQLException e) {
-			PencilMain.logger.error("删除学生信息抛错"+e.getMessage());
 			e.printStackTrace();
 			return false;
 		}
@@ -340,8 +361,10 @@ public class StudentLog {
 			e.printStackTrace();
 		}
 	}
-	
-	//得到所有的职称分类
+	/*
+	 * inter:得到所有的职称分类
+	 * time：2018/03/15
+	 */
 	public static String[] allWorkTitle(){
 		int count = 0;
 		try {
@@ -368,7 +391,6 @@ public class StudentLog {
 	
 	//返回table数组
 	public static Vector<Object[]> dao(String str) throws Exception{
-		System.out.println(str);
 		PreparedStatement stmt = connect.prepareStatement(str);
 		ResultSet rs = stmt.executeQuery();
 		int count = 0;
@@ -391,7 +413,10 @@ public class StudentLog {
 		return info;
 	}
 	
-	//得到学生表的日志字段
+	/*
+	 * inter:根据用户ID，得到用户的全文检索数据。一般用于学生全文检索数据的更新
+	 * time：2018/03/15
+	 */
 	public static String getStudentLog(int sId,Statement stmt) throws SQLException{
 		String sql = "select s_no,s_name,s_phone,s_tphone,s_address,s_qq,s_weixin from student where s_id = "+sId;
 		res = stmt.executeQuery(sql);
@@ -408,7 +433,10 @@ public class StudentLog {
 		return data;
 	}
 	
-	//更新学生的基本信息。更新学生的工作时调用。
+	/*
+	 * inter:学生添加工作时，更新学生的当前工作信息。
+	 * time：2018/03/15
+	 */
 	public static void updateWork(Work stu,Statement stmt) throws SQLException{
 		boolean change = false;
 		if(stmt==null){
@@ -427,8 +455,11 @@ public class StudentLog {
 		}
 	}
 	
-	//得到各个办公室更新的数据
-	public static Vector<Object[]> getUpdate(long time,String limit) throws SQLException{
+	/*
+	 * inter:各个办公室数据合并的方法，根据数据开始和结束时间得到更新的数据
+	 * time：2018/03/15
+	 */
+	public static Vector<Object[]> getUpdate(long time,long eTime,String limit) throws SQLException{
 		String option;
 		if(limit.equals(""))
 			option = "";
@@ -437,11 +468,11 @@ public class StudentLog {
 		String sql = "select s.s_no,s_name,s_sex,s_birth,s_person,s_hometown,e.s_faculty,e.s_major,"
 			+ "e.s_class,e.s_education,e.s_enter,e.s_graduate,w.nation,w.province,w.city,w.s_workspace,w.s_worktitle,"
 			+ "w.s_work,s_workphone,s_homephone,s_phone,s_tphone,s_address,s_postcode,s_email,s_qq,s_weixin,s_remark1,"
-			+ "s_remark2,s_remark3,s_remark4,s_remark5 from"+" (select * from student where update_time>="+time+") s join ("
-			+ "select * from education  where update_time>="+time+option+") e on s.s_id=e.s_id left join "
-			+ "(select * from worklog where update_time>="+time+") w on s.s_id=w.s_id order by s.update_time asc;";
-		System.out.println(sql);
+			+ "s_remark2,s_remark3,s_remark4,s_remark5 from"+" (select * from student where update_time>="+time+" and update_time<="+eTime+") s join ("
+			+ "select * from education  where update_time>="+time+" and update_time<="+eTime+option+") e on s.s_id=e.s_id left join "
+			+ "(select * from worklog where update_time>="+time+" and update_time<="+eTime+") w on s.s_id=w.s_id order by s.update_time asc;";
 		stmt = connect.createStatement();
+		System.out.println(sql);
 		ResultSet rs = stmt.executeQuery(sql);
 		ResultSetMetaData rsmd=rs.getMetaData();//用于获取关于 ResultSet 对象中列的类型和属性信息的对象
 		int colNum=rsmd.getColumnCount();	//得到列数

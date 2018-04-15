@@ -28,36 +28,36 @@ import schoolmate.model.User;
 import schoolmate.view.element.FrameMenubar;
 import schoolmate.view.element.FrameToolBar;
 import schoolmate.view.element.TabelPanel;
+import schoolmate.view.element.tablePanel.AllUserPanel;
 
 public class PencilMain extends JFrame{
 	private static final long serialVersionUID = 1L;
 	public static final int COLUM = 34;
-	public static User nowUser;
-	public static int rowCount=25;
-	public JDesktopPane desktopPane;
-	public static boolean dbControl = true;	//数据库一写多读的要求 false=>正在处理大量的写数据。
-	private SendEmailFrame sendEmailFrame;
-	private AllUserFrame userFrame;
-	private LabelManageFrame labelFrame;
-	private FrameMenubar frameMenubar;
-	private FrameToolBar toolbar;
-	public TabbedFrame tabbedFrame;
+	public static User nowUser;	//当前登陆的用户信息
+	public JDesktopPane desktopPane;	//多文档窗体容器
+	public static boolean dbControl = true;	//sqlite数据库只支持一写多读，false=>正在处理大量的写数据。
+	private SendEmailFrame sendEmailFrame;	//发送邮箱界面
+	private AllUserFrame userFrame;	//用户管理界面
+	private LabelManageFrame labelFrame;	//字段修改界面
+	private FrameMenubar frameMenubar;	//顶部菜单栏
+	private FrameToolBar frameToolbar;	//顶部功能栏
+	public TabbedFrame tabbedFrame;	//条件检索界面
 	private ImportExlFrame importFrame;	//文件导入界面
-	private BackupUpdateFrame backupUpdate;
+	private BackupUpdateFrame backupUpdate;	//	导出更新数据额界面
 	public CollectDataFrame collectDataFrame;	//汇总功能界面
-	private OutportExlFrame output;	//导出标准Excel界面
+	private OutportExlFrame outputFrame;	//导出标准Excel界面
 	private BackupsDataFrame backupsFrame;	//数据备份界面
 	private ReNewFrame reNewFrame;	//数据恢复界面
-	private LoginFrame loginFrame;//登录界面
-	private RemarksFrame Remarks;
-	private UserDetailFrame userDetail;
+	private LoginFrame loginFrame;	//登录界面
+	private RemarksFrame remarkFrame;	//修改备注字段界面
+	private UserDetailFrame userDetail;	//用户详情界面
 	private PencilMain _this;
 	private ForgetPasswordFrame forgetPassword;	//忘记密码界面
 	public static int frameWidth,frameHeight;	//屏幕宽高
 	public static int showWidth,showHeight;
 	public static String education[] = {"  请选择设置的密保问题    ","数字与字母组合6至12位"};
-	public static String regular[] = {"","^[\\d]{6,12}$","^[\\w]{6,12}$"};
-	public static String dbPath = "jdbc:sqlite:E:/assess/schoolmates.db";
+	public static String regular[] = {"^[\\d]{6,12}$","^[\\w]{6,12}$"};
+	public static String dbPath = "jdbc:sqlite:E:/assess/spy/mates.lite";
 	public static String[] DEFAULT_FONT  = new String[]{
 		    "CheckBox.font",
 		    "ScrollPane.font",
@@ -79,8 +79,7 @@ public class PencilMain extends JFrame{
 			"ComboBox.font",
 		    "MenuItem.font",
 			"PopupMenu.font",
-			"ProgressBar.font",
-		    
+			"ProgressBar.font", 
 	};
 	public static Logger logger = Logger.getLogger(PencilMain.class);
 	public PencilMain() throws Exception{
@@ -116,17 +115,6 @@ public class PencilMain extends JFrame{
         });
 	}
 	
-	private Image getImagePath(String resource){
-		Image image=null;
-		InputStream is = (InputStream) this.getClass().getResourceAsStream(resource);   
-		try {
-			image = ImageIO.read(is);
-		} catch (IOException e) {
-			logger.error(e.getMessage());
-		}
-		return image;
-	}
-	
 	//得到中间面板的宽和高
 	public void getShowSize(){
 		Dimension size = desktopPane.getSize();
@@ -136,6 +124,17 @@ public class PencilMain extends JFrame{
     	showWidth = size.width;
     	showHeight = size.height;
     	repaint();
+	}
+	
+	private Image getImagePath(String resource){
+		Image image=null;
+		InputStream is = (InputStream) this.getClass().getResourceAsStream(resource);   
+		try {
+			image = ImageIO.read(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return image;
 	}
 		
 	public static void main(String[] args) throws Exception{
@@ -158,8 +157,8 @@ public class PencilMain extends JFrame{
         pencil.showLogin();
 	}
 	
-	public void showLogin() throws Exception{
-		if(loginFrame==null){
+	public void showLogin(){	//显示登录界面
+		if(loginFrame==null||loginFrame.isClosed()){
 			loginFrame = new LoginFrame(this);
 			desktopPane.add(loginFrame);
 		}else
@@ -168,10 +167,27 @@ public class PencilMain extends JFrame{
 			loginFrame.setUser();
 		loginFrame.toFront();
 	}
-	
-	//汇总
-	public void collectPanel() throws Exception{
-		if(collectDataFrame==null){
+	public void quitLogin(){	//退出登录
+		nowUser = null;
+		setJMenuBar(null);
+		remove(frameToolbar);
+		collectDataFrame.dispose();
+		showLogin();
+		repaint();
+	}
+	public void loginSuccess() throws Exception{
+		loginFrame.dispose();
+		frameMenubar = new FrameMenubar(this);
+		frameToolbar = new FrameToolBar(this);
+		setJMenuBar(frameMenubar.createMenu());
+		if(nowUser.u_role>1)
+			add(frameToolbar,BorderLayout.NORTH);
+		getContentPane().revalidate();
+		getContentPane().repaint();
+		collectPanel();
+	}
+	public void collectPanel() throws Exception{	//汇总
+		if(collectDataFrame==null||collectDataFrame.isClosed()){
 			collectDataFrame = new CollectDataFrame(this);
 			desktopPane.add(collectDataFrame);
 		}
@@ -180,49 +196,39 @@ public class PencilMain extends JFrame{
 		collectDataFrame.toFront();
 		collectDataFrame.setMaximum(true);
 	}
-	
-	public void forgetPassword(){
-		if(forgetPassword==null){
+	public void forgetPassword(){	//忘记密码
+		if(forgetPassword==null||forgetPassword.isClosed()){
 			forgetPassword = new ForgetPasswordFrame(this);
 			desktopPane.add(forgetPassword);
-		}
+		}else
+			forgetPassword.setVisible(!forgetPassword.isShowing());
 		forgetPassword.toFront();
 	}
-	
-	public void userLogin() throws Exception{
-		loginFrame.hide();
-		frameMenubar = new FrameMenubar(this);
-		toolbar = new FrameToolBar(this);
-		setJMenuBar(frameMenubar.createMenu());
-		add(toolbar,BorderLayout.NORTH);
-		getContentPane().revalidate();
-		getContentPane().repaint();
-		collectPanel();
-	}
-	public void alterLabel(TabelPanel tableDemo,String[] label,String[] text,int type){
+	public void alterLabel(TabelPanel tableDemo,String[] label,String[] text,int type){	//修改数据库字段
 		AlterLabelFrame alterLabel = new AlterLabelFrame(tableDemo,label,text,type);
 		desktopPane.add(alterLabel);
 		alterLabel.toFront();
 	}
-	//显示用户详情
-	public void userDetail(){
+	public void userDetail(){	//显示用户详情
 		if(userDetail==null||userDetail.isClosed()){
 			userDetail = new UserDetailFrame(this);
 			desktopPane.add(userDetail);
 		}
 		userDetail.toFront();
 	}
-	public void importExl() throws PropertyVetoException{
-		//null或者点关闭之后重新初始化，点击菜单栏改变显示的状态
+	public void importExl(){
 		if(importFrame==null||importFrame.isClosed()){
 			importFrame = new ImportExlFrame(this);       
 	        desktopPane.add(importFrame);
 		}
         importFrame.toFront();
 	}
-	public void addWorkLog(int type,int id,StudentDetailFrame detail,int updateId) throws PropertyVetoException{
-		//null或者点关闭之后重新初始化，点击菜单栏改变显示的状态
-		AddWorkLogFrame addWorkLogFrame = new AddWorkLogFrame(type,id,detail,updateId);       
+	/*
+	 * type0=工作记录，1=教育记录。id=修改的学生ID。 updateId=修改的信息id，默认为0
+	 * inter：添加学生的工作或者学习记录
+	 */
+	public void addStudentLog(int type,int id,StudentDetailFrame detail,int updateId){
+		AddStudentLogFrame addWorkLogFrame = new AddStudentLogFrame(type,id,detail,updateId);       
         desktopPane.add(addWorkLogFrame);
 		addWorkLogFrame.toFront();
 	}
@@ -249,6 +255,10 @@ public class PencilMain extends JFrame{
         //介绍网站https://sourceforge.net/p/djproject/discussion/671154/thread/e813001e/
         //NativeInterface.runEventPump();  
 	}
+	/*
+	 * temp=学生记录，type：0=展示，1=修改，2=添加
+	 * inter：添加学生的工作或者学习记录
+	 */
 	public void studentDetail(String[] temp,int type){
 		StudentDetailFrame detailFrame = new StudentDetailFrame(this,temp,type);
 		desktopPane.add(detailFrame);
@@ -257,53 +267,47 @@ public class PencilMain extends JFrame{
 	//导出Excel
 	public void outputExl(StudentModel studentModel,int type,String title){
 		if(backupsFrame==null||backupsFrame.isClosed()){
-			output = new OutportExlFrame(studentModel,type,title);
-			desktopPane.add(output);
-			output.toFront();
+			outputFrame = new OutportExlFrame(studentModel,type,title);
+			desktopPane.add(outputFrame);
+			outputFrame.toFront();
 		}else{
-			output.dispose();
+			outputFrame.dispose();
 		}
 	} 
-	//备份
-	public void backupsData(){
+	
+	public void backupsData(){	//数据备份
 		if(backupsFrame==null||backupsFrame.isClosed()){
 			backupsFrame = new BackupsDataFrame();
 			desktopPane.add(backupsFrame);
 		}
 		backupsFrame.toFront();
 	}
-	
-	public void backupUpdate(){
+	public void backupUpdate(){	//导出更新数据
 		if(backupUpdate==null||backupUpdate.isClosed()){
 			backupUpdate = new BackupUpdateFrame(this);
 			desktopPane.add(backupUpdate);
 		}
 		backupUpdate.toFront();
 	}
-	
-	//还原
-	public void reNewFrame(){
+	public void reNewFrame(){	//数据库还原
 		if(reNewFrame==null||reNewFrame.isClosed()){
 			reNewFrame = new ReNewFrame();
 			desktopPane.add(reNewFrame);
 		}
 		reNewFrame.toFront();
 	}
-	//修改备注
-	public void Remarks(){
-		if(Remarks==null||Remarks.isClosed()){
-			Remarks = new RemarksFrame();
-			desktopPane.add(Remarks);
+	public void remarkFrame(){	//修改备注
+		if(remarkFrame==null||remarkFrame.isClosed()){
+			remarkFrame = new RemarksFrame();
+			desktopPane.add(remarkFrame);
 		}
-		Remarks.toFront();
+		remarkFrame.toFront();
 	}
-	//添加用户
-	public void addUser(int id){
-		AddUserFrame addUserFrame = new AddUserFrame(id);
+	public void addUser(AllUserPanel alluser,int id){	//添加用户( id 修改的用户id)
+		AddUserFrame addUserFrame = new AddUserFrame(alluser,id);
 		desktopPane.add(addUserFrame);
 		addUserFrame.toFront();
 	}
-	
 	public void labelManage() throws SQLException{
 		if(labelFrame==null||labelFrame.isClosed()){
 			labelFrame = new LabelManageFrame(collectDataFrame);
@@ -324,7 +328,7 @@ public class PencilMain extends JFrame{
 		dbControl = type;
 		collectDataFrame.MenuControl(dbControl);
 		frameMenubar.MenuControl(dbControl);
-		toolbar.MenuControl(dbControl);
+		frameToolbar.MenuControl(dbControl);
 	}
 	
 }

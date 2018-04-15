@@ -48,15 +48,15 @@ public class RemarksFrame extends JInternalFrame implements ActionListener{
     	Update.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
     	Update.setForeground(Color.white);  
     	Update.addActionListener(this);
-    	Back.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
+    	Back.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
     	Back.setForeground(Color.white);  
     	Back.addActionListener(this);
     	BackupsPanel = new JPanel();
     	BackupsPanel.setBackground(Color.WHITE);
     	GroupLayout layout = new GroupLayout(BackupsPanel); 
     	BackupsPanel.setLayout(layout);
-		setSize(400, 400);
-		setLocation((PencilMain.showWidth-400)/2, 0);
+		setSize(360, 360);
+		setLocation((PencilMain.showWidth-360)/2, 0);
 		setVisible(true);
 		//创建GroupLayout的水平连续组，，越先加入的ParallelGroup，优先级级别越高。几列
 		GroupLayout.SequentialGroup hGroup = layout.createSequentialGroup();
@@ -100,20 +100,16 @@ public class RemarksFrame extends JInternalFrame implements ActionListener{
 						StudentLog.updateRemarks(Remarks[i].getText(), i);
 						update = true;
 					} catch (SQLException e1) {
-						JOptionPane.showMessageDialog(null, "修改失败！");
+						JOptionPane.showMessageDialog(this, "修改失败！");
 						e1.printStackTrace();
 						return;
 					}
 				}
 			}
 			if(update){
-				int res = JOptionPane.showConfirmDialog(null, "修改成功！请重启该系统更新数据O(∩_∩)O","提示",JOptionPane.YES_NO_OPTION);
-				if(res==0)
-					System.exit(0);
-				else
-					dispose();
+				JOptionPane.showMessageDialog(this, "修改成功！重启系统后使用新的字段");
 			}else{
-				JOptionPane.showMessageDialog(null, "您没有改变原数据！");
+				JOptionPane.showMessageDialog(this, "改变数据后再点击修改！");
 			}
 		}else if(btn == Back){
 			dispose();

@@ -13,7 +13,10 @@ public class AddressLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
 	private static ResultSet res;
-	//国家的处理方法
+	/* 
+	 * inter：判断该国家是否存在。 true=存在 false=不存在。
+	 * time:2018/03/15
+	 */
 	public static boolean searchNation(String address) throws SQLException{
 		int count = 0;
 		stmt = connect.createStatement();
@@ -30,7 +33,7 @@ public class AddressLog {
 	}
 	
 	/* 
-	 * inter：根据国家的所有字段，删除国家数据，并通过 delProvinceNa和delCityNa方法，删除国家下的省份和市区。
+	 * inter：根据国家的所有字段，删除国家数据，并通过 delProvinceNa和delCityNa方法，删除国家下的省份和市区。 并使用delStuFromAdd方法删除该地区的学生
 	 * time:2018/03/15
 	 */
 	public static boolean deleteNation(String name){
@@ -72,7 +75,10 @@ public class AddressLog {
 		}
 		return true;
 	}
-	
+	/* 
+	 * inter：得到所有的国家名称，用来提示用户输入数据。
+	 * time:2018/03/15
+	 */
 	public static String[] allNation(){
 		int count = 0;
 		try {
@@ -96,13 +102,19 @@ public class AddressLog {
 		}
 		return null;
 	}
-	
+	/* 
+	 * inter：一般用于国家不存在时，在一个事务的情况下插入一个国家。
+	 * time:2018/03/15
+	 */
 	public static void insertNation(String address,Statement stmt) throws SQLException{
 		String sql = "INSERT INTO nation (n_name) VALUES ('"+address+"');";
 		stmt.executeUpdate(sql);
 	}
 	
-	//省份的处理方法
+	/* 
+	 * inter：判断该省份是否存在。 true=存在 false=不存在。
+	 * time:2018/03/15
+	 */
 	public static boolean searchProvince(String address,String nation) throws SQLException{
 		int count = 0;
 		stmt = connect.createStatement();
@@ -118,7 +130,7 @@ public class AddressLog {
 		return false;
 	}
 	/* 
-	 * inter：根据省份的所有字段，删除省份数据，并通过 delCityFromPro 方法，删除省份下的市区。
+	 * inter：根据省份的所有字段，删除省份数据，并通过 delCityFromPro 方法，删除省份下的市区。并通过 delStuFromAdd 方法删除该地区的学生信息。
 	 * time:2018/03/15
 	 */
 	public static int deleteProvince(String province,String nation){
@@ -161,7 +173,10 @@ public class AddressLog {
 		}
 		return true;
 	}
-	
+	/*
+	 * inter：根据一定情况得到该情况下的省份数据。一般用于提示用户输入
+	 * time:2018/03/15
+	 */
 	public static String[] allProvince(String str){
 		int count = 0;
 		try {
@@ -185,7 +200,10 @@ public class AddressLog {
 		}
 		return null;
 	}
-	
+	/* 
+	 * inter：用于省份不存在时，在一个事务的情况下插入一个省份。
+	 * time:2018/03/15
+	 */
 	public static void insertProvince(String address,String nation,Statement stmt) throws SQLException{
 		String sql = "INSERT INTO province (p_name,n_name) VALUES ('"+address+"','"+nation+"');";
 		stmt.executeUpdate(sql);
@@ -257,7 +275,10 @@ public class AddressLog {
 		String sql = "update city set n_name='"+now[0]+"' where n_name='"+old[0]+"';";
 		stmt.executeUpdate(sql);
 	}
-	
+	/* 
+	 * inter：删除市区的数据。并通过 delStuFromAdd 方法删除该地区的学生信息。
+	 * time:2018/03/15
+	 */
 	public static boolean deleteCity(String city,String province,String nation){
 		try {
 			stmt = connect.createStatement();
@@ -288,6 +309,7 @@ public class AddressLog {
 			connect.commit();
 			stmt.close();
 		} catch (SQLException e) {
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 			return false;
 		}
@@ -318,7 +340,10 @@ public class AddressLog {
 		}
 		return null;
 	}
-	
+	/* 
+	 * inter：用于市区不存在时，在一个事务的情况下插入一个市区。
+	 * time:2018/03/15
+	 */
 	public static void insertCity(String address,String province,String nation,Statement stmt) throws SQLException{
 		String sql = "INSERT INTO city (c_name,p_name,n_name) VALUES ('"+address+"','"+province+"','"+nation+"');";
 		stmt.executeUpdate(sql);

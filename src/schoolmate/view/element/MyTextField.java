@@ -36,6 +36,12 @@ public class MyTextField extends JTextField implements FocusListener{
 		addFocusListener(this);
 	}
 	
+	public void setShowText(String value){
+		showText = value;
+		setText(value);
+		setForeground(Color.GRAY);
+	}
+	
 	public void setMenu(List<Object> model){
 		if(model!=null){
 			this.model = model; 
@@ -106,7 +112,6 @@ public class MyTextField extends JTextField implements FocusListener{
 					e1.printStackTrace();
 				}
 				index = e.getDot();
-				System.out.println(index);
 			}
 		}
 	}

@@ -79,11 +79,7 @@ public class EduDetailPanel extends TabelPanel implements ActionListener{
 				JOptionPane.showMessageDialog(null, "正在导入数据，不允许该操作");
 			}
 		}else if(item==alterItem){
-			try {
-				pencil.addWorkLog(1,sId,detail,eId);
-			} catch (PropertyVetoException e1) {
-				e1.printStackTrace();
-			}
+			pencil.addStudentLog(1,sId,detail,eId);
 		}
 	}
 }

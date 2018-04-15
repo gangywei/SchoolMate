@@ -25,8 +25,8 @@ import schoolmate.view.element.RegexDocument;
 public class LoginFrame extends JInternalFrame implements ActionListener{
 	private PencilMain pencilMain;
 	protected JPanel loginContent;
-	private JTextField userCount = new JTextField("18439331592",15);
-    private JPasswordField userPwd = new JPasswordField("121961",15);  
+	private JTextField userCount = new JTextField("",15);
+    private JPasswordField userPwd = new JPasswordField("",15);  
     private JLabel userLabel = new JLabel("账     号：");  
     private JLabel pwdLabel = new JLabel("密     码：");  
     private JButton loginBtn = new JButton("登    录");  
@@ -60,7 +60,7 @@ public class LoginFrame extends JInternalFrame implements ActionListener{
         loginContent.add(resetBtn);
         
         setSize(400, 240);
-        setLocation((PencilMain.showWidth-450)/2, (PencilMain.showHeight-240)/2);
+        setLocation((PencilMain.showWidth-400)/2, (PencilMain.showHeight-240)/2);
         add(loginContent);
 		setVisible(true);
 	}
@@ -97,7 +97,7 @@ public class LoginFrame extends JInternalFrame implements ActionListener{
 						pencilMain.nowUser.u_problem = Integer.parseInt(result[1]);
 						pencilMain.nowUser.u_answer = result[2];
 						pencilMain.nowUser.u_name = result[0];
-						pencilMain.userLogin();
+						pencilMain.loginSuccess();
 					}
 				} catch (Exception e1) {
 					e1.printStackTrace();

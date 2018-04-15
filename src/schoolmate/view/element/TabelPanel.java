@@ -50,7 +50,7 @@ public abstract class TabelPanel extends JPanel{
 		initTable();
 		popupMenu.add(alterItem);
 		popupMenu.add(deleteItem);
-		table.setAutoCreateRowSorter(true);
+		//table.setAutoCreateRowSorter(true);
 		table.setFillsViewportHeight(true);
         tableScroll = new JScrollPane(table);
         tableScroll.setBackground(Color.WHITE);

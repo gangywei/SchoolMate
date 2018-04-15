@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -24,7 +25,7 @@ import schoolmate.model.Education;
 import schoolmate.model.Work;
 import schoolmate.view.element.MyTextField;
 
-public class AddWorkLogFrame extends JInternalFrame implements ActionListener{
+public class AddStudentLogFrame extends JInternalFrame implements ActionListener{
 	private JPanel detailPanel = new JPanel();
 	private String education[] = {"","专科","本科","硕士","博士"};
 	private JLabel workLabel[] = {new JLabel("工作国家："),new JLabel("工作省份："),new JLabel("工作市区：")
@@ -32,17 +33,19 @@ public class AddWorkLogFrame extends JInternalFrame implements ActionListener{
 	private JLabel eduLabel[] = {new JLabel("学    号："),new JLabel("学     院："),new JLabel("专    业："),new JLabel("班    级：")
 			,new JLabel("学    历："),new JLabel("入学年份："),new JLabel("毕业年份：")};
 	private MyTextField inputAry[] = new MyTextField[7];
-	private List<Object> majorList,facultyList,eduList,nationList,provinceList,cityList;
+	private List<Object> majorList,facultyList,eduList,nationList,provinceList,cityList,yearList;
 	private String[] majorAry,facultyAry;
 	private JButton submitBtn = new JButton("提    交"),
 			resetBtn = new JButton("关闭页面");
 	private int type,sId;
-	private int now_id = 0;
+	private int nowId = 0;
 	private StudentDetailFrame detail;
+	private Calendar date = Calendar.getInstance();
+	private int inYear = 1985,outYear = date.get(Calendar.YEAR);
 	//type 判断0=工作记录 1=教育记录 2=需要修改学生表的工作记录
 	//n_id 修改信息的now_ID
-	public AddWorkLogFrame(int type,int sId,StudentDetailFrame detail,int n_id){
-		this.now_id = n_id;
+	public AddStudentLogFrame(int type,int sId,StudentDetailFrame detail,int n_id){
+		this.nowId = n_id;
 		this.detail = detail;
 		this.type = type;
 		this.sId = sId;
@@ -61,12 +64,12 @@ public class AddWorkLogFrame extends JInternalFrame implements ActionListener{
 		detailPanel.setLayout(layout);
 		for(int i=0;i<7;i++)
 			inputAry[i] = new MyTextField("", 15);
-		if(now_id!=0){
+		if(nowId!=0){
 			String data[];
 			if(type!=1)
-				data = WorkLog.searchWork(now_id);
+				data = WorkLog.searchWork(nowId);
 			else
-				data = EducationLog.searchEdu(now_id);
+				data = EducationLog.searchEdu(nowId);
 			for(int i=0;i<data.length&&data!=null;i++)
 				inputAry[i].setText(data[i]);
 		}
@@ -98,11 +101,25 @@ public class AddWorkLogFrame extends JInternalFrame implements ActionListener{
 	  		hGroup.addGap(20);
 		}else{
 			setTitle("添加学历记录");
+			if(nowId==0){
+				inputAry[4].setShowText("必填内容");
+				inputAry[1].setShowText("必填内容");
+				inputAry[6].setShowText("必填内容");
+			}
 			eduList = new ArrayList<Object>();
+			yearList = new ArrayList<Object>();
 			majorList = new ArrayList<Object>();
 	        facultyList = new ArrayList<Object>();
-	        facultyAry = FacultyLog.allFaculty();
-			majorAry = MajorLog.allMajor("");
+	        if(detail.collect.user.u_role==1)
+	        	facultyAry = FacultyLog.allFaculty("where f_name in "+detail.collect.limitTemp);
+	        else
+	        	facultyAry = FacultyLog.allFaculty("");
+	        for(int now=outYear;now>=inYear;now--)
+				yearList.add(now+"");
+	        if(detail.collect.user.u_role==1)
+	        	majorAry = MajorLog.allMajor("where f_name in "+detail.collect.limitTemp);
+	        else
+	        	majorAry = MajorLog.allMajor("");
 			for(int i=0;i<majorAry.length;i++)
 				majorList.add(majorAry[i]);
 			for(int i=0;i<facultyAry.length;i++)
@@ -112,6 +129,8 @@ public class AddWorkLogFrame extends JInternalFrame implements ActionListener{
 			inputAry[1].setMenu(facultyList);
 			inputAry[2].setMenu(majorList);
 			inputAry[4].setMenu(eduList);
+			inputAry[5].setMenu(yearList);
+			inputAry[6].setMenu(yearList);
 	  		hGroup.addGroup(layout.createParallelGroup().addComponent(eduLabel[0]).addComponent(eduLabel[1]).addComponent(eduLabel[2]).addComponent(eduLabel[3])
 	  				.addComponent(eduLabel[4]).addComponent(eduLabel[5]).addComponent(eduLabel[6]).addComponent(submitBtn));
 	  		hGroup.addGap(15);
@@ -153,11 +172,11 @@ public class AddWorkLogFrame extends JInternalFrame implements ActionListener{
 				Work temp = new Work(inputAry[0].getText(),inputAry[1].getText(),inputAry[2].getText(),inputAry[3].getText(),
 						inputAry[4].getText(),inputAry[5].getText());
 				temp.s_id = sId;
-				temp.wl_id = now_id;
+				temp.wl_id = nowId;
 				try {
-					if(now_id==0)
+					if(nowId==0){
 						WorkLog.insertWork(temp, null);
-					else{
+					}else{
 						if(type==0)
 							WorkLog.updateWork(temp, null,0);
 						else
@@ -171,7 +190,7 @@ public class AddWorkLogFrame extends JInternalFrame implements ActionListener{
 				}
 			}else{
 				String s_no = inputAry[0].getText();
-				String regNo = "[\\d]{10}";
+				String regNo = "[\\d]{8,15}";
 				if(!s_no.equals(""))
 					if(!Helper.matchRegular(s_no, regNo)){
 						JOptionPane.showMessageDialog(this, "学号输入不符合要求");
@@ -180,17 +199,24 @@ public class AddWorkLogFrame extends JInternalFrame implements ActionListener{
 				Education temp = new Education(0,inputAry[0].getText(),inputAry[4].getText(),inputAry[1].getText(),inputAry[2].getText(),
 						inputAry[3].getText(),inputAry[5].getText(),inputAry[6].getText());
 				temp.s_id = sId;
-				temp.e_id = now_id;
+				temp.e_id = nowId;
+				boolean res = false;
 				try {
-					if(now_id==0)
-						EducationLog.insertEdu(null, temp);
-					else
-						EducationLog.updateEdu(null, temp);
-					detail.eduTabel.updateTabel();
-					this.dispose();
+					if(nowId==0){
+						res = EducationLog.insertEdu(null, temp);
+						if(!res)
+							JOptionPane.showMessageDialog(this, "存在该学历信息");
+					}else{
+						res = EducationLog.updateEdu(null, temp);
+							
+					}
+					if(res){
+						detail.eduTabel.updateTabel();
+						this.dispose();
+					}
 				} catch (SQLException e1) {
 					e1.printStackTrace();
-					JOptionPane.showMessageDialog(this, "添加成功");
+					JOptionPane.showMessageDialog(this, "添加失败");
 				}
 			}
 			detail.collect.refeshBtn.doClick();

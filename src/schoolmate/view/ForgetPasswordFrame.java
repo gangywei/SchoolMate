@@ -25,18 +25,19 @@ import schoolmate.control.Helper;
 import schoolmate.database.StudentLog;
 import schoolmate.database.UserLog;
 import schoolmate.model.User;
+import schoolmate.view.element.MyTextField;
 
 public class ForgetPasswordFrame extends JInternalFrame implements ActionListener{
 	private PencilMain pencilMain;
 	protected JPanel loginContent;
-	private JTextField userCount = new JTextField(15);
+	private MyTextField userCount = new MyTextField("用户注册手机号",15);
 	private JComboBox<String> userPro = new JComboBox<String>(PencilMain.education);
 	private JPasswordField userAns = new JPasswordField(15); 
     private JPasswordField userPwd = new JPasswordField(15);  
     private JPasswordField confirmUserPwd = new JPasswordField(15);
-    private JLabel userLabel = new JLabel("账     号： ");  
-    private JLabel proLabel = new JLabel("问     题： ");  
-    private JLabel ansLabel = new JLabel("答     案： "); 
+   private JLabel userLabel = new JLabel("账      号： ");  
+    private JLabel proLabel = new JLabel("问      题： ");  
+    private JLabel ansLabel = new JLabel("答      案： "); 
     private JLabel pwdLabel = new JLabel("新 密 码： ");
     private JLabel confirmPwdLabel = new JLabel("确认密码：");
     private JButton confirm = new JButton("确    认");  
@@ -93,11 +94,11 @@ public class ForgetPasswordFrame extends JInternalFrame implements ActionListene
 			}else if(index==0){
 				JOptionPane.showMessageDialog(null, "请选择并填写密保问题！");
 				return;
-			}else if(!Helper.matchRegular(answer, PencilMain.regular[index])){
-				JOptionPane.showMessageDialog(null, "密保问题不符合要求！");
-				return;
 			}else if(!upwd.trim().equals(confirmUpwd.trim())){
 				JOptionPane.showMessageDialog(null, "密码不一致");
+				return;
+			}else if(!Helper.matchRegular(upwd.trim(), PencilMain.regular[2])){
+				JOptionPane.showMessageDialog(null, "密码格式为6-12位数字或字母");
 				return;
 			}
 
@@ -107,8 +108,8 @@ public class ForgetPasswordFrame extends JInternalFrame implements ActionListene
 					if(UserLog.alterPwd(uname.trim(), upwd.trim(),index,answer)){
 						PencilMain.nowUser = new User(uname, upwd);
 						JOptionPane.showMessageDialog(null, "修改成功,即将返回登陆页面");
-						setVisible(false);
 						pencilMain.showLogin();
+						dispose();
 					}else{
 						JOptionPane.showMessageDialog(null, "修改密码失败，请重新操作");
 						return;
@@ -122,7 +123,7 @@ public class ForgetPasswordFrame extends JInternalFrame implements ActionListene
 			}
 
 		}else if(btn==cancel){
-			setVisible(false);
+			dispose();
 			try {
 				pencilMain.showLogin();
 			} catch (Exception e1) {

@@ -18,25 +18,12 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 	public static String[] errorCol = {"错误信息","学号","姓名","性别","出生日期","身份证号","籍贯","学院","专业","班级","学历",
 			"入学年份","毕业年份","工作国家","工作省份","工作市区","工作单位","职称","职务","办公电话","家用电话",
 			"手机","手机2","通讯地址","邮编","E-mail","QQ","微信","","","","",""};	//33个字段
-	public static boolean[] dataStyle = {false,false,false,true,true,false,false,false,false,false,
-			true,true,false,false,false,false,false,false,true,true,
-			true,true,false,true,false,true,false,false,false,false,false,false};
-	public String nowColumn[];
-	public String[] Remarks = new String[5];
+	public String nowColumn[];	//当前使用的表格信息
+	public String[] remarks = new String[5];	//数据库学生表备注字段
 	public int type;	//判断使用哪种表头=>影响到数据的导出和数据的显示 0=>数据库(导出学生数据和发送邮件导出信息)  1=>Excel(只用于导入Excel)
 	public Vector<Object[]> data = new Vector<Object[]>();
-	public Vector<Object[]> SelectData = new Vector<Object[]>();
 	public StudentModel(Vector<Object[]> data,int type){
-		try {
-			Remarks = StudentLog.SelectRemarks();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		for(int i = 5;i>0;i--){
-			dbCol[dbCol.length-i] = Remarks[5-i];
-			excelCol[excelCol.length-i] = Remarks[5-i];
-			errorCol[errorCol.length-i] = Remarks[5-i];
-		}
+		updateRemark();
 		this.type = type;
 		if(type==0)
 			nowColumn = dbCol;
@@ -45,6 +32,19 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 		else if(type==2)
 			nowColumn = errorCol;
 		this.setData(data);
+	}
+	//更新备注字段
+	public void updateRemark(){
+		try {
+			remarks = StudentLog.SelectRemarks();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		for(int i = 5;i>0;i--){
+			dbCol[dbCol.length-i] = remarks[5-i];
+			excelCol[excelCol.length-i] = remarks[5-i];
+			errorCol[errorCol.length-i] = remarks[5-i];
+		}
 	}
 	
 	public StudentModel(int type){
@@ -56,16 +56,19 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 		else if(type==2) 
 			nowColumn = errorCol;
 	}
-	
 	public int getColumnCount() {
 		return nowColumn.length;
 	}
-	
+	/*
+	 * inter:删除tableModle中的所有数据
+	 */
 	public void removeAll(){
 		this.data.clear();
 		this.setRowCount(0);
 	}
-	//从后删除一定数量的元素
+	/* j=删除几行
+	 * inter:从后向前删除tableModle的数据
+	 */
 	public void removeLast(int j){
 		int length = data.size();
 		for(int i=1;i<=j;i++){
@@ -73,11 +76,12 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 		}
 		this.setRowCount(length-j);
 	}
-
 	public String getColumnName(int col) {
 		return nowColumn[col];
 	}
-	
+	/*
+	 * inter:设置tableModle的数据，可能存在相同的学生，使用条件判断id是否存在，去除相同的学生
+	 */
 	public void setData(Vector<Object[]> data){
 		String str = "";
 		for(int i=0;i<data.size();i++){
@@ -92,14 +96,13 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 		this.data = data;
 		this.setRowCount(data.size());
 	}
-	
 	public Object getValueAt(int row, int col) {
 		if(this.getRowCount()>0)
 			if(col>=1&&type==0)
 				return data.elementAt(row)[col+1];	//隐藏数据库中的ID字段。
 			else
 				return data.elementAt(row)[col];
-		return null;
+		return "";
 	}
 	
 	public Object getCell(int row,int col){
@@ -109,7 +112,9 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 	public Class getColumnClass(int c) {
 		return getValueAt(0, c).getClass();
 	}
-	//返回以逗号分隔的学生id 信息
+	/*
+	 * inter:返回选中的学生的id字符串，以逗号分隔。
+	 */
 	public String getSelect(){
 		String condition = "";
 		for(int i=0;i<data.size();i++){
@@ -123,28 +128,13 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 			return condition.substring(0,condition.length()-1);
 	}
 	
-	//得到选中的表格数据
-	public Vector<Object[]> getSelectData(){
-		SelectData.clear();
-		for(int i=0;i<data.size();i++){
-			if((Boolean)data.elementAt(i)[0]){
-				SelectData.add(data.elementAt(i));
-				SelectData.elementAt(SelectData.size()-1)[0]=data.elementAt(i)[3];
-				SelectData.elementAt(SelectData.size()-1)[1]=data.elementAt(i)[20];
-			}
-		}
-		data = SelectData;
-		if(SelectData.size()==0)
-			return null;
-		else
-			return SelectData;
-	}
-	
 	public void addRow(Object[] temp){
 		data.add(temp);
 		this.setRowCount(data.size());
 	}
-	
+	/*
+	 * inter:返回选中学生的数量
+	 */
 	public int getSelectCount(){
 		int totle = 0;
 		for(int i=0;i<data.size();i++){
@@ -153,10 +143,6 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 			}
 		}
 		return totle;
-	}
-	
-	public int SelectCount(){
-		return SelectData.size();
 	}
 	
 	public void deleteSelect(){

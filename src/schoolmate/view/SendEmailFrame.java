@@ -274,7 +274,7 @@ public class SendEmailFrame extends JInternalFrame implements ActionListener{
 								return;
 							}
 							startBtn.setEnabled(true);
-							processBar.setString("发送邮件完成...");
+							processBar.setString("发送邮件完成！！！");
 						}
 					}
 				).start();

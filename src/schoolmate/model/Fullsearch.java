@@ -1,6 +1,7 @@
 package schoolmate.model;
 
 public class Fullsearch {
+	public int s_id;
 	private String fs_content;
 
 	public String getFs_content() {

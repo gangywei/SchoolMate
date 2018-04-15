@@ -90,14 +90,10 @@ public class WorkDetailPanel extends TabelPanel implements ActionListener{
 				JOptionPane.showMessageDialog(null, "正在导入数据，不允许该操作");
 			}
 		}else if(item==alterItem){
-			try {
-				if(nowSelect==model.data.size()-1){
-					pencil.addWorkLog(2,sId,detail,wlId);
-				}else
-					pencil.addWorkLog(0,sId,detail,wlId);
-			} catch (PropertyVetoException e1) {
-				e1.printStackTrace();
-			}
+			if(nowSelect==model.data.size()-1){
+				pencil.addStudentLog(2,sId,detail,wlId);
+			}else
+				pencil.addStudentLog(0,sId,detail,wlId);
 		}
 	}
 }

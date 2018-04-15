@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -31,11 +30,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -45,7 +40,6 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
-
 import schoolmate.control.tableModel.StudentModel;
 import schoolmate.database.FacultyLog;
 import schoolmate.database.StudentLog;
@@ -78,20 +72,20 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     private JButton startBtn = new JButton("开  始");
     private JButton stopBtn = new JButton("取  消");
     private JButton exportBtn = new JButton("导出数据");
-    private JProgressBar processBar = new JProgressBar(0,100);	//创建进度条 
+    private JProgressBar processBar = new JProgressBar(0,100);	//创建进度条
     private JScrollPane scroll;
     private PencilMain pencil;
     private String[] facultyAry;
     private List<Object> facultyList;
-    
+
     private JRadioButton imtype1 = new JRadioButton("正常");
 	private JRadioButton imtype2 = new JRadioButton("跳过检查");
 	private JRadioButton imtype3 = new JRadioButton("学历导入");
-    
+
     //导入Excel方法变量
-    int userSize = errorModel.excelCol.length;
+    int userSize = StudentModel.excelCol.length;
     private String user[] = new String[userSize];
-    
+
     public ImportExlFrame(PencilMain pencil){
     	init();
     	this.pencil = pencil;
@@ -99,47 +93,47 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     public void init(){
     	imtype1.setSelected(true);
     	setClosable(true);//提供关闭按钮
-    	setResizable(true);  //允许自由调整大小 
+    	setResizable(true);  //允许自由调整大小
         setTitle("导入Excel信息");
     	table = new JTable(errorModel);
 		table.setFillsViewportHeight(true);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		
-		processBar.setStringPainted(true);// 设置进度条上的字符串显示，false则不能显示  
-	    
+
+		processBar.setStringPainted(true);// 设置进度条上的字符串显示，false则不能显示
+
 	    facultyList = new ArrayList<Object>();
-	    facultyAry = FacultyLog.allFaculty();
+	    facultyAry = FacultyLog.allFaculty("");
 		for(int i=0;i<facultyAry.length;i++)
 			facultyList.add(facultyAry[i]);
-		
-	    downloadBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
-	    downloadBtn.setForeground(Color.white);  
+
+	    downloadBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));
+	    downloadBtn.setForeground(Color.white);
 	    downloadBtn.addActionListener(this);
-    	importBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
-    	importBtn.setForeground(Color.white);  
+    	importBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));
+    	importBtn.setForeground(Color.white);
     	importBtn.addActionListener(this);
     	exportBtn.addActionListener(this);
-    	exportBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
+    	exportBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));
     	exportBtn.setForeground(Color.white);
     	stopBtn.addActionListener(this);
-    	stopBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
-    	stopBtn.setForeground(Color.white);  
-    	startBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
-    	startBtn.setForeground(Color.white);  
+    	stopBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));
+    	stopBtn.setForeground(Color.white);
+    	startBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));
+    	startBtn.setForeground(Color.white);
     	startBtn.addActionListener(this);
-    	
+
     	btnControl(0);
-    	
+
     	ButtonGroup grp = new ButtonGroup();
     	grp.add(imtype1);grp.add(imtype2);grp.add(imtype3);
-    	
+
     	bottomPanel = new JPanel(new BorderLayout());
-    	
+
     	btnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     	btnPanel.setBackground(Color.WHITE);
     	btnPanel.add(downloadBtn);btnPanel.add(importBtn);btnPanel.add(startBtn);btnPanel.add(stopBtn);
     	btnPanel.add(exportBtn);btnPanel.add(imtype1);btnPanel.add(imtype2);btnPanel.add(imtype3);
-    	
+
     	importPanel = new JPanel();
     	importPanel.setBackground(Color.white);
     	GroupLayout layout = new GroupLayout(importPanel);
@@ -181,7 +175,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
             propertyVetoE.printStackTrace();
         }
     }
-    
+
     public void btnControl(int type){
     	if(type==0){	//没有选择文件
     		startBtn.setEnabled(false);
@@ -208,7 +202,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     		stopBtn.setEnabled(false);
     	}
     }
-    
+
     //得到文件的信息，并判断shell的正确性。
     public void selectFile() throws InvalidFormatException, IOException{
     	totleRow = 0;
@@ -218,7 +212,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     		sheet = workbook.getSheetAt(0);
     	}else{
     		InputStream xlsxIo = new FileInputStream(filePath);
-	        xwb = new XSSFWorkbook(xlsxIo); 
+	        xwb = new XSSFWorkbook(xlsxIo);
     		sheet = xwb.getSheetAt(0);
     	}
 		Row tmp = sheet.getRow(0);// 获得列数，先获得一行，在得到该行列数
@@ -237,7 +231,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 	    	btnControl(1);
 		}
     }
-    
+
     //导入xls的线程
     public class xlsThread extends Thread{
     	public void run(){
@@ -286,8 +280,8 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     				nowCount++;
     				processBar.setString("正在导入第"+nowCount+"条记录 姓名"+user[1]);// 设置提示信息
     				importPanel.repaint();
-    				Student stu = new Student(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9], 
-    						user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19], 
+    				Student stu = new Student(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
+    						user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
     						user[20], user[21], user[22], user[23], user[24], user[25], user[26],user[27], user[28], user[29],
     						user[30], user[31]);
     				try {
@@ -317,6 +311,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
         		try {
 					connect.commit();
 				} catch (SQLException e) {
+					JOptionPane.showMessageDialog(null, e.getMessage());
 					e.printStackTrace();
 				}
 				if(errorCount==0){
@@ -328,7 +323,6 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 			}else{
 				try {
 					connect.rollback();
-					errorModel.removeLast(errorCount);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -344,7 +338,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
         	pencil.collectDataFrame.refeshBtn.doClick();
     	}
     }
-    
+
     //导入xlsx的线程
     public class xlsxThread extends Thread{
     	public void run(){
@@ -369,40 +363,52 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 	    	int rows = sheet.getLastRowNum() + 1;// 获得行数
 			int cols = userSize;	//得到列数
 			for (int nowRow = 1; nowRow < rows&&threadCon; nowRow++){// 读取数据
-				XSSFRow row = sheet.getRow(nowRow);
-				try{
-    				for (int col = 0; col < cols; col++){
-    					String val = formatter.formatCellValue(row.getCell(col));
-    					user[col] = val;
-    				}
-				} catch (RuntimeException e) {
-					JOptionPane.showMessageDialog(null,"导入的Excel文件格式不符合要求");
-					btnControl(4);
-					break;
-				}
-				nowCount++;
-				processBar.setString("正在导入第"+nowCount+"条记录 姓名"+user[1]);// 设置提示信息
-				importPanel.repaint();
-				Student stu = new Student(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9], 
-						user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19], 
-						user[20], user[21], user[22], user[23], user[24], user[25], user[26],user[27], user[28], user[29],
-						user[30], user[31]);
 				try {
-					String res = null;
-					if(!user[1].trim().equals("")){
-						res = StudentLog.importExl(stmt, stu, type);
+					Thread.sleep(25);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				XSSFRow row = sheet.getRow(nowRow);
+				if(row!=null){	//该行不为空
+					try{
+	    				for (int col = 0; col < cols; col++){
+	    					String val = formatter.formatCellValue(row.getCell(col));
+	    					user[col] = val;
+	    				}
+					} catch (RuntimeException e) {
+						threadCon = false;
+						JOptionPane.showMessageDialog(null,"导入的Excel文件格式不符合要求");
+						btnControl(4);
+						break;
 					}
-					if(res!=null){
-						errorCount++;
-						String[] temp = stu.toArray();
-						temp[0] = res;
-						errorModel.addRow(temp);
-						importPanel.updateUI();
+					nowCount++;
+					processBar.setString("正在导入第"+nowCount+"条记录 姓名"+user[1]);// 设置提示信息
+					importPanel.repaint();
+					Student stu = new Student(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
+							user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
+							user[20], user[21], user[22], user[23], user[24], user[25], user[26],user[27], user[28], user[29],
+							user[30], user[31]);
+					try {
+						String res = null;
+						if(!user[1].trim().equals("")){
+							res = StudentLog.importExl(stmt, stu, type);
+						}else{
+							res = "名字不可以为空";
+						}
+						if(res!=null){
+							errorCount++;
+							String[] temp = stu.toArray();
+							temp[0] = res;
+							errorModel.addRow(temp);
+							importPanel.updateUI();
+						}
+					} catch (SQLException e) {
+						JOptionPane.showMessageDialog(null,"导入的Excel文件内容不符合要求");
+						btnControl(4);
+						break;
 					}
-				} catch (SQLException e) {
-					JOptionPane.showMessageDialog(null,"导入的Excel文件内容不符合要求");
-					btnControl(4);
-					break;
+				}else{
+					processBar.setString("跳过空行");// 设置提示信息
 				}
 			}
 
@@ -421,7 +427,6 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 			}else{
 				try {
 					connect.rollback();
-					errorModel.removeLast(errorCount);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -446,15 +451,15 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 			MyFileFilter filter = new MyFileFilter(arg);
 			JFileChooser fileChoose = new JFileChooser("F:");
 			fileChoose.addChoosableFileFilter(filter);
-	        //是否可多选   
+	        //是否可多选
 	        fileChoose.setMultiSelectionEnabled(false);
 	        //以允许用户只选择文件 默认
 	        fileChoose.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	        //设置是否显示隐藏文件  
+	        //设置是否显示隐藏文件
 	        fileChoose.setFileHidingEnabled(false);
 	        fileChoose.setAcceptAllFileFilterUsed(false);
 	        int returnValue = fileChoose.showOpenDialog(null);
-	        if (returnValue == JFileChooser.APPROVE_OPTION){  
+	        if (returnValue == JFileChooser.APPROVE_OPTION){
 	        	filePath = fileChoose.getSelectedFile().toString();
 	        	file = new File(filePath);
 	        	try {
@@ -492,7 +497,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 			pencil.outputExl(downModel,2,"标准Excel文档");
 		}
     }
-    public void doDefaultCloseAction() {  
+    public void doDefaultCloseAction() {
 	    dispose();
 	}
 }

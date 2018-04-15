@@ -17,7 +17,10 @@ public class WorkLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
 	private static ResultSet res;
-	
+	/* 
+	 * inter:在同一事务下，插入学生的工作记录。
+	 * time：2018/03/15
+	 */
 	public static void insertWork(Student stu,Statement stmt) throws SQLException{
 		String sql = "INSERT INTO worklog (s_id,s_workspace,s_work,s_worktitle,province,city,nation,update_time) VALUES "
 				+ "("+stu.s_id+",'"+stu.s_workspace+"','"+stu.s_work+"','"+stu.s_worktitle+"','"+stu.s_province+"','"+stu.s_city+"','"+stu.s_nation+"',"+Helper.dataTime(null)+");";
@@ -33,8 +36,8 @@ public class WorkLog {
 		if(type==0){
 			sql = "update worklog set nation='"+now[0]+"',province='"+now[1]+"',city='"+now[2]+"' where nation='"+old[0]+
 			"' and province='"+old[1]+"' and city='"+old[2]+"';";
-			sql2 = "update student set s_nation='"+now[0]+"',s_faculty='"+now[1]+"',s_major='"+now[2]+"' where nation='"+old[0]+
-					"' and s_faculty='"+old[1]+"' and s_major='"+old[2]+"';";
+			sql2 = "update student set s_nation='"+now[0]+"',s_province='"+now[1]+"',s_city='"+now[2]+"' where s_nation='"+old[0]+
+					"' and s_province='"+old[1]+"' and s_city='"+old[2]+"';";
 		}else if(type==1){
 			sql = "update worklog set nation='"+now[0]+"',province='"+now[1]+"' where nation='"+old[0]+"' and province='"+old[1]+"';";
 			sql2 = "update student set s_nation='"+now[0]+"',s_province='"+now[1]+"' where s_nation='"+old[0]+"' and s_province='"+old[1]+"';";
@@ -45,41 +48,48 @@ public class WorkLog {
 		stmt.executeUpdate(sql);
 		stmt.executeUpdate(sql2);
 	}
-	
-	public static void insertWork(Work stu,Statement stmt) throws SQLException{
+	/* 学生添加工作记录时，插入工作记录，并更新学生的工作记录，修改时间
+	 * time：2018/03/15
+	 */
+	public static void insertWork(Work work,Statement stmt) throws SQLException{
 		boolean change = false;
 		if(stmt==null){
 			change = true;
 			stmt = connect.createStatement();
 		}
 		String sql = "INSERT INTO worklog (s_id,s_workspace,s_work,s_worktitle,province,city,nation,update_time) VALUES "
-				+ "("+stu.s_id+",'"+stu.s_workspace+"','"+stu.s_work+"','"+stu.s_worktitle+"','"+stu.province+"','"+stu.city+"','"+stu.nation+"',"+Helper.dataTime(null)+");";
+				+ "("+work.s_id+",'"+work.s_workspace+"','"+work.s_work+"','"+work.s_worktitle+"','"+work.province+"','"+work.city+"','"+work.nation+"',"+Helper.dataTime(null)+");";
 		stmt.executeUpdate(sql);
-		StudentLog.updateWork(stu, stmt);
+		StudentLog.updateWork(work, stmt);
 		if(change){
 			connect.commit();
 			stmt.close();
 		}
 	}
-	
-	//type判断是否更新学生信息表。0 = 不更新 1 = 更新
-	public static void updateWork(Work stu,Statement stmt,int type) throws SQLException{
+	/* 学生修改工作记录时，插入工作记录，并更新学生的工作记录，修改时间
+	 * time：2018/03/15
+	 */
+	public static void updateWork(Work work,Statement stmt,int type) throws SQLException{
 		boolean change = false;
+		long time = Helper.dataTime(null);
 		if(stmt==null){
 			change = true;
 			stmt = connect.createStatement();
 		}
-		String sql = "update worklog set s_workspace='"+stu.s_workspace+"',s_work='"+stu.s_work+"',s_worktitle='"+stu.s_worktitle+"',province='"+stu.province+"',city='"
-		+stu.city+"',nation='"+stu.nation+"',update_time="+Helper.dataTime(null)+" where wl_id="+stu.wl_id;
+		String sql = "update worklog set s_workspace='"+work.s_workspace+"',s_work='"+work.s_work+"',s_worktitle='"+work.s_worktitle+"',province='"+work.province+"',city='"
+		+work.city+"',nation='"+work.nation+"',update_time="+time+" where wl_id="+work.wl_id;
 		stmt.executeUpdate(sql);
+		StudentLog.updateTime(work.s_id, stmt, time);
 		if(type==1)
-			StudentLog.updateWork(stu, stmt);
+			StudentLog.updateWork(work, stmt);
 		if(change){
 			connect.commit();
 			stmt.close();
 		}
 	}
-	
+	/* 根据工作ID 得到工作记录的信息，一般用于工作记录的修改
+	 * time：2018/03/15
+	 */
 	public static String[] searchWork(int id){
 		String[] work = null;
 		String sql;
@@ -103,7 +113,9 @@ public class WorkLog {
 		} 
 		return work;
 	}
-	//type = 0不更新学生表，type = 1更新学生记录
+	/* 学生修改工作记录时，插入工作记录，并更新学生的工作记录，修改时间
+	 * time：2018/03/15
+	 */
 	public static void deleteWork(Work work,Statement stmt,int type) throws SQLException{
 		boolean change = false;
 		if(stmt==null){
@@ -119,12 +131,16 @@ public class WorkLog {
 			stmt.close();
 		}
 	}
-	//删除学生时删除学生的所有工作记录
+	/* 删除学生时删除学生的所有工作记录
+	 * time：2018/03/15
+	 */
 	public static void deleteWork(int sId,Statement stmt) throws SQLException{
 		String sql = "delete from worklog where s_id="+sId+";";
 		stmt.executeUpdate(sql);
 	}
-	
+	/* 删除学生时删除学生的所有工作记录
+	 * time：2018/03/15
+	 */
 	public static void deleteManyWk(String count,Statement stmt) throws SQLException{
 		String sql = "delete from worklog where s_id in ("+count+");";
 		stmt.executeUpdate(sql);
@@ -134,9 +150,7 @@ public class WorkLog {
 	public static Vector<Object[]> dao(String str) throws Exception{
 		PreparedStatement stmt = connect.prepareStatement(str);
 		ResultSet rs = stmt.executeQuery();
-		int count = 0;
 		while (rs.next()){
-			count++;
 		}
 		rs = stmt.executeQuery();
 		ResultSetMetaData rsmd=rs.getMetaData();//用于获取关于 ResultSet 对象中列的类型和属性信息的对象
@@ -147,25 +161,6 @@ public class WorkLog {
 			info.add((new Object[colNum]));
 			for (int j=1;j<=colNum;j++){
 				info.elementAt(i)[j-1]=(Object) rs.getObject(j);
-			}
-			i++;
-		}
-		return info;
-	}
-	
-	public static Vector<Object[]> getUpdate(long time) throws SQLException{
-		String sql = "select * from worklog where update_time>="+time;
-		stmt = connect.createStatement();
-		ResultSet rs = stmt.executeQuery(sql);
-		ResultSetMetaData rsmd=rs.getMetaData();//用于获取关于 ResultSet 对象中列的类型和属性信息的对象
-		int colNum=rsmd.getColumnCount()-1;	//得到列数
-		Vector<Object[]> info = new Vector<Object[]>();
-		int i=0;
-		while (rs.next()){
-			info.add((new Object[colNum]));
-			info.elementAt(i)[0] = 3;	//表示工作信息
-			for (int j=1;j<colNum;j++){
-				info.elementAt(i)[j]=(Object) rs.getObject(j+1);
 			}
 			i++;
 		}
