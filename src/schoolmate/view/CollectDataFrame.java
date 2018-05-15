@@ -196,7 +196,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 			btnNum = Math.ceil((float)dataTotle/(float)dataNum);
 			nowIndex = 1;
 		}
-		pageLabel.setText("当前页："+nowIndex+" 总页面："+(int)btnNum);
+		//pageLabel.setText("当前页："+nowIndex+" 总页面："+(int)btnNum);
 		allBtn.setText("全部选中");
 		table.updateUI();
 		this.updateUI();
@@ -290,8 +290,13 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 			else
 				pencil.sendEmail(studentModel);
 		}else if(btn==exportBtn){
-			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-			pencil.outputExl(studentModel,1,df.format(new Date())+"导出Excel");
+			int count = studentModel.getSelectCount();
+			if(count>0){
+				SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+				pencil.outputExl(studentModel,1,df.format(new Date())+"导出Excel");
+			}else{
+				JOptionPane.showMessageDialog(null, "请选择想要导出的数据");
+			}
 		}
 	}
 }

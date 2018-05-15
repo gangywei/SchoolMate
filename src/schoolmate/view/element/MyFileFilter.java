@@ -29,8 +29,8 @@ public class MyFileFilter extends FileFilter {
     }
     public String getDescription() {
     	for(int i=0;i<ext.length;i++)
-	        if (ext[i].equals("db"))
-	            return "数据库(*.db)";
+	        if (ext[i].equals("temp"))
+	            return "数据备份文件(*.temp)";
 	        else if(ext[i].equals("xls")||ext[i].equals("xlsx"))
 	        	return "Excel(*.xls,*.xlsx)";
         return "";

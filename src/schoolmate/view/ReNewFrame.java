@@ -27,7 +27,7 @@ import schoolmate.view.element.MyFileFilter;
 public class ReNewFrame extends JInternalFrame implements ActionListener{
 	public JPanel BackupsPanel,interPanel;
 	String str = new String(
-			"<strong>数据还原功能</strong><br/>"
+			"<strong>数据恢复功能</strong><br/>"
 			+ "<p>清空当前数据<strong>并恢复备份数据库的数据，恢复完成要重启该系统！</strong></p>");
 	JEditorPane editPane = new JEditorPane("text/html", str);
 	private String filePath;
@@ -82,7 +82,6 @@ public class ReNewFrame extends JInternalFrame implements ActionListener{
 		add(BackupsPanel);
 	}
 
-
 	public void fileCopy(String beginFilename, String endFilename) {
         // 创建输入输出流对象
         try {
@@ -124,11 +123,11 @@ public class ReNewFrame extends JInternalFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		JButton btn = (JButton)e.getSource();
 		if(btn == SelectPath){
-			JFileChooser fileChoose = new JFileChooser("F:");
 			String[] arg = {"temp"};
 			MyFileFilter filter = new MyFileFilter(arg);
+			JFileChooser fileChoose = new JFileChooser("F:");
+			fileChoose.addChoosableFileFilter(filter);
 	        //是否可多选   
-			fileChoose.addChoosableFileFilter(filter);//导入可选择的文件的后缀名类型
 	        fileChoose.setMultiSelectionEnabled(false);
 	        fileChoose.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	        //设置是否显示隐藏文件  

@@ -116,13 +116,13 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 			yearList = new ArrayList<Object>();
 			majorList = new ArrayList<Object>();
 	        facultyList = new ArrayList<Object>();
-	        if(detail.collect.user.u_role==1)
+	        if(detail.collect.user.u_role==2)	//只有普通管理员只能添加自己专业的学生信息
 	        	facultyAry = FacultyLog.allFaculty("where f_name in "+detail.collect.limitTemp);
 	        else
 	        	facultyAry = FacultyLog.allFaculty("");
 //	        for(int now=outYear;now>=inYear;now--)
 //				yearList.add(now+"");
-	        if(detail.collect.user.u_role==1)
+	        if(detail.collect.user.u_role==2)
 	        	majorAry = MajorLog.allMajor("where f_name in "+detail.collect.limitTemp);
 	        else
 	        	majorAry = MajorLog.allMajor("");
@@ -196,18 +196,20 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 				}
 			}else{
 				String s_no = inputAry[0].getText();
-				String regNo = "[\\d]{8,15}";
+				String regNo = "[\\d]+";
 				if(!s_no.equals(""))
 					if(!Helper.matchRegular(s_no, regNo)){
 						JOptionPane.showMessageDialog(this, "学号输入不符合要求");
 						return;
 					}
-				if(Integer.parseInt(inputAry[5].getText())>=Integer.parseInt(inputAry[6].getText())){
-					JOptionPane.showMessageDialog(this, "学生入学信息输入错误");
-					return;
-				}
+				String in = inputAry[5].getText(),out = inputAry[6].getText();
+				if(!in.equals("")&&!out.equals(""))
+					if(Integer.parseInt(in)>=Integer.parseInt(out)){
+						JOptionPane.showMessageDialog(this, "学生入学信息输入错误");
+						return;
+					}
 				Education temp = new Education(0,s_no,inputAry[4].getText(),inputAry[1].getText(),inputAry[2].getText(),
-						inputAry[3].getText(),inputAry[5].getText(),inputAry[6].getText());
+						inputAry[3].getText(),in,out);
 				temp.s_id = sId;
 				temp.e_id = nowId;
 				boolean res = false;

@@ -54,7 +54,7 @@ public class BackupUpdateFrame extends JInternalFrame implements ActionListener{
     private JTextField beginInput = new JTextField("",19); 
     private JTextField endInput = new JTextField("",19); 
     SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-    private JTextField nameInput = new JTextField(df.format(new Date())+"数据备份",20);
+    private JTextField nameInput = new JTextField(df.format(new Date())+"导出更新数据",20);
     private JLabel pathLabel = new JLabel("文件路径：");
     private JLabel fileText = new JLabel("点击选择地址按钮：");
     private JLabel statusJLabel = new JLabel("备份状态：");

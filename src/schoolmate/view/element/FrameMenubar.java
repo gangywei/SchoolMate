@@ -151,6 +151,11 @@ public class FrameMenubar implements ActionListener{
         alterDialog.add(alterPanel);
 	}
 	
+	public void closeDialog(){
+		if(alterDialog!=null)
+			alterDialog.dispose();
+	}
+	
 	public void alterPwd() throws NoSuchAlgorithmException, UnsupportedEncodingException, SQLException{
 		String pwd,tpwd,answer;
 		int index = userPro.getSelectedIndex();

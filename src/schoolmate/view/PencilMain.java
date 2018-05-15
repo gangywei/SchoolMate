@@ -170,7 +170,18 @@ public class PencilMain extends JFrame{
 	public void quitLogin(){	//退出登录
 		nowUser = null;
 		setJMenuBar(null);
+		frameMenubar.closeDialog();
 		remove(frameToolbar);
+		desktopPane.removeAll();
+		if(userDetail!=null)userDetail.dispose();
+		if(importFrame!=null)importFrame.dispose();
+		if(forgetPassword!=null)forgetPassword.dispose();
+		if(userFrame!=null)userFrame.dispose();
+		if(labelFrame!=null)labelFrame.dispose();
+		if(remarkFrame!=null)remarkFrame.dispose();
+		if(reNewFrame!=null)reNewFrame.dispose();
+		if(backupUpdate!=null)backupUpdate.dispose();
+		if(backupsFrame!=null)backupsFrame.dispose();
 		collectDataFrame.dispose();
 		showLogin();
 		repaint();
@@ -279,6 +290,7 @@ public class PencilMain extends JFrame{
 		if(backupsFrame==null||backupsFrame.isClosed()){
 			backupsFrame = new BackupsDataFrame();
 			desktopPane.add(backupsFrame);
+			
 		}
 		backupsFrame.toFront();
 	}

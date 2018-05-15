@@ -88,7 +88,6 @@ public class BackupsDataFrame extends JInternalFrame implements ActionListener{
 		vGroup.addGap(20);
 		layout.setVerticalGroup(vGroup);//设置垂直组
 		add(BackupsPanel);
-    
 	}
 
 

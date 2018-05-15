@@ -68,7 +68,7 @@ public class EducationLog {
 			return false;
 		}
 		long time = Helper.dataTime(null);
-		String sql = "update Education set s_faculty='"+edu.s_faculty+"',s_major='"+edu.s_major+"',s_class='"+edu.s_class+"',s_education='"+edu.s_education+
+		String sql = "update Education set s_no='"+edu.s_no+"',s_faculty='"+edu.s_faculty+"',s_major='"+edu.s_major+"',s_class='"+edu.s_class+"',s_education='"+edu.s_education+
 				"',s_enter='"+edu.s_enter+"',s_graduate='"+edu.s_graduate+"',update_time="+time+" where e_id="+edu.e_id;
 		stmt.executeUpdate(sql);
 		StudentLog.updateTime(edu.s_id, stmt, time);

@@ -65,7 +65,7 @@ public class StudentLog {
 		if(!nation.equals("")){
 			boolean nationRes = AddressLog.searchNation(nation);
 			if(!nationRes){
-				AddressLog.insertProvince(province,nation,stmt);
+				AddressLog.insertNation(nation,stmt);
 			}
 		}
 		if(!province.equals("")){
