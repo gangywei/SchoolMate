@@ -53,16 +53,16 @@ public class EducationLog {
 		stmt.executeUpdate(sql);
 	}
 	/* 
-	 * inter：searchEdu 判断是否存在该记录，学生不存在该教育信息的情况下，更新学生的教育信息。并查新学生表的修改时间
+	 * inter：searchEdu 判断是否存在该记录，学生不存在该教育信息的情况下，更新学生的教育信息。并查新学生表的修改时间,type 查找用户学历信息
 	 * time:2018/03/15
 	 */
-	public static boolean updateEdu(Statement stmt,Education edu) throws SQLException{
+	public static boolean updateEdu(Statement stmt,Education edu,boolean type) throws SQLException{
 		boolean change = false;
 		if(stmt==null){
 			change = true;
 			stmt = connect.createStatement();
 		}
-		if(!searchEdu(stmt, edu.s_id, edu.s_education)){
+		if(type&&!searchEdu(stmt, edu.s_id, edu.s_education)){
 			if(change)
 				stmt.close();
 			return false;

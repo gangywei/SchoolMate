@@ -166,14 +166,11 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		if(dbCondition[7]!=null)
 			dbCondition[7]+=')';
 		//学院
-		if(collect.user.u_role>1){
+		if(collect.user.u_role>=1){
 			dbCondition[1] = null;
 			for(i=0;(facultyBox!=null)&&i<facultyBox.length;i++){
 				if(facultyBox[i].isSelected()){
 					if(dbCondition[1]==null){
-						if(collect.user.u_role==1)
-							dbCondition[1] += "and (s_faculty='"+facultyBox[i].getText()+"'";
-						else
 							dbCondition[1] = "(s_faculty='"+facultyBox[i].getText()+"'";
 					}else{
 						dbCondition[1] += " or s_faculty='"+facultyBox[i].getText()+"'";
@@ -392,8 +389,9 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		JButton btn = (JButton)e.getSource();
 		String str[] = getCondition();
 		if(btn==searchBtn){
-			if(str!=null)
+			if(str!=null){
 				collect.updateTabel(str,null);
+			}
 		}else if(btn==searchAllBtn){
 			if(str!=null)
 				collect.updateTabel(str,null);

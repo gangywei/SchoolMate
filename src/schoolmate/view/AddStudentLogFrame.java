@@ -39,11 +39,12 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 			resetBtn = new JButton("关闭页面");
 	private int type,sId;
 	private int nowId = 0;
+	private String data[];
 	private StudentDetailFrame detail;
 	private Calendar date = Calendar.getInstance();
 	private int inYear = 1985,outYear = date.get(Calendar.YEAR);
 	//type 判断0=工作记录 1=教育记录 2=需要修改学生表的工作记录
-	//n_id 修改信息的now_ID
+	//n_id 修改信息的now_ID,0=不修改
 	public AddStudentLogFrame(int type,int sId,StudentDetailFrame detail,int n_id){
 		this.nowId = n_id;
 		this.detail = detail;
@@ -65,7 +66,6 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 		for(int i=0;i<7;i++)
 			inputAry[i] = new MyTextField("", 15);
 		if(nowId!=0){
-			String data[];
 			if(type!=1)
 				data = WorkLog.searchWork(nowId);
 			else
@@ -77,7 +77,10 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 		GroupLayout.SequentialGroup hGroup = layout.createSequentialGroup();
 		hGroup.addGap(20);//添加间隔
 		if(type!=1){
-			setTitle("添加工作记录");
+			if(nowId!=0)
+				setTitle("修改工作记录");
+			else
+				setTitle("添加工作记录");
 			nationList = new ArrayList<Object>();
 			provinceList = new ArrayList<Object>();
 			cityList = new ArrayList<Object>();
@@ -100,7 +103,10 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 	  				.addComponent(inputAry[4]).addComponent(inputAry[5]).addComponent(resetBtn));
 	  		hGroup.addGap(20);
 		}else{
-			setTitle("添加学历记录");
+			if(nowId!=0)
+				setTitle("修改学历记录");
+			else
+				setTitle("添加学历记录");
 			if(nowId==0){
 				inputAry[4].setShowText("必填内容");
 				inputAry[1].setShowText("必填内容");
@@ -114,8 +120,8 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 	        	facultyAry = FacultyLog.allFaculty("where f_name in "+detail.collect.limitTemp);
 	        else
 	        	facultyAry = FacultyLog.allFaculty("");
-	        for(int now=outYear;now>=inYear;now--)
-				yearList.add(now+"");
+//	        for(int now=outYear;now>=inYear;now--)
+//				yearList.add(now+"");
 	        if(detail.collect.user.u_role==1)
 	        	majorAry = MajorLog.allMajor("where f_name in "+detail.collect.limitTemp);
 	        else
@@ -129,8 +135,8 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 			inputAry[1].setMenu(facultyList);
 			inputAry[2].setMenu(majorList);
 			inputAry[4].setMenu(eduList);
-			inputAry[5].setMenu(yearList);
-			inputAry[6].setMenu(yearList);
+//			inputAry[5].setMenu(yearList);
+//			inputAry[6].setMenu(yearList);
 	  		hGroup.addGroup(layout.createParallelGroup().addComponent(eduLabel[0]).addComponent(eduLabel[1]).addComponent(eduLabel[2]).addComponent(eduLabel[3])
 	  				.addComponent(eduLabel[4]).addComponent(eduLabel[5]).addComponent(eduLabel[6]).addComponent(submitBtn));
 	  		hGroup.addGap(15);
@@ -196,7 +202,11 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 						JOptionPane.showMessageDialog(this, "学号输入不符合要求");
 						return;
 					}
-				Education temp = new Education(0,inputAry[0].getText(),inputAry[4].getText(),inputAry[1].getText(),inputAry[2].getText(),
+				if(Integer.parseInt(inputAry[5].getText())>=Integer.parseInt(inputAry[6].getText())){
+					JOptionPane.showMessageDialog(this, "学生入学信息输入错误");
+					return;
+				}
+				Education temp = new Education(0,s_no,inputAry[4].getText(),inputAry[1].getText(),inputAry[2].getText(),
 						inputAry[3].getText(),inputAry[5].getText(),inputAry[6].getText());
 				temp.s_id = sId;
 				temp.e_id = nowId;
@@ -204,12 +214,15 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 				try {
 					if(nowId==0){
 						res = EducationLog.insertEdu(null, temp);
-						if(!res)
-							JOptionPane.showMessageDialog(this, "存在该学历信息");
 					}else{
-						res = EducationLog.updateEdu(null, temp);
-							
+						if(data[0].equals(s_no)&&data[3].equals(inputAry[3].getText())&&data[4].equals(inputAry[4].getText())&&data[5].equals(inputAry[5].getText())
+								&&data[6].equals(inputAry[6].getText()))
+							res = EducationLog.updateEdu(null, temp,true);	//需要查找数据库是否有该同学的学院专业数据
+						else
+							res = EducationLog.updateEdu(null, temp,false);
 					}
+					if(!res)	//查找数据库是否有该同学的学院专业数据的结果
+						JOptionPane.showMessageDialog(this, "存在该学历信息");
 					if(res){
 						detail.eduTabel.updateTabel();
 						this.dispose();
