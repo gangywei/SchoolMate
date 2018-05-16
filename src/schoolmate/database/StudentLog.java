@@ -27,11 +27,10 @@ public class StudentLog {
 	 */
 	public static int uniqueStu(Student stu,Statement stmt) throws SQLException{
 		int count = 0;
-		String s_person = stu.s_person;
 		String s_phone = stu.s_phone;
 		if(s_phone.equals(""))
 			s_phone = "*****";
-		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_phone='"+s_phone+"' or (s_name='"+stu.s_name+"' and s_faculty='"+stu.s_faculty+"' and s_graduate='"+stu.s_graduate+"' and s_education='"+stu.s_education+"');";
+		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_faculty='"+stu.s_faculty+"' and s_graduate='"+stu.s_graduate+"' and s_education='"+stu.s_education+"';";
 		res = stmt.executeQuery(str);
 		while (res.next()) {
 			count = res.getInt("totle");
@@ -48,12 +47,10 @@ public class StudentLog {
 	 */
 	public static int uniqueStuDegree(Student stu,Statement stmt) throws SQLException{
 		int count = 0;
-		String s_person = stu.s_person;
 		String s_phone = stu.s_phone;
 		if(s_phone.equals(""))
 			s_phone = "*****";
-		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_phone='"+s_phone+"' or (s_name='"+stu.s_name+"' and s_faculty!='"+stu.s_faculty+"' and (s_graduate<'"+(Integer.parseInt(stu.s_graduate)-4)+"' or s_graduate>'"+(Integer.parseInt(stu.s_graduate)+4)+"'));";
-		System.out.println(str);
+		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_faculty!='"+stu.s_faculty+"' and (s_graduate<'"+(Integer.parseInt(stu.s_graduate)-4)+"' or s_graduate>'"+(Integer.parseInt(stu.s_graduate)+4)+"');";
 		res = stmt.executeQuery(str);
 		while (res.next()) {
 			count = res.getInt("totle");
@@ -126,9 +123,6 @@ public class StudentLog {
 		try{
 			if(result==null){
 				stmt = connect.createStatement();
-				if(!stu.s_no.equals(""))
-					if(searchSno(stu.s_no,stmt)!=0)
-						throw new Exception("存在该学号的学生 ");
 				String sql = "INSERT INTO student "
 						+ "(s_no,s_name,s_sex,s_birth,s_person,s_hometown,s_province,"
 						+ "s_city,s_workspace,s_worktitle,s_work,s_workphone,s_homephone,s_phone,"
@@ -151,7 +145,7 @@ public class StudentLog {
 				Education edu = new Education(stu.s_id,stu.s_no,stu.s_education,stu.s_faculty,stu.s_major,stu.s_class,stu.s_enter,stu.s_graduate);
 				res = EducationLog.insertEdu(stmt,edu);
 				if(!res){
-					throw new Exception("该校友具有此学历信息，请搜索该校友检查数据是否正确");
+					throw new Exception("【推测学历重复】存在该校友的学历信息，请检查信息是否重复");
 				}
 				String log = stu.s_no+" "+stu.s_name+" "+stu.s_workspace+" "+stu.s_work+" "+stu.s_worktitle+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_address+" "+stu.s_email+" "+stu.s_qq;
 				FullsearchLog.insertFullsearch(log, id, stmt);	//检索表
@@ -182,9 +176,9 @@ public class StudentLog {
 					count = uniqueStu(stu,stmt);
 					degCount = uniqueStuDegree(stu,stmt);
 					if(count>0)	//出现count>0，就会导入到符合信息的教育记录。
-						throw new Exception("【推测学历重复】存在这个人的学历信息，请检查信息是否重复");
+						throw new Exception("【推测学历重复】存在该校友的学历信息，请检查信息是否重复");
 					if(degCount>0)	//出现count>0，就会导入到符合信息的教育记录。
-						throw new Exception("【推测数据更新】存在这个人的学历信息，请判断是否需要更新");
+						throw new Exception("【推测数据更新】存在该校友的学历信息，请判断是否需要更新");
 				}
 				if(degCount==0&&count==0){	//导入学生记录+学历信息。
 					String sql = "INSERT INTO student "
@@ -211,7 +205,7 @@ public class StudentLog {
 						Education edu = new Education(stu.s_id,stu.s_no,stu.s_education,stu.s_faculty,stu.s_major,stu.s_class,stu.s_enter,stu.s_graduate);
 						res = EducationLog.insertEdu(stmt,edu);
 						if(!res){
-							throw new Exception("【推测学历重复】存在这个人的学历信息，请检查信息是否重复");
+							throw new Exception("【推测学历重复】存在该校友的学历信息，请检查信息是否重复");
 						}
 					}else
 						throw new Exception("学历信息为空，请补充学历信息");
