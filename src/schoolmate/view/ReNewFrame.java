@@ -152,7 +152,7 @@ public class ReNewFrame extends JInternalFrame implements ActionListener{
 				try {
 					int res =JOptionPane.showConfirmDialog(this,"清空当前数据并还原备份的数据","数据恢复提示",JOptionPane.YES_NO_OPTION);
 					if(res==0)
-						fileCopy(filePath,"E:/assess/spy/mates.lite");
+						fileCopy(filePath,PencilMain.PPATH+"/spy/mates.lite");
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}

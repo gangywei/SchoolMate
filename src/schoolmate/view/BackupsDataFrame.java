@@ -158,7 +158,7 @@ public class BackupsDataFrame extends JInternalFrame implements ActionListener{
 				return;
 			}else{
 				try {
-					fileCopy("E:/assess/spy/mates.lite",
+					fileCopy(PencilMain.PPATH+"/spy/mates.lite",
 							filePath+"\\"+nameInput.getText()+".temp");
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(null, "备份未成功！");

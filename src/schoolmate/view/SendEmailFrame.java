@@ -52,7 +52,7 @@ public class SendEmailFrame extends JInternalFrame implements ActionListener{
     private JButton startBtn = new JButton("开  始"); 
     private String regEmail = "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
     private EmailManager emailManage = new EmailManager();
-    private final String URL = "file:///E:/assess/summer/index.html";
+    private final String URL = "file:///"+PencilMain.PPATH+"/summer/index.html";
     private StudentModel errorModel = new StudentModel(0);
     private JProgressBar processBar = new JProgressBar();	//创建进度条 
     private PencilMain pencil;

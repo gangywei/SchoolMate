@@ -78,9 +78,8 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     private String[] facultyAry;
     private List<Object> facultyList;
 
-    private JRadioButton imtype1 = new JRadioButton("正常");
+    private JRadioButton imtype1 = new JRadioButton("检查学历");
 	private JRadioButton imtype2 = new JRadioButton("跳过检查");
-	private JRadioButton imtype3 = new JRadioButton("学历导入");
 
     //导入Excel方法变量
     int userSize = StudentModel.excelCol.length;
@@ -125,14 +124,14 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     	btnControl(0);
 
     	ButtonGroup grp = new ButtonGroup();
-    	grp.add(imtype1);grp.add(imtype2);grp.add(imtype3);
+    	grp.add(imtype1);grp.add(imtype2);
 
     	bottomPanel = new JPanel(new BorderLayout());
 
     	btnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     	btnPanel.setBackground(Color.WHITE);
     	btnPanel.add(downloadBtn);btnPanel.add(importBtn);btnPanel.add(startBtn);btnPanel.add(stopBtn);
-    	btnPanel.add(exportBtn);btnPanel.add(imtype1);btnPanel.add(imtype2);btnPanel.add(imtype3);
+    	btnPanel.add(exportBtn);btnPanel.add(imtype1);btnPanel.add(imtype2);
 
     	importPanel = new JPanel();
     	importPanel.setBackground(Color.white);
@@ -227,7 +226,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 			}
 			totleRow += sheet.getLastRowNum();// 获得行数
 			fileText.setText(filePath);
-	    	numberText.setText("数据记录数= "+totleRow+",统计可能出现不准确。");
+	    	numberText.setText("数据记录数= "+totleRow+",仅供参考");
 	    	btnControl(1);
 		}
     }
@@ -238,8 +237,6 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     		int type = 0;
     		if(imtype2.isSelected())
 				type = 1;
-			else if(imtype3.isSelected())
-				type = 2;
     		Connection connect=DBConnect.getConnection();
     		Statement stmt = null;
 			try {
@@ -317,7 +314,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 				if(errorCount==0){
 					processBar.setString("导入成功！！");
 				}else{
-					processBar.setString("导入失败的数目  "+errorCount+"！！请导出错误Excel,修改错误数据并重新导入");
+					processBar.setString("导入失败的数目有  "+errorCount+"条,请导出错误Excel,修改错误数据并重新导入");
 				}
 				btnControl(3);
 			}else{
@@ -345,8 +342,6 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     		int type = 0;
     		if(imtype2.isSelected())
 				type = 1;
-			else if(imtype3.isSelected())
-				type = 2;
     		Connection connect=DBConnect.getConnection();
     		Statement stmt = null;
 			try {

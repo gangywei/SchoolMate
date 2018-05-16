@@ -22,18 +22,38 @@ public class StudentLog {
 	private static PreparedStatement pStat;
 	
 	/* 
-	 * inter：判断是否为同一个人，根据 姓名、学院、毕业年份、学历判断。count=1 得到学生ID，返回count（推测为同一个人的人数）
+	 * inter：判断是否有这个人的学历信息，根据 姓名、学院、毕业年份、学历判断。count=1 得到学生ID，返回count（推测为同一个人的人数）
 	 * time:2018/03/15
 	 */
 	public static int uniqueStu(Student stu,Statement stmt) throws SQLException{
 		int count = 0;
 		String s_person = stu.s_person;
 		String s_phone = stu.s_phone;
-		if(s_person.equals(""))
-			s_person = "*****";
 		if(s_phone.equals(""))
 			s_phone = "*****";
-		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_person='"+s_person+"' or (s_name='"+stu.s_name+"' and s_faculty='"+stu.s_faculty+"' and s_graduate='"+stu.s_graduate+"' and s_education='"+stu.s_education+"');";
+		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_phone='"+s_phone+"' or (s_name='"+stu.s_name+"' and s_faculty='"+stu.s_faculty+"' and s_graduate='"+stu.s_graduate+"' and s_education='"+stu.s_education+"');";
+		res = stmt.executeQuery(str);
+		while (res.next()) {
+			count = res.getInt("totle");
+			if(count==1)
+				stu.s_id = res.getInt("s_id");
+			else
+				break;
+		}
+		return count;
+	}
+	/* 
+	 * inter：判断同一个人的不同学历，根据 姓名、学历不同、毕业年份大于数据库6年以内。count=1 得到学生ID，返回count（推测为同一个人学历不同的情况）
+	 * time:2018/03/15
+	 */
+	public static int uniqueStuDegree(Student stu,Statement stmt) throws SQLException{
+		int count = 0;
+		String s_person = stu.s_person;
+		String s_phone = stu.s_phone;
+		if(s_phone.equals(""))
+			s_phone = "*****";
+		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_phone='"+s_phone+"' or (s_name='"+stu.s_name+"' and s_faculty!='"+stu.s_faculty+"' and (s_graduate<'"+(Integer.parseInt(stu.s_graduate)-4)+"' or s_graduate>'"+(Integer.parseInt(stu.s_graduate)+4)+"'));";
+		System.out.println(str);
 		res = stmt.executeQuery(str);
 		while (res.next()) {
 			count = res.getInt("totle");
@@ -108,7 +128,7 @@ public class StudentLog {
 				stmt = connect.createStatement();
 				if(!stu.s_no.equals(""))
 					if(searchSno(stu.s_no,stmt)!=0)
-						throw new Exception("存在该学号的学生。 ");
+						throw new Exception("存在该学号的学生 ");
 				String sql = "INSERT INTO student "
 						+ "(s_no,s_name,s_sex,s_birth,s_person,s_hometown,s_province,"
 						+ "s_city,s_workspace,s_worktitle,s_work,s_workphone,s_homephone,s_phone,"
@@ -131,7 +151,7 @@ public class StudentLog {
 				Education edu = new Education(stu.s_id,stu.s_no,stu.s_education,stu.s_faculty,stu.s_major,stu.s_class,stu.s_enter,stu.s_graduate);
 				res = EducationLog.insertEdu(stmt,edu);
 				if(!res){
-					throw new Exception("学历信息重复");
+					throw new Exception("该校友具有此学历信息，请搜索该校友检查数据是否正确");
 				}
 				String log = stu.s_no+" "+stu.s_name+" "+stu.s_workspace+" "+stu.s_work+" "+stu.s_worktitle+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_address+" "+stu.s_email+" "+stu.s_qq;
 				FullsearchLog.insertFullsearch(log, id, stmt);	//检索表
@@ -148,7 +168,7 @@ public class StudentLog {
 		stmt.close();
 		return null;
 	}
-	/* 0 正常导入，推测为一个人的检查。1 跳过推测为一个人的检查， 直接导入学生数据。2 导入推测为一个人的学历数据。当推测的人数为2时同样导入不成功。
+	/* 0 正常导入，推测为一个人的检查，推测存在这个人并且学历信息需要添加学历信息。1 跳过推测为一个人的检查， 直接导入学生数据。
 	 * inter：Excel表导入学生记录，
 	 * time:2018/03/15
 	 */
@@ -157,22 +177,16 @@ public class StudentLog {
 		try{
 			if(result==null){
 				int count = 0;
+				int degCount = 0;
 				if(type==0){
 					count = uniqueStu(stu,stmt);
+					degCount = uniqueStuDegree(stu,stmt);
 					if(count>0)	//出现count>0，就会导入到符合信息的教育记录。
-						throw new Exception("基本数据相同人数= "+count);
-				}else if(type==2){
-					count = uniqueStu(stu,stmt);
-					if(count==0)
-						throw new Exception("没有基本信息相同的人。");
-					else if(count>1)
-						throw new Exception("基本信息相同的人数>1,导入失败！");
+						throw new Exception("【推测学历重复】存在这个人的学历信息，请检查信息是否重复");
+					if(degCount>0)	//出现count>0，就会导入到符合信息的教育记录。
+						throw new Exception("【推测数据更新】存在这个人的学历信息，请判断是否需要更新");
 				}
-				if(!(count==1&&type==2)){	//导入学生记录+学历信息。
-					if(!stu.s_no.equals(""))
-						if(searchSno(stu.s_no,stmt)!=0){
-							throw new Exception("存在该学号的学生。 ");
-						}
+				if(degCount==0&&count==0){	//导入学生记录+学历信息。
 					String sql = "INSERT INTO student "
 							+ "(s_no,s_name,s_sex,s_birth,s_person,s_hometown,s_province,"
 							+ "s_city,s_workspace,s_worktitle,s_work,s_workphone,s_homephone,s_phone,"
@@ -190,26 +204,21 @@ public class StudentLog {
 						id = res.getInt("id");
 						stu.s_id = id;
 					}
+					
 					insertOption(stu.s_faculty, stu.s_major,stu.s_nation, stu.s_province, stu.s_city,stmt);
 					if(!stu.s_education.equals("")){
 						boolean res = false;
 						Education edu = new Education(stu.s_id,stu.s_no,stu.s_education,stu.s_faculty,stu.s_major,stu.s_class,stu.s_enter,stu.s_graduate);
 						res = EducationLog.insertEdu(stmt,edu);
 						if(!res){
-							throw new Exception("学历信息重复");
+							throw new Exception("【推测学历重复】存在这个人的学历信息，请检查信息是否重复");
 						}
-					}
+					}else
+						throw new Exception("学历信息为空，请补充学历信息");
+					
 					String log = stu.s_no+" "+stu.s_name+" "+stu.s_workspace+" "+stu.s_work+" "+stu.s_worktitle+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_address+" "+stu.s_email+" "+stu.s_qq;
 					FullsearchLog.insertFullsearch(log, id, stmt);	//检索表
 					WorkLog.insertWork(stu, stmt);	//学生工作记录
-				}else{	//只导入学生教育流程记录
-					boolean res = false;
-					Education edu = new Education(stu.s_id,stu.s_no,stu.s_education,stu.s_faculty,stu.s_major,stu.s_class,stu.s_enter,stu.s_graduate);
-					res = EducationLog.insertEdu(stmt,edu);
-					if(!res){
-						throw new Exception("学历信息重复");
-					}else
-						insertOption(stu.s_faculty, stu.s_major,"", "", "",stmt);
 				}	
 			}else{
 				throw new Exception(result);

@@ -38,8 +38,8 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 	private JRadioButton[] sexRadio = {new JRadioButton("男"),new JRadioButton("女"),new JRadioButton("无")};
 	private JCheckBox[] educationBox = {new JCheckBox("专科"),new JCheckBox("本科"),
 			new JCheckBox("硕士"),new JCheckBox("博士")};
-	private JCheckBox[] facultyBox,majorBox,nationBox,provinceBox,cityBox,workBox;
-	private String[] labelName = {"其他条件","学院","专业","工作国家","工作省份","工作市区","工作职称"};
+	private JCheckBox[] facultyBox,majorBox,nationBox,provinceBox,cityBox;
+	private String[] labelName = {"其他条件","学院","专业","工作国家","工作省份","工作市区"};
 	private JTabbedPane jTabbed = new JTabbedPane(JTabbedPane.TOP);
 	private String[] faculty,major,nation,province,city,work;
 	private MyCheckList inList,outList;
@@ -193,6 +193,19 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		}
 		if(dbCondition[2]!=null)
 			dbCondition[2]+=')';
+		//国家
+		dbCondition[3] = null;
+		for(i=0;(nationBox!=null)&&i<nationBox.length;i++){
+			if(nationBox[i].isSelected()){
+				if(dbCondition[3]==null){
+					dbCondition[3] = "(s_nation='"+nationBox[i].getText()+"'";
+				}else{
+					dbCondition[3] += " or s_nation='"+nationBox[i].getText()+"'";
+				}
+			}
+		}
+		if(dbCondition[3]!=null)
+			dbCondition[3]+=')';
 		//省份
 		dbCondition[4] = null;
 		for(i=0;(provinceBox!=null)&&i<provinceBox.length;i++){
@@ -219,20 +232,6 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		}
 		if(dbCondition[5]!=null)
 			dbCondition[5]+=')';
-		//职务
-		dbCondition[6] = null;
-		for(i=0;(workBox!=null)&&i<workBox.length;i++){
-			if(workBox[i].isSelected()){
-				if(dbCondition[6]==null){
-					dbCondition[6] = "(s_worktitle='"+workBox[i].getText()+"'";
-					}else{
-						dbCondition[6] += " or s_worktitle='"+workBox[i].getText()+"'";
-					}
-			}
-		}
-		if(dbCondition[6]!=null)
-			dbCondition[6]+=')';
-		
 		//组织检索条件
 		for(i=0;i<dbCondition.length;i++){
 			if(dbCondition[i]!=null){
@@ -360,18 +359,6 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 						cityBox[i] = new JCheckBox(city[i]);
 						cityBox[i].addItemListener(this);
 						panels[selectIndex].add(cityBox[i]);
-					}
-				}
-				break;
-			case 6:	//职称
-				if(workBox==null){
-					work = StudentLog.allWorkTitle();
-					int length = work.length;
-					workBox = new JCheckBox[length];
-					for(int i=0;i<length;i++){
-						workBox[i] = new JCheckBox(work[i]);
-						workBox[i].addItemListener(this);
-						panels[selectIndex].add(workBox[i]);
 					}
 				}
 				break;

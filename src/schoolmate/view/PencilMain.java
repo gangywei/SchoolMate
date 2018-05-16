@@ -52,12 +52,13 @@ public class PencilMain extends JFrame{
 	private RemarksFrame remarkFrame;	//修改备注字段界面
 	private UserDetailFrame userDetail;	//用户详情界面
 	private PencilMain _this;
+	public static final String PPATH = System.getProperty("user.dir");
 	private ForgetPasswordFrame forgetPassword;	//忘记密码界面
 	public static int frameWidth,frameHeight;	//屏幕宽高
 	public static int showWidth,showHeight;
 	public static String education[] = {"  请选择设置的密保问题    ","数字与字母组合6至12位"};
 	public static String regular[] = {"^[\\d]{6,12}$","^[\\w]{6,12}$"};
-	public static String dbPath = "jdbc:sqlite:E:/assess/spy/mates.lite";
+	public static String dbPath = "jdbc:sqlite:"+PPATH+"/spy/mates.lite";
 	public static String[] DEFAULT_FONT  = new String[]{
 		    "CheckBox.font",
 		    "ScrollPane.font",
@@ -138,6 +139,8 @@ public class PencilMain extends JFrame{
 	}
 		
 	public static void main(String[] args) throws Exception{
+		
+		
         try
         {
         	for (int i = 0; i < DEFAULT_FONT.length; i++)
