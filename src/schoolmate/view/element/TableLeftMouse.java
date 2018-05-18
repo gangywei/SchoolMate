@@ -27,7 +27,7 @@ public class TableLeftMouse extends JPopupMenu implements ActionListener{
 		updateItem.addActionListener(this);
 		deleteItem.addActionListener(this);
 		add(detailItem);
-		if(panel.user.u_role>1){
+		if(PencilMain.nowUser.u_role>1){
 			add(updateItem);
 			add(deleteItem);
 		}

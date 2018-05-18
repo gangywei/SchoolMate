@@ -33,6 +33,11 @@ public class EducationLog {
 		String sql = "INSERT INTO Education (s_id,s_no,s_faculty,s_major,s_class,s_education,s_enter,s_graduate,update_time) VALUES "
 				+ "("+edu.s_id+",'"+edu.s_no+"','"+edu.s_faculty+"','"+edu.s_major+"','"+edu.s_class+"','"+edu.s_education+"','"+edu.s_enter+"','"+edu.s_graduate+"',"+Helper.dataTime(null)+");";
 		stmt.executeUpdate(sql);
+		if(change){	//如果是直接插入一条教育记录更新搜索表
+			String log = edu.s_no+";---; "+edu.s_class+";---";
+			String str = FullsearchLog.getLog(edu.s_id, 2, log, stmt);
+			FullsearchLog.updateFullsearch(str,edu.s_id,stmt);
+		}
 		if(change){
 			connect.commit();
 			stmt.close();
@@ -56,7 +61,7 @@ public class EducationLog {
 	 * inter：searchEdu 判断是否存在该记录，学生不存在该教育信息的情况下，更新学生的教育信息。并查新学生表的修改时间,type 查找用户学历信息
 	 * time:2018/03/15
 	 */
-	public static boolean updateEdu(Statement stmt,Education edu,boolean type) throws SQLException{
+	public static boolean updateEdu(Statement stmt,Education edu,boolean type,String old[]) throws SQLException{
 		boolean change = false;
 		if(stmt==null){
 			change = true;
@@ -71,6 +76,9 @@ public class EducationLog {
 		String sql = "update Education set s_no='"+edu.s_no+"',s_faculty='"+edu.s_faculty+"',s_major='"+edu.s_major+"',s_class='"+edu.s_class+"',s_education='"+edu.s_education+
 				"',s_enter='"+edu.s_enter+"',s_graduate='"+edu.s_graduate+"',update_time="+time+" where e_id="+edu.e_id;
 		stmt.executeUpdate(sql);
+		String log = edu.s_no+"; "+old[0]+"; "+edu.s_class+"; "+old[1];
+		String str = FullsearchLog.getLog(edu.s_id, 2, log, stmt);
+		FullsearchLog.updateFullsearch(str,edu.s_id,stmt);
 		StudentLog.updateTime(edu.s_id, stmt, time);
 		if(change){
 			connect.commit();
@@ -82,14 +90,34 @@ public class EducationLog {
 	 * inter：删除学生时同时删除用户的教育信息。 用户id。
 	 * time:2018/03/15
 	 */
-	public static void deleteEdu(Statement stmt,int s_id) throws SQLException{
+	public static void deleteEduFS(Statement stmt,int s_id) throws SQLException{
 		boolean change = false;
 		if(stmt==null){
 			change = true;
 			stmt = connect.createStatement();
 		}
-		String sql = "delete from Education where e_id="+s_id+"";
+		String sql = "delete from Education where s_id="+s_id+"";
 		stmt.executeUpdate(sql);
+		if(change){
+			connect.commit();
+			stmt.close();
+		}
+	}
+	/* 
+	 * inter：删除学生的教育记录。 教育记录id。
+	 * time:2018/03/15
+	 */
+	public static void deleteEdu(Statement stmt,int e_id,int s_id,String old[]) throws SQLException{
+		boolean change = false;
+		if(stmt==null){
+			change = true;
+			stmt = connect.createStatement();
+		}
+		String sql = "delete from Education where e_id="+e_id+"";
+		stmt.executeUpdate(sql);
+		String log = "-; "+old[0]+";-; "+old[1];
+		String str = FullsearchLog.getLog(s_id, 2, log, stmt);
+		FullsearchLog.updateFullsearch(str,s_id,stmt);
 		if(change){
 			connect.commit();
 			stmt.close();

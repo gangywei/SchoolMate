@@ -29,7 +29,7 @@ import schoolmate.view.element.MyTable;
 import schoolmate.view.element.TableLeftMouse;
 
 public class CollectDataFrame extends JInternalFrame implements ActionListener{
-	private String cell = "s.s_id,s.s_no,s_name,s_sex,s_birth,s_person,s_hometown,e.s_faculty,e.s_major,"
+	private String cell = "s.s_id,e.s_no,s_name,s_sex,s_birth,s_person,s_hometown,e.s_faculty,e.s_major,"
 			+ "e.s_class,e.s_education,e.s_enter,e.s_graduate,s_nation,s_province,s_city,s_workspace,s_worktitle,"
 			+ "s_work,s_workphone,s_homephone,s_phone,s_tphone,s_address,s_postcode,s_email,s_qq,s_weixin,s_remark1,"
 			+ "s_remark2,s_remark3,s_remark4,s_remark5,s.update_time";
@@ -37,7 +37,6 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 	double btnNum = 0;
 	private JScrollPane scroll;
 	public MyTable table;
-	public User user;
 	private RowListener rowLis;
 	private JLabel pageLabel;	//页码标签
 	public String instant="",condition="",//模糊查询和组合查询的条件
@@ -63,16 +62,16 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 	private BlurSearchFrame blurSearchFrame;
 	public CollectDataFrame(PencilMain pencil) throws Exception{
 		this.pencil = pencil;
-		this.user = PencilMain.nowUser;
-		if(user.u_role<=2){
-			String[] res = user.faculty.split(",");
+		if(PencilMain.nowUser.u_role<=2){
+			String[] res = PencilMain.nowUser.faculty.split(",");
 			limitTemp = "(";
 			for(int i=0;i<res.length;i++){
 				limitTemp += '"'+res[i]+"\",";
 			}
-			limitTemp = limitTemp.substring(0,limitTemp.length()-1);
+			limitTemp += "''";	//搜索学院为空的数据
 			limitTemp += ')';
 			limitStr = "s_faculty in "+limitTemp;
+			System.out.println(limitStr);
 		}
 		init();
 	}

@@ -5,7 +5,7 @@ import javax.swing.table.DefaultTableModel;
 import schoolmate.control.BaseModel;
 
 public class WorkModel extends BaseModel{
-	private static String[] Column = {"工作国家","工作省份","工作市区","职务","职称","工作单位"};//5个字段
+	private static String[] Column = {"工作国家","工作省份","工作市区","职务","职称","工作单位","办公电话"};//6个字段
 	
 	public WorkModel(Vector<Object[]> data){
 		super(Column, data);

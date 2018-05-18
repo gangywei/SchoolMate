@@ -48,8 +48,10 @@ public abstract class TabelPanel extends JPanel{
 	public void init(){
 		setLayout(new BorderLayout());
 		initTable();
-		popupMenu.add(alterItem);
-		popupMenu.add(deleteItem);
+		if(PencilMain.nowUser.u_role>1){
+			popupMenu.add(alterItem);
+			popupMenu.add(deleteItem);
+		}
 		//table.setAutoCreateRowSorter(true);
 		table.setFillsViewportHeight(true);
         tableScroll = new JScrollPane(table);

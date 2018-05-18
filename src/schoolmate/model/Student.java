@@ -7,11 +7,10 @@ public class Student {
 	//所在班级	学历/学位	入学年份	毕业年份	工作国家	工作省份	工作市区	工作单位	
 	//职务	职称	办公电话	宅电	手机1	手机2	通讯地址	邮编	
 	//E-mail	QQ	微信	备注字段	备注字段	备注字段	备注字段	备注字段
-	public Student(String no,String name,String sex,String birth,String person,String hometown,String faculty,String major,
+	public Student(String name,String sex,String birth,String person,String hometown,String faculty,String major,
 			String classs,String education,String enter,String graduate,String nation,String province,String city,String workspace,
 			String work,String worktitle,String workphone,String homephone,String phone,String tphone,String address,String postcode,
 			String email,String qq,String weixin,String remark1,String remark2,String remark3,String remark4,String remark5){
-		s_no = no;
 		s_name = name;
 		s_sex = sex;
 		s_birth = birth;
@@ -29,7 +28,29 @@ public class Student {
 		s_workspace = workspace;
 		s_worktitle = worktitle;
 		s_work = work;
-		s_workphone = workphone;
+		s_homephone = homephone;
+		s_workphone = worktitle;
+		s_phone = phone;
+		s_tphone = tphone;
+		s_address = address;
+		s_postcode = postcode;
+		s_email = email;
+		s_qq = qq;
+		s_weixin = weixin;
+		s_remark1 = remark1;
+		s_remark2 = remark2;
+		s_remark3 = remark3;
+		s_remark4 = remark4;
+		s_remark5 = remark5;
+	}
+	//学生的基本信息
+	public Student(String name,String sex,String birth,String person,String hometown,String homephone,String phone,String tphone,String address,String postcode,
+			String email,String qq,String weixin,String remark1,String remark2,String remark3,String remark4,String remark5){
+		s_name = name;
+		s_sex = sex;
+		s_birth = birth;
+		s_person = person;
+		s_hometown = hometown;
 		s_homephone = homephone;
 		s_phone = phone;
 		s_tphone = tphone;
@@ -46,12 +67,8 @@ public class Student {
 	}
 	
 	public String judgeStudent(){
-		String regNo = "[\\d]+";
 		if(s_name.equals(""))
 			return "姓名不可以为空";
-		if(!s_no.equals(""))
-			if(!Helper.matchRegular(s_no, regNo))
-				return "学号输入错误";
 		String regPerson = "^[0-9]{17}[0-9Xx]{1}$";
 		if(!s_person.equals(""))
 			if(!Helper.matchRegular(s_person, regPerson))
@@ -71,14 +88,14 @@ public class Student {
 	}
 	
 	public String[] toArray(){
-		String temp[] = {"",s_no,s_name,s_sex,s_birth,s_person,s_hometown,s_faculty,s_major,s_class,
+		String temp[] = {"",s_name,s_sex,s_birth,s_person,s_hometown,s_faculty,s_major,s_class,
 				s_education,s_enter,s_graduate,s_nation,s_province,s_city,s_workspace,s_work,s_worktitle,s_workphone,
 				s_homephone,s_phone,s_tphone,s_address,s_postcode,s_email,s_qq,s_weixin,s_remark1,s_remark2,
 				s_remark3,s_remark4,s_remark5,""};	//添加一个错误信息字段
 		return temp;
 	}
 	public int s_id;
-	public String s_no;
+	public String s_no = "";
 	public String s_name;
 	public String s_sex;
 	public String s_birth;

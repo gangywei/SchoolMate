@@ -45,7 +45,7 @@ public class WorkDetailPanel extends TabelPanel implements ActionListener{
 	
 	public void updateTabel(){
 		try {
-			data = UserLog.dao("select wl_id,s_id,nation,province,city,s_work,s_worktitle,s_workspace from worklog where s_id = "+sId);
+			data = UserLog.dao("select wl_id,s_id,nation,province,city,s_work,s_worktitle,s_workspace,s_workphone from worklog where s_id = "+sId);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -67,11 +67,11 @@ public class WorkDetailPanel extends TabelPanel implements ActionListener{
 				if(res==0){
 					boolean result = true;
 					try {
-						Work temp = new Work("", "", "", "", "", "");
+						Work temp = new Work("", "", "", "", "", "", "");
 						temp.s_id = sId;
 						temp.wl_id = wlId;
-						if(nowSelect==model.data.size()-1){
-							int now =JOptionPane.showConfirmDialog(this,"删除该记录,该信息的当前工作记录将为空","删除信息提示",JOptionPane.YES_NO_OPTION);
+						if(nowSelect==model.data.size()-1&&nowSelect==0){
+							int now =JOptionPane.showConfirmDialog(this,"删除该记录,该校友的当前工作记录将为空","删除信息提示",JOptionPane.YES_NO_OPTION);
 							if(now==0)
 								WorkLog.deleteWork(temp, null, 1);
 						}else

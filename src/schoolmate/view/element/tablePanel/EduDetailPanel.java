@@ -58,14 +58,15 @@ public class EduDetailPanel extends TabelPanel implements ActionListener{
 		if(item==deleteItem){
 			if(PencilMain.dbControl){
 				if(nowSelect==model.data.size()-1&&nowSelect==0){
-					JOptionPane.showMessageDialog(this,"学生教育记录不允许为空，请进行修改操作");
+					JOptionPane.showMessageDialog(this,"校友教育记录不允许为空，可以进行修改操作");
 					return;
 				}
 				int res =JOptionPane.showConfirmDialog(this,"删除这条记录的所有信息","删除信息提示",JOptionPane.YES_NO_OPTION);
 				if(res==0){
 					boolean result = true;
 					try {
-						EducationLog.deleteEdu(null, eId);
+						String old[] = {model.getCell(nowSelect, 2).toString(),(String)model.getCell(nowSelect, 5)};
+						EducationLog.deleteEdu(null, eId, sId, old);
 					} catch (SQLException e1) {
 						result = false;
 						e1.printStackTrace();

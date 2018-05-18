@@ -20,7 +20,6 @@ public class StudentLog {
 	private static Statement stmt = null;
 	private static ResultSet res;
 	private static PreparedStatement pStat;
-	
 	/* 
 	 * inter：判断是否有这个人的学历信息，根据 姓名、学院、毕业年份、学历判断。count=1 得到学生ID，返回count（推测为同一个人的人数）
 	 * time:2018/03/15
@@ -99,22 +98,6 @@ public class StudentLog {
 		}
 	}
 	/* 
-	 * inter：判断是否存在该账号的用户。 count=该账号的人数
-	 * time:2018/03/15
-	 */
-	public static int searchSno(String sno,Statement stmt) throws SQLException{
-		if(stmt==null){
-			stmt = connect.createStatement();
-		}
-		int count = 0;
-		String sql = "select count(*) totle from student where s_no='"+sno+"'";	
-		res = stmt.executeQuery(sql);
-		while (res.next()) {
-			count = res.getInt("totle");
-		}
-		return count;
-	}
-	/* 
 	 * inter：判断输入的信息格式是否正确，并插入该信息。学生姓名不为空就可以插入。
 	 * time:2018/03/15
 	 */
@@ -124,14 +107,14 @@ public class StudentLog {
 			if(result==null){
 				stmt = connect.createStatement();
 				String sql = "INSERT INTO student "
-						+ "(s_no,s_name,s_sex,s_birth,s_person,s_hometown,s_province,"
-						+ "s_city,s_workspace,s_worktitle,s_work,s_workphone,s_homephone,s_phone,"
-						+ "s_tphone,s_address,s_postcode,s_email,s_qq,s_remark1,s_nation,"
-						+ "s_weixin,s_remark2,s_remark3,s_remark4,s_remark5,update_time) "
+						+ "(s_name,s_sex,s_birth,s_person,s_hometown,"
+						+ "s_homephone,s_phone,s_tphone,s_address,s_postcode,"
+						+ "s_email,s_qq,s_remark1,s_weixin,s_remark2,"
+						+ "s_remark3,s_remark4,s_remark5,update_time) "
 						+ "VALUES "
-						+ "('"+stu.s_no+"','"+stu.s_name+"','"+stu.s_sex+"','"+stu.s_birth+"','"+stu.s_person+"','"+stu.s_hometown+"','"+stu.s_province+"','"
-						+stu.s_city+"','"+stu.s_workspace+"','"+stu.s_worktitle+"','"+stu.s_work+"','"+stu.s_workphone+"','"+stu.s_homephone+"','"+stu.s_phone+"','"
-						+stu.s_tphone+"','"+stu.s_address+"','"+stu.s_postcode+"','"+stu.s_email+"','"+stu.s_qq+"','"+stu.s_remark1+"','"+stu.s_nation+"','"
+						+ "('"+stu.s_name+"','"+stu.s_sex+"','"+stu.s_birth+"','"+stu.s_person+"','"+stu.s_hometown+"','"
+						+stu.s_homephone+"','"+stu.s_phone+"','"
+						+stu.s_tphone+"','"+stu.s_address+"','"+stu.s_postcode+"','"+stu.s_email+"','"+stu.s_qq+"','"+stu.s_remark1+"','"
 						+stu.s_weixin+"','"+stu.s_remark2+"','"+stu.s_remark3+"'"+ ",'"+stu.s_remark4+"','"+stu.s_remark5+"',"+Helper.dataTime(null)+");";
 				stmt.executeUpdate(sql);
 				int id = 0;
@@ -140,28 +123,29 @@ public class StudentLog {
 					id = res.getInt("id");
 					stu.s_id = id;
 				}
-				insertOption(stu.s_faculty, stu.s_major,stu.s_nation, stu.s_province, stu.s_city,stmt);
 				boolean res = false;
-				Education edu = new Education(stu.s_id,stu.s_no,stu.s_education,stu.s_faculty,stu.s_major,stu.s_class,stu.s_enter,stu.s_graduate);
+				Education edu = new Education(stu.s_id,"","","","","","","");
 				res = EducationLog.insertEdu(stmt,edu);
-				if(!res){
+				if(!res)
 					throw new Exception("【推测学历重复】存在该校友的学历信息，请检查信息是否重复");
-				}
-				String log = stu.s_no+" "+stu.s_name+" "+stu.s_workspace+" "+stu.s_work+" "+stu.s_worktitle+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_address+" "+stu.s_email+" "+stu.s_qq;
+				Work work = new Work("", "", "", "", "", "", "");
+				work.s_id = id;
+				WorkLog.insertWork(work, stmt);
+				String log = stu.s_name+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "+" & ";
 				FullsearchLog.insertFullsearch(log, id, stmt);	//检索表
-				WorkLog.insertWork(stu, stmt);	//学生工作记录
 				connect.commit();
 			}else{
 				throw new Exception(result);
 			}
 		}catch(Exception e){
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 			connect.rollback();
 			return e.getMessage();
 		}
 		stmt.close();
 		return null;
 	}
+	
 	/* 0 正常导入，推测为一个人的检查，推测存在这个人并且学历信息需要添加学历信息。1 跳过推测为一个人的检查， 直接导入学生数据。
 	 * inter：Excel表导入学生记录，
 	 * time:2018/03/15
@@ -182,13 +166,13 @@ public class StudentLog {
 				}
 				if(degCount==0&&count==0){	//导入学生记录+学历信息。
 					String sql = "INSERT INTO student "
-							+ "(s_no,s_name,s_sex,s_birth,s_person,s_hometown,s_province,"
-							+ "s_city,s_workspace,s_worktitle,s_work,s_workphone,s_homephone,s_phone,"
+							+ "(s_name,s_sex,s_birth,s_person,s_hometown,s_province,"
+							+ "s_city,s_workspace,s_worktitle,s_work,s_homephone,s_phone,"
 							+ "s_tphone,s_address,s_postcode,s_email,s_qq,s_remark1,s_nation,"
 							+ "s_weixin,s_remark2,s_remark3,s_remark4,s_remark5,update_time) "
 							+ "VALUES "
-							+ "('"+stu.s_no+"','"+stu.s_name+"','"+stu.s_sex+"','"+stu.s_birth+"','"+stu.s_person+"','"+stu.s_hometown+"','"+stu.s_province+"','"
-							+stu.s_city+"','"+stu.s_workspace+"','"+stu.s_worktitle+"','"+stu.s_work+"','"+stu.s_workphone+"','"+stu.s_homephone+"','"+stu.s_phone+"','"
+							+ "('"+stu.s_name+"','"+stu.s_sex+"','"+stu.s_birth+"','"+stu.s_person+"','"+stu.s_hometown+"','"+stu.s_province+"','"
+							+stu.s_city+"','"+stu.s_workspace+"','"+stu.s_worktitle+"','"+stu.s_work+"','"+stu.s_homephone+"','"+stu.s_phone+"','"
 							+stu.s_tphone+"','"+stu.s_address+"','"+stu.s_postcode+"','"+stu.s_email+"','"+stu.s_qq+"','"+stu.s_remark1+"','"+stu.s_nation+"','"
 							+stu.s_weixin+"','"+stu.s_remark2+"','"+stu.s_remark3+"'"+ ",'"+stu.s_remark4+"','"+stu.s_remark5+"',"+Helper.dataTime(null)+");";
 					stmt.executeUpdate(sql);
@@ -198,7 +182,6 @@ public class StudentLog {
 						id = res.getInt("id");
 						stu.s_id = id;
 					}
-					
 					insertOption(stu.s_faculty, stu.s_major,stu.s_nation, stu.s_province, stu.s_city,stmt);
 					if(!stu.s_education.equals("")){
 						boolean res = false;
@@ -209,10 +192,12 @@ public class StudentLog {
 						}
 					}else
 						throw new Exception("学历信息为空，请补充学历信息");
-					
-					String log = stu.s_no+" "+stu.s_name+" "+stu.s_workspace+" "+stu.s_work+" "+stu.s_worktitle+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_address+" "+stu.s_email+" "+stu.s_qq;
+					Work work = new Work(stu.s_nation, stu.s_province, stu.s_city, stu.s_work, stu.s_worktitle, stu.s_workspace, stu.s_workphone);
+					work.s_id = id;
+					WorkLog.insertWork(work, stmt);	//学生工作记录
+					String log = stu.s_name+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "
+							+stu.s_work+" "+stu.s_worktitle+" & "+stu.s_class+" "+stu.s_no;
 					FullsearchLog.insertFullsearch(log, id, stmt);	//检索表
-					WorkLog.insertWork(stu, stmt);	//学生工作记录
 				}	
 			}else{
 				throw new Exception(result);
@@ -232,17 +217,16 @@ public class StudentLog {
 			if(result==null){
 				stmt = connect.createStatement();
 				//每行5个
-				String sql = "update student set s_no='"+stu.s_no+"',s_name='"+stu.s_name+"',s_sex='"+stu.s_sex+"',s_birth='"+stu.s_birth+"',s_person='"+stu.s_person
-						+"',s_hometown='"+stu.s_hometown+"',s_workphone='"+stu.s_workphone+"',s_homephone='"+stu.s_homephone+"',s_phone='"+stu.s_phone+"',s_tphone='"+stu.s_tphone
+				String sql = "update student set s_name='"+stu.s_name+"',s_sex='"+stu.s_sex+"',s_birth='"+stu.s_birth+"',s_person='"+stu.s_person
+						+"',s_hometown='"+stu.s_hometown+"',s_homephone='"+stu.s_homephone+"',s_phone='"+stu.s_phone+"',s_tphone='"+stu.s_tphone
 						+"',s_address='"+stu.s_address+"',s_postcode='"+stu.s_postcode+"',s_email='"+stu.s_email+"',s_qq='"+stu.s_qq+"',s_remark1='"+stu.s_remark1
 						+"',s_weixin='"+stu.s_weixin+"',s_remark2='"+stu.s_remark2+"',s_remark3='"+stu.s_remark3+"',s_remark4='"+stu.s_remark4+"',s_remark5='"+stu.s_remark5
 						+"' where s_id='"+sId+"';";
 				int count = stmt.executeUpdate(sql);
 				if(count==1){
-					insertOption(stu.s_faculty, stu.s_major,stu.s_nation, stu.s_province, stu.s_city,stmt);
-					String log = stu.s_no+" "+stu.s_name+" "+stu.s_workspace+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_address+" "+stu.s_weixin+" "+stu.s_qq+" "
-							+stu.s_work+" "+stu.s_worktitle;
-					FullsearchLog.updateFullsearch(log,sId,stmt);
+					String log = stu.s_name+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email;
+					String str = FullsearchLog.getLog(sId, 0, log, stmt);
+					FullsearchLog.updateFullsearch(str,sId,stmt);
 					connect.commit();
 				}else{
 					throw new Exception("修改用户执行失败");
@@ -267,9 +251,7 @@ public class StudentLog {
 		String sql = "update student set update_time="+time+" where s_id="+id;
 		stmt.executeUpdate(sql);
 	}
-	/* 在一个事务下刷新学生的修改日期
-	 * time:2018/03/15
-	 */
+	//搜索界面得到记录的数量
 	public static int getNumber(String sql) throws SQLException{
 		int count = 0;
 		stmt = connect.createStatement();
@@ -318,7 +300,7 @@ public class StudentLog {
 			stmt = connect.createStatement();
 			String sql = "delete from student where s_id="+sId;
 			stmt.executeUpdate(sql);
-			EducationLog.deleteEdu(stmt, sId);
+			EducationLog.deleteEduFS(stmt, sId);
 			FullsearchLog.deleteFullsearch(sId,stmt);
 			WorkLog.deleteWork(sId, stmt);
 			connect.commit();
@@ -348,21 +330,6 @@ public class StudentLog {
 			return false;
 		}
 		return true;
-	}
-	/*
-	 * inter:使用in查询，在一个事务下删除多条数据。删除教育、工作、全文检索记录
-	 * time：2018/03/15
-	 */
-	public static void deleteMany(String str,Statement stmt){
-		try {
-			String sql = "delete from student where s_id in ("+str+");";
-			stmt.executeUpdate(sql);
-			EducationLog.deleteManyEdu(stmt, str);
-			FullsearchLog.deleteManyFs(str,stmt);
-			WorkLog.deleteManyWk(str, stmt);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 	/*
 	 * inter:得到所有的职称分类
@@ -417,27 +384,7 @@ public class StudentLog {
 	}
 	
 	/*
-	 * inter:根据用户ID，得到用户的全文检索数据。一般用于学生全文检索数据的更新
-	 * time：2018/03/15
-	 */
-	public static String getStudentLog(int sId,Statement stmt) throws SQLException{
-		String sql = "select s_no,s_name,s_phone,s_tphone,s_address,s_qq,s_weixin from student where s_id = "+sId;
-		res = stmt.executeQuery(sql);
-		String data = "";
-		while (res.next()) {
-			data += res.getString("s_no")+" ";
-			data += res.getString("s_name")+" ";
-			data += res.getString("s_phone")+" ";
-			data += res.getString("s_tphone")+" ";
-			data += res.getString("s_address")+" ";
-			data += res.getString("s_qq")+" ";
-			data += res.getString("s_weixin")+" ";
-		}
-		return data;
-	}
-	
-	/*
-	 * inter:学生添加工作时，更新学生的当前工作信息。
+	 * inter:学生添加工作时，更新学生的当前工作信息 + 并更新索引表
 	 * time：2018/03/15
 	 */
 	public static void updateWork(Work stu,Statement stmt) throws SQLException{
@@ -447,11 +394,12 @@ public class StudentLog {
 			stmt = connect.createStatement();
 		}
 		String sql = "update student set s_workspace='"+stu.s_workspace+"',s_work='"+stu.s_work+"',s_worktitle='"+stu.s_worktitle+"',s_province='"+stu.province+"',s_city='"
-		+stu.city+"',s_nation='"+stu.nation+"',update_time="+Helper.dataTime(null)+" where s_id="+stu.s_id;
+		+stu.city+"',s_nation='"+stu.nation+"',s_workphone='"+stu.s_workphone+"',update_time="+Helper.dataTime(null)+" where s_id="+stu.s_id;
 		stmt.executeUpdate(sql);
-		String log = getStudentLog(stu.s_id, stmt);
-		log += stu.s_work+" "+stu.s_worktitle+" "+stu.s_workspace;
-		FullsearchLog.updateFullsearch(log, stu.s_id, stmt);
+		//所有修改工作记录都要更新索引表
+		String log = stu.s_work+" "+stu.s_worktitle;
+		String str = FullsearchLog.getLog(stu.s_id, 1, log, stmt);
+		FullsearchLog.updateFullsearch(str,stu.s_id,stmt);
 		if(change){
 			connect.commit();
 			stmt.close();
@@ -468,9 +416,9 @@ public class StudentLog {
 			option = "";
 		else
 			option = " and "+limit;
-		String sql = "select s.s_no,s_name,s_sex,s_birth,s_person,s_hometown,e.s_faculty,e.s_major,"
+		String sql = "select s_name,s_sex,s_birth,s_person,s_hometown,e.s_faculty,e.s_major,"
 			+ "e.s_class,e.s_education,e.s_enter,e.s_graduate,w.nation,w.province,w.city,w.s_workspace,w.s_worktitle,"
-			+ "w.s_work,s_workphone,s_homephone,s_phone,s_tphone,s_address,s_postcode,s_email,s_qq,s_weixin,s_remark1,"
+			+ "w.s_work,s_homephone,s_phone,s_tphone,s_address,s_postcode,s_email,s_qq,s_weixin,s_remark1,"
 			+ "s_remark2,s_remark3,s_remark4,s_remark5 from"+" (select * from student where update_time>="+time+" and update_time<="+eTime+") s join ("
 			+ "select * from education  where update_time>="+time+" and update_time<="+eTime+option+") e on s.s_id=e.s_id left join "
 			+ "(select * from worklog where update_time>="+time+" and update_time<="+eTime+") w on s.s_id=w.s_id order by s.update_time asc;";

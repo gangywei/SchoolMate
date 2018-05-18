@@ -17,15 +17,6 @@ public class WorkLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
 	private static ResultSet res;
-	/* 
-	 * inter:在同一事务下，插入学生的工作记录。
-	 * time：2018/03/15
-	 */
-	public static void insertWork(Student stu,Statement stmt) throws SQLException{
-		String sql = "INSERT INTO worklog (s_id,s_workspace,s_work,s_worktitle,province,city,nation,update_time) VALUES "
-				+ "("+stu.s_id+",'"+stu.s_workspace+"','"+stu.s_work+"','"+stu.s_worktitle+"','"+stu.s_province+"','"+stu.s_city+"','"+stu.s_nation+"',"+Helper.dataTime(null)+");";
-		stmt.executeUpdate(sql);
-	}
 	/* old 原数据，now修改后的数据，type 0=市区，1=省市，2=国家
 	 * inter:根据教育流程标签的old（学院、专业）数据更新为now数据。在一个事务下更新。
 	 * time：2018/03/15
@@ -57,16 +48,16 @@ public class WorkLog {
 			change = true;
 			stmt = connect.createStatement();
 		}
-		String sql = "INSERT INTO worklog (s_id,s_workspace,s_work,s_worktitle,province,city,nation,update_time) VALUES "
-				+ "("+work.s_id+",'"+work.s_workspace+"','"+work.s_work+"','"+work.s_worktitle+"','"+work.province+"','"+work.city+"','"+work.nation+"',"+Helper.dataTime(null)+");";
+		String sql = "INSERT INTO worklog (s_id,s_workspace,s_work,s_worktitle,province,city,nation,s_workphone,update_time) VALUES "
+				+ "("+work.s_id+",'"+work.s_workspace+"','"+work.s_work+"','"+work.s_worktitle+"','"+work.province+"','"+work.city+"','"+work.nation+"','"+work.s_workphone+"',"+Helper.dataTime(null)+");";
 		stmt.executeUpdate(sql);
-		StudentLog.updateWork(work, stmt);
-		if(change){
+		if(change){	//如果添加学生记录是一个单独的事务，需要更新学生的工作记录+检索表
+			StudentLog.updateWork(work, stmt);
 			connect.commit();
 			stmt.close();
 		}
 	}
-	/* 学生修改工作记录时，插入工作记录，并更新学生的工作记录，修改时间
+	/* 学生修改工作记录时，插入工作记录，并更新学生的工作记录，修改时间  type=1更新学生记录 =0不更新
 	 * time：2018/03/15
 	 */
 	public static void updateWork(Work work,Statement stmt,int type) throws SQLException{
@@ -77,7 +68,7 @@ public class WorkLog {
 			stmt = connect.createStatement();
 		}
 		String sql = "update worklog set s_workspace='"+work.s_workspace+"',s_work='"+work.s_work+"',s_worktitle='"+work.s_worktitle+"',province='"+work.province+"',city='"
-		+work.city+"',nation='"+work.nation+"',update_time="+time+" where wl_id="+work.wl_id;
+		+work.city+"',nation='"+work.nation+"',s_workphone='"+work.s_workphone+"',update_time="+time+" where wl_id="+work.wl_id;
 		stmt.executeUpdate(sql);
 		StudentLog.updateTime(work.s_id, stmt, time);
 		if(type==1)
@@ -95,16 +86,17 @@ public class WorkLog {
 		String sql;
 		try {
 			stmt = connect.createStatement();
-			sql = "SELECT s_workspace,s_work,s_worktitle,nation,province,city FROM worklog where wl_id="+id+";";
+			sql = "SELECT s_workspace,s_work,s_worktitle,nation,province,s_workphone,city FROM worklog where wl_id="+id+";";
 			res = stmt.executeQuery(sql);
 			while (res.next()) {
-				work = new String[6];
+				work = new String[7];
 				work[0] = res.getString("nation");
 				work[1] = res.getString("province");
 				work[2] = res.getString("city");
 				work[3] = res.getString("s_work");
 				work[4] = res.getString("s_worktitle");
 				work[5] = res.getString("s_workspace");
+				work[6] = res.getString("s_workphone");
 			}
 			res.close();
 			stmt.close(); 
@@ -113,7 +105,7 @@ public class WorkLog {
 		} 
 		return work;
 	}
-	/* 学生修改工作记录时，插入工作记录，并更新学生的工作记录，修改时间
+	/* 学生修改工作记录时，插入工作记录，并更新学生的工作记录，修改时间+更新检索表
 	 * time：2018/03/15
 	 */
 	public static void deleteWork(Work work,Statement stmt,int type) throws SQLException{
@@ -124,8 +116,9 @@ public class WorkLog {
 		}
 		String sql = "delete from worklog where wl_id="+work.wl_id+";";
 		stmt.executeUpdate(sql);
-		if(type==1)
+		if(type==1){	//更新学生表的工作记录+检索表信息
 			StudentLog.updateWork(work, stmt);
+		}
 		if(change){
 			connect.commit();
 			stmt.close();

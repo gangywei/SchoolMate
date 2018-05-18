@@ -39,7 +39,6 @@ public class FacultyLog {
 		try {
 			stmt = connect.createStatement();
 			String sql = "select count(*) totle from faculty "+limit+";";
-			System.out.println(sql);
 			res = stmt.executeQuery(sql);
 			while (res.next()) {
 				count = res.getInt("totle");

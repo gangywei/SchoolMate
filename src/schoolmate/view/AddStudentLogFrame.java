@@ -29,7 +29,7 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 	private JPanel detailPanel = new JPanel();
 	private String education[] = {"","专科","本科","硕士","博士"};
 	private JLabel workLabel[] = {new JLabel("工作国家："),new JLabel("工作省份："),new JLabel("工作市区：")
-			,new JLabel("职    务："),new JLabel("职    称："),new JLabel("工作单位：")};
+			,new JLabel("职    务："),new JLabel("职    称："),new JLabel("工作单位："),new JLabel("办公电话：")};
 	private JLabel eduLabel[] = {new JLabel("学    号："),new JLabel("学     院："),new JLabel("专    业："),new JLabel("班    级：")
 			,new JLabel("学    历："),new JLabel("入学年份："),new JLabel("毕业年份：")};
 	private MyTextField inputAry[] = new MyTextField[7];
@@ -97,10 +97,10 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 			inputAry[1].setMenu(provinceList);
 			inputAry[2].setMenu(cityList);
 	  		hGroup.addGroup(layout.createParallelGroup().addComponent(workLabel[0]).addComponent(workLabel[1]).addComponent(workLabel[2]).addComponent(workLabel[3])
-	  				.addComponent(workLabel[4]).addComponent(workLabel[5]).addComponent(submitBtn));
+	  				.addComponent(workLabel[4]).addComponent(workLabel[5]).addComponent(workLabel[6]).addComponent(submitBtn));
 	  		hGroup.addGap(15);
 			hGroup.addGroup(layout.createParallelGroup().addComponent(inputAry[0]).addComponent(inputAry[1]).addComponent(inputAry[2]).addComponent(inputAry[3])
-	  				.addComponent(inputAry[4]).addComponent(inputAry[5]).addComponent(resetBtn));
+	  				.addComponent(inputAry[4]).addComponent(inputAry[5]).addComponent(inputAry[6]).addComponent(resetBtn));
 	  		hGroup.addGap(20);
 		}else{
 			if(nowId!=0)
@@ -116,13 +116,13 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 			yearList = new ArrayList<Object>();
 			majorList = new ArrayList<Object>();
 	        facultyList = new ArrayList<Object>();
-	        if(detail.collect.user.u_role==2)	//只有普通管理员只能添加自己专业的学生信息
+	        if(PencilMain.nowUser.u_role==2)	//只有普通管理员只能添加自己专业的学生信息
 	        	facultyAry = FacultyLog.allFaculty("where f_name in "+detail.collect.limitTemp);
 	        else
 	        	facultyAry = FacultyLog.allFaculty("");
-//	        for(int now=outYear;now>=inYear;now--)
-//				yearList.add(now+"");
-	        if(detail.collect.user.u_role==2)
+	        for(int now=outYear;now>=inYear;now--)
+				yearList.add(now+"");
+	        if(PencilMain.nowUser.u_role==2)
 	        	majorAry = MajorLog.allMajor("where f_name in "+detail.collect.limitTemp);
 	        else
 	        	majorAry = MajorLog.allMajor("");
@@ -135,8 +135,8 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 			inputAry[1].setMenu(facultyList);
 			inputAry[2].setMenu(majorList);
 			inputAry[4].setMenu(eduList);
-//			inputAry[5].setMenu(yearList);
-//			inputAry[6].setMenu(yearList);
+			inputAry[5].setMenu(yearList);
+			inputAry[6].setMenu(yearList);
 	  		hGroup.addGroup(layout.createParallelGroup().addComponent(eduLabel[0]).addComponent(eduLabel[1]).addComponent(eduLabel[2]).addComponent(eduLabel[3])
 	  				.addComponent(eduLabel[4]).addComponent(eduLabel[5]).addComponent(eduLabel[6]).addComponent(submitBtn));
 	  		hGroup.addGap(15);
@@ -149,7 +149,7 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
   		GroupLayout.SequentialGroup vGroup = layout.createSequentialGroup();
         vGroup.addGap(20);
         if(type!=1){
-        	for(int i=0;i<6;i++){
+        	for(int i=0;i<7;i++){
 	        	vGroup.addGroup(layout.createParallelGroup()
 	            		.addComponent(workLabel[i]).addComponent(inputAry[i]));
 	        	vGroup.addGap(17);
@@ -174,9 +174,9 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 	public void actionPerformed(ActionEvent e) {
 		JButton btn = (JButton)e.getSource();
 		if(btn==submitBtn){
-			if(type!=1){
+			if(type!=1){	//0 2 导入和修改工作记录
 				Work temp = new Work(inputAry[0].getText(),inputAry[1].getText(),inputAry[2].getText(),inputAry[3].getText(),
-						inputAry[4].getText(),inputAry[5].getText());
+						inputAry[4].getText(),inputAry[5].getText(),inputAry[6].getText());
 				temp.s_id = sId;
 				temp.wl_id = nowId;
 				try {
@@ -217,11 +217,12 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 					if(nowId==0){
 						res = EducationLog.insertEdu(null, temp);
 					}else{
-						if(data[0].equals(s_no)&&data[3].equals(inputAry[3].getText())&&data[4].equals(inputAry[4].getText())&&data[5].equals(inputAry[5].getText())
-								&&data[6].equals(inputAry[6].getText()))
-							res = EducationLog.updateEdu(null, temp,true);	//需要查找数据库是否有该同学的学院专业数据
-						else
-							res = EducationLog.updateEdu(null, temp,false);
+						String old[] = {data[0],data[3]};
+						//如果学历没变，直接修改数据
+						if(data[4].equals(inputAry[4].getText()))
+							res = EducationLog.updateEdu(null, temp, false, old);
+						else	//学历变化啦，查询是否学历重复
+							res = EducationLog.updateEdu(null, temp, true, old);
 					}
 					if(!res)	//查找数据库是否有该同学的学院专业数据的结果
 						JOptionPane.showMessageDialog(this, "存在该学历信息");

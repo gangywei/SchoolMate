@@ -40,8 +40,6 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 			submitBtn = new JButton("修改基础信息");
 	public WorkDetailPanel workTabel;
 	public EduDetailPanel eduTabel;
-	private JLabel countLabel = new JLabel("学号：");
-	private MyTextField countInput = new MyTextField("2001198405",10);
     private JLabel nameLabel = new JLabel("姓名：");  
     private JTextField nameInput = new MyTextField("必填内容",10);
     private JLabel sexLabel = new JLabel("性别：");  
@@ -53,8 +51,6 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
     private MyTextField personInput = new MyTextField("身份证号",10);
     private JLabel hometownLabel = new JLabel("家庭住址：");
     private JTextField hometownInput = new JTextField(10);
-    private JLabel workphoneLabel = new JLabel("单位电话：");
-    private JTextField workphoneInput = new JTextField(10);
     private JLabel homephoneLabel = new JLabel("家庭电话：");
     private JTextField homephoneInput = new JTextField(10);
     private JLabel phoneLabel = new JLabel("手机号：");
@@ -136,66 +132,64 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 		GroupLayout.SequentialGroup hGroup = layout.createSequentialGroup();
 		hGroup.addGap(20);//添加间隔
 		hGroup.addGroup(layout.createParallelGroup()
-				.addComponent(countLabel).addComponent(phoneLabel).addComponent(emailLabel).addComponent(remarkLabel1));
+				.addComponent(nameLabel).addComponent(tphoneLabel).addComponent(weixinLabel).addComponent(remarkLabel3));
 		hGroup.addGap(5);//添加间隔
 		hGroup.addGroup(layout.createParallelGroup()
-				.addComponent(countInput).addComponent(phoneInput).addComponent(emailInput).addComponent(remarkInput1));
+				.addComponent(nameInput).addComponent(tphoneInput).addComponent(weixinInput).addComponent(remarkInput3));
 		hGroup.addGap(20);
 		hGroup.addGroup(layout.createParallelGroup()
-				.addComponent(nameLabel).addComponent(tphoneLabel).addComponent(qqLabel).addComponent(remarkLabel2));
+				.addComponent(sexLabel).addComponent(hometownLabel).addComponent(postcodeLabel).addComponent(remarkLabel4));
 		hGroup.addGap(5);
 		hGroup.addGroup(layout.createParallelGroup()
-				.addComponent(nameInput).addComponent(tphoneInput).addComponent(qqInput).addComponent(remarkInput2));
+				.addComponent(sexBox).addComponent(hometownInput).addComponent(postcodeInput).addComponent(remarkInput4));
 		hGroup.addGap(20);
 		hGroup.addGroup(layout.createParallelGroup()
-				.addComponent(sexLabel).addComponent(hometownLabel).addComponent(weixinLabel).addComponent(remarkLabel3));
+				.addComponent(birthLabel).addComponent(homephoneLabel).addComponent(addressLabel).addComponent(remarkLabel5));
 		hGroup.addGap(5);
 		hGroup.addGroup(layout.createParallelGroup()
-				.addComponent(sexBox).addComponent(hometownInput).addComponent(weixinInput).addComponent(remarkInput3));
+				.addComponent(birthInput).addComponent(homephoneInput).addComponent(addressInput).addComponent(remarkInput5));
 		hGroup.addGap(20);
 		hGroup.addGroup(layout.createParallelGroup()
-				.addComponent(birthLabel).addComponent(homephoneLabel).addComponent(postcodeLabel).addComponent(remarkLabel4));
+				.addComponent(personLabel).addComponent(emailLabel).addComponent(remarkLabel1));
 		hGroup.addGap(5);
 		hGroup.addGroup(layout.createParallelGroup()
-				.addComponent(birthInput).addComponent(homephoneInput).addComponent(postcodeInput).addComponent(remarkInput4));
+				.addComponent(personInput).addComponent(emailInput).addComponent(remarkInput1));
 		hGroup.addGap(20);
 		hGroup.addGroup(layout.createParallelGroup()
-				.addComponent(personLabel).addComponent(workphoneLabel).addComponent(addressLabel).addComponent(remarkLabel5));
+				.addComponent(phoneLabel).addComponent(qqLabel).addComponent(remarkLabel2));
 		hGroup.addGap(5);
 		hGroup.addGroup(layout.createParallelGroup()
-				.addComponent(personInput).addComponent(workphoneInput).addComponent(addressInput).addComponent(remarkInput5));
+				.addComponent(phoneInput).addComponent(qqInput).addComponent(remarkInput2));
 		hGroup.addGap(20);
 		layout.setHorizontalGroup(hGroup);//设置水平组
 		//创建GroupLayout的垂直连续组，，越先加入的ParallelGroup，优先级级别越高。几行
 		GroupLayout.SequentialGroup vGroup = layout.createSequentialGroup();
         vGroup.addGap(30);
         vGroup.addGroup(layout.createParallelGroup()
-        		.addComponent(countLabel).addComponent(countInput)
                 .addComponent(nameLabel).addComponent(nameInput)
                 .addComponent(sexLabel).addComponent(sexBox)
                 .addComponent(birthLabel).addComponent(birthInput)
                 .addComponent(personLabel).addComponent(personInput)
+                .addComponent(phoneLabel).addComponent(phoneInput)
                 );
         vGroup.addGap(10);
         vGroup.addGroup(layout.createParallelGroup()
-                .addComponent(phoneLabel).addComponent(phoneInput)
                 .addComponent(tphoneLabel).addComponent(tphoneInput)
                 .addComponent(hometownLabel).addComponent(hometownInput)
                 .addComponent(homephoneLabel).addComponent(homephoneInput)
-                .addComponent(workphoneLabel).addComponent(workphoneInput)
+                .addComponent(emailLabel).addComponent(emailInput)
+                .addComponent(qqLabel).addComponent(qqInput)
                 );
         vGroup.addGap(10);
         vGroup.addGroup(layout.createParallelGroup()
-        		.addComponent(emailLabel).addComponent(emailInput)
-        		.addComponent(qqLabel).addComponent(qqInput)
         		.addComponent(weixinLabel).addComponent(weixinInput)
         		.addComponent(postcodeLabel).addComponent(postcodeInput)
         		.addComponent(addressLabel).addComponent(addressInput)
+        		.addComponent(remarkLabel1).addComponent(remarkInput1)
+        		.addComponent(remarkLabel2).addComponent(remarkInput2)
         		);
         vGroup.addGap(10);
         vGroup.addGroup(layout.createParallelGroup()
-        		.addComponent(remarkLabel1).addComponent(remarkInput1)
-        		.addComponent(remarkLabel2).addComponent(remarkInput2)
         		.addComponent(remarkLabel3).addComponent(remarkInput3)
         		.addComponent(remarkLabel4).addComponent(remarkInput4)
         		.addComponent(remarkLabel5).addComponent(remarkInput5));
@@ -235,13 +229,11 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 	}
 	
 	public void setData(){
-		countInput.setText(student[2]);
 		nameInput.setText(student[3]);
 		sexBox.setSelectedItem(student[4]);
 		birthInput.setText(student[5]);
 		personInput.setText(student[6]);
 		hometownInput.setText(student[7]);
-		workphoneInput.setText(student[20]);
 		homephoneInput.setText(student[21]);
 		phoneInput.setText(student[22]);
 		tphoneInput.setText(student[23]);
@@ -257,13 +249,11 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 		remarkInput5.setText(student[33]);
 		if(type==0){
 			submitBtn.setEnabled(false);
-			countInput.setEnabled(false);
 			nameInput.setEnabled(false);
 			sexBox.setEnabled(false);
 			birthInput.setEnabled(false);
 			personInput.setEnabled(false);
 			hometownInput.setEnabled(false);
-			workphoneInput.setEnabled(false);
 			homephoneInput.setEnabled(false);
 			phoneInput.setEnabled(false);
 			tphoneInput.setEnabled(false);
@@ -287,14 +277,12 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 		}else if(btn==addEducation){
 			pencil.addStudentLog(1,Integer.parseInt(student[1]),this,0);
 		}else if(btn==submitBtn){
-			if(type==2){
+			if(type==2){	//添加学生信息
 				String name = nameInput.getText();
-				String count = countInput.getText();
 				String sex = (String) sexBox.getSelectedItem();
 				String birth = birthInput.getText();
 				String person = personInput.getText();
 				String hometown = hometownInput.getText();
-				String workphone = workphoneInput.getText();
 				String homephone = homephoneInput.getText();
 				String phone = phoneInput.getText();
 				String tphone = tphoneInput.getText();
@@ -308,8 +296,7 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 				String remark4 = remarkInput4.getText();
 				String remark5 = remarkInput5.getText();
 				String weixin = weixinInput.getText();
-				Student temp = new Student(count, name, sex, birth, person, hometown, "", "", "", "", 
-						"", "", "", "", "", "", "", "", workphone, homephone, 
+				Student temp = new Student(name, sex, birth, person, hometown, homephone, 
 						phone, tphone, address, postcode, email, qq, weixin, remark1, remark2, remark3, 
 						remark4, remark5);
 				student = temp.toArray();
@@ -338,26 +325,11 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 					JOptionPane.showMessageDialog(null, "姓名不允许为空");
 				}
 			}else{
-				String count = countInput.getText();
-				if(!count.equals(""))
-					if(!count.equals(student[2]))	//判断学号是否重复
-						try {
-							if(StudentLog.searchSno(student[2],null)!=0){
-								JOptionPane.showMessageDialog(this, "存在该学号的学生,修改失败 ");
-								return;
-							}
-						} catch (SQLException e2) {
-							JOptionPane.showMessageDialog(this, "修改失败 ");
-							e2.printStackTrace();
-							return;
-						}
 				student[3] = nameInput.getText();
-				student[2] = countInput.getText();
 				student[4] = (String) sexBox.getSelectedItem();
 				student[5] = birthInput.getText();
 				student[6] = personInput.getText();
 				student[7] = hometownInput.getText();
-				student[20] = workphoneInput.getText();
 				student[21] = homephoneInput.getText();
 				student[22] = phoneInput.getText();
 				student[23] = tphoneInput.getText();
@@ -365,26 +337,23 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 				student[25] = postcodeInput.getText();
 				student[26] = emailInput.getText();
 				student[27] = qqInput.getText();
+				student[28] = weixinInput.getText();
 				student[29] = remarkInput1.getText();
 				student[30] = remarkInput2.getText();
 				student[31] = remarkInput3.getText();
 				student[32] = remarkInput4.getText();
 				student[33] = remarkInput5.getText();
-				student[28] = weixinInput.getText();
-				if(!student[3].equals("")){
+				if(!student[3].trim().equals("")){
 					try {
-						if(!student[3].trim().equals("")){
-							Student temp = new Student(student[2], student[3], student[4], student[5], student[6], student[7], student[8], student[9], student[10], 
-									student[11], student[12], student[13], student[14], student[15], student[16], student[17], student[18], student[19], student[20], 
-									student[21], student[22], student[23], student[24], student[25], student[26], student[27], student[28], student[29], student[30], 
-									student[31], student[32],student[33]);
-							String res = StudentLog.updateStudent(temp, Integer.parseInt(student[1]));
-							if(res!=null)
-								JOptionPane.showMessageDialog(this, res);
-							else{
-								JOptionPane.showMessageDialog(this, "操作成功");
-								pencil.collectDataFrame.refeshBtn.doClick();
-							}
+						Student temp = new Student(student[3], student[4], student[5], student[6],
+								student[20],student[21], student[22], student[23], student[24], student[25], student[26], student[27],student[28],student[29], 									
+								student[30], student[31], student[32], student[33]);
+						String res = StudentLog.updateStudent(temp, Integer.parseInt(student[1]));
+						if(res!=null)
+							JOptionPane.showMessageDialog(this, res);
+						else{
+							JOptionPane.showMessageDialog(this, "操作成功");
+							pencil.collectDataFrame.refeshBtn.doClick();
 						}
 					} catch (SQLException e1) {
 						System.err.println("添加学生"+e.getClass().getName() + ": " + e1.getMessage());

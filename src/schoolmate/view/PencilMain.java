@@ -32,7 +32,7 @@ import schoolmate.view.element.tablePanel.AllUserPanel;
 
 public class PencilMain extends JFrame{
 	private static final long serialVersionUID = 1L;
-	public static final int COLUM = 34;
+	public static final int COLUM = StudentModel.excelCol.length+2;	//多两个字段
 	public static User nowUser;	//当前登陆的用户信息
 	public JDesktopPane desktopPane;	//多文档窗体容器
 	public static boolean dbControl = true;	//sqlite数据库只支持一写多读，false=>正在处理大量的写数据。
@@ -139,8 +139,10 @@ public class PencilMain extends JFrame{
 	}
 		
 	public static void main(String[] args) throws Exception{
-		
-		
+//		String temp = " ---  ---";
+//		String swap[] = temp.split(" ");
+//		for(int i=0;i<swap.length;i++)
+//			System.out.println(swap[i]);
         try
         {
         	for (int i = 0; i < DEFAULT_FONT.length; i++)

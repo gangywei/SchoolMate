@@ -277,16 +277,15 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     				nowCount++;
     				processBar.setString("正在导入第"+nowCount+"条记录 姓名"+user[1]);// 设置提示信息
     				importPanel.repaint();
-    				Student stu = new Student(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
-    						user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
-    						user[20], user[21], user[22], user[23], user[24], user[25], user[26],user[27], user[28], user[29],
-    						user[30], user[31]);
+    				Student stu = new Student(user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
+							user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
+							user[20], user[21], user[22], user[23], user[24], user[25], user[26],user[27], user[28], user[29],user[30],user[31]);
     				try {
     					String res = null;
-    					if(!user[1].trim().equals("")){	//判断名字非空
+    					if(!user[1].trim().equals("")&&!user[9].trim().equals("")){	//判断名字非空
     						res = StudentLog.importExl(stmt, stu, type);
     					}else{
-    						res = "名字不可以为空";
+    						res = "名字或者学历不可以为空";
     					}
 						if(res!=null){
 							errorCount++;
@@ -301,7 +300,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 						break;
 					}
 				}else{
-					processBar.setString("跳过空行");// 设置提示信息
+					processBar.setString(nowCount+" 跳过空行");// 设置提示信息
 				}
 			}
         	if(threadCon){
@@ -379,10 +378,9 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 					nowCount++;
 					processBar.setString("正在导入第"+nowCount+"条记录 姓名"+user[1]);// 设置提示信息
 					importPanel.repaint();
-					Student stu = new Student(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
+					Student stu = new Student( user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
 							user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
-							user[20], user[21], user[22], user[23], user[24], user[25], user[26],user[27], user[28], user[29],
-							user[30], user[31]);
+							user[20], user[21], user[22], user[23], user[24], user[25], user[26],user[27], user[28], user[29],user[30],user[31]);
 					try {
 						String res = null;
 						if(!user[1].trim().equals("")){
@@ -403,7 +401,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 						break;
 					}
 				}else{
-					processBar.setString("跳过空行");// 设置提示信息
+					processBar.setString(nowCount+" 跳过空行");// 设置提示信息
 				}
 			}
 
