@@ -43,12 +43,21 @@ public class BaseModel  extends DefaultTableModel{
 		this.setRowCount(data.size());
 	}
 	
+	public void remove(int index){
+		data.remove(index);
+		this.setRowCount(data.size());
+	}
+	
 	public void deleteSelect(){
 		for(int i=data.size()-1;i>=0;i--){
 			if((Boolean)data.elementAt(i)[0]){
 				removeRow(i);
 			}
 		}
+	}
+	
+	public void setCell(int row,int col,Object obj){
+		data.elementAt(row)[col] = obj;
 	}
 	//对表格的修改操作
     public boolean isCellEditable(int row, int col) {

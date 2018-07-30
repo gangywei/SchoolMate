@@ -27,20 +27,20 @@ import javax.swing.JTextField;
 public class AlterLabelFrame extends JInternalFrame implements ActionListener{
 	private int type;
 	private int labSize;
-	private String[] label;
+	private int rowIndex;
 	private String[] textValue;
 	private JLabel[] labAry;
 	private JPanel detailPanel,btnPanel;
 	private JTextField[] textAry;
-	private TabelPanel tableDemo;
+	private TabelPanel table;
 	private JButton confirm = new JButton("确    认");  
 	private JButton cancel = new JButton("取    消");
-	public AlterLabelFrame(TabelPanel tableDemo,String[] label,String[] text,int type){
+	public AlterLabelFrame(TabelPanel tableDemo,String[] label,String[] text,int index,int type){
 		this.type = type;
 		textValue = text;
-		this.label = label;
+		table = tableDemo;
+		rowIndex = index;
 		labSize = label.length;
-		this.tableDemo = tableDemo;
 		labAry = new JLabel[labSize];
 		textAry = new JTextField[labSize];
 		for(int i=0;i<labSize;i++){
@@ -134,7 +134,10 @@ public class AlterLabelFrame extends JInternalFrame implements ActionListener{
 			if(!res)
 				JOptionPane.showMessageDialog(this, "更新数据库失败");
 			else{
-				tableDemo.updateTotle();
+				//更新数据
+				for(int i=0;i<labSize;i++)
+					table.model.setCell(rowIndex, i, textAry[i].getText());
+				table.updateUI();
 				dispose();
 			}
 		}else if(btn==cancel){

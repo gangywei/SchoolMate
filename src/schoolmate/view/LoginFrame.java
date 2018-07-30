@@ -25,8 +25,8 @@ import schoolmate.view.element.RegexDocument;
 public class LoginFrame extends JInternalFrame implements ActionListener{
 	private PencilMain pencilMain;
 	protected JPanel loginContent;
-	private JTextField userCount = new JTextField("18439331592",15);
-    private JPasswordField userPwd = new JPasswordField("18439331592",15);  
+	private JTextField userCount = new JTextField("",15);
+    private JPasswordField userPwd = new JPasswordField("",15);  
     private JLabel userLabel = new JLabel("账     号：");  
     private JLabel pwdLabel = new JLabel("密     码：");  
     private JButton loginBtn = new JButton("登    录");  

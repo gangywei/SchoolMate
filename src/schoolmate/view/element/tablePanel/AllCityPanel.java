@@ -51,6 +51,7 @@ public class AllCityPanel extends TabelPanel implements ActionListener{
 		String province = (String) model.getCell(nowSelect, 1);
 		String nation = (String) model.getCell(nowSelect, 0);
 		String[] text = {nation,province,sName};
+		
 		JMenuItem item = (JMenuItem) e.getSource();
 		if(item==deleteItem){
 			if(PencilMain.dbControl){
@@ -59,8 +60,8 @@ public class AllCityPanel extends TabelPanel implements ActionListener{
 					boolean result = AddressLog.deleteCity(sName,province,nation);
 					if(result)
 						try {
-							updateTabel();
-							collectFrame.refeshBtn.doClick();
+							model.remove(nowSelect);
+							this.updateUI();
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
@@ -72,7 +73,7 @@ public class AllCityPanel extends TabelPanel implements ActionListener{
 			}
 		}else if(item==alterItem){
 			if(PencilMain.dbControl){
-				collectFrame.pencil.alterLabel(this,model.nowColumn,text,2);
+				collectFrame.pencil.alterLabel(this,model.nowColumn,text,nowSelect,2);
 			}else{
 				JOptionPane.showMessageDialog(null, "正在导入数据，不允许该操作");
 			}

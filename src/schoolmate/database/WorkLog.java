@@ -1,7 +1,6 @@
 package schoolmate.database;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -10,7 +9,6 @@ import java.util.Vector;
 
 import schoolmate.control.Helper;
 import schoolmate.model.DBConnect;
-import schoolmate.model.Student;
 import schoolmate.model.Work;
 
 public class WorkLog {
@@ -39,6 +37,28 @@ public class WorkLog {
 		stmt.executeUpdate(sql);
 		stmt.executeUpdate(sql2);
 	}
+	//检查是否需要更新数据库字段
+	public static void checkField(String nation,String province,String city,Statement stmt) throws SQLException{
+		if(!nation.equals("")){
+			boolean nationRes = AddressLog.searchNation(nation);
+			if(!nationRes){
+				AddressLog.insertNation(nation,stmt);
+			}
+		}
+		if(!province.equals("")){
+			boolean provinceRes = AddressLog.searchProvince(province,nation);
+			if(!provinceRes){
+				AddressLog.insertProvince(province,nation,stmt);
+			}
+		}
+		if(!city.equals("")){
+			boolean cityRes = AddressLog.searchCity(city,province,nation);
+			if(!cityRes){
+				AddressLog.insertCity(city,province,nation,stmt);
+			}
+		}
+	}
+	
 	/* 学生添加工作记录时，插入工作记录，并更新学生的工作记录，修改时间
 	 * time：2018/03/15
 	 */
@@ -46,8 +66,9 @@ public class WorkLog {
 		boolean change = false;
 		if(stmt==null){
 			change = true;
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 		}
+		checkField(work.nation,work.province,work.city,stmt);
 		String sql = "INSERT INTO worklog (s_id,s_workspace,s_work,s_worktitle,province,city,nation,s_workphone,update_time) VALUES "
 				+ "("+work.s_id+",'"+work.s_workspace+"','"+work.s_work+"','"+work.s_worktitle+"','"+work.province+"','"+work.city+"','"+work.nation+"','"+work.s_workphone+"',"+Helper.dataTime(null)+");";
 		stmt.executeUpdate(sql);
@@ -65,8 +86,9 @@ public class WorkLog {
 		long time = Helper.dataTime(null);
 		if(stmt==null){
 			change = true;
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 		}
+		checkField(work.nation,work.province,work.city,stmt);
 		String sql = "update worklog set s_workspace='"+work.s_workspace+"',s_work='"+work.s_work+"',s_worktitle='"+work.s_worktitle+"',province='"+work.province+"',city='"
 		+work.city+"',nation='"+work.nation+"',s_workphone='"+work.s_workphone+"',update_time="+time+" where wl_id="+work.wl_id;
 		stmt.executeUpdate(sql);
@@ -85,7 +107,7 @@ public class WorkLog {
 		String[] work = null;
 		String sql;
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			sql = "SELECT s_workspace,s_work,s_worktitle,nation,province,s_workphone,city FROM worklog where wl_id="+id+";";
 			res = stmt.executeQuery(sql);
 			while (res.next()) {
@@ -112,7 +134,7 @@ public class WorkLog {
 		boolean change = false;
 		if(stmt==null){
 			change = true;
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 		}
 		String sql = "delete from worklog where wl_id="+work.wl_id+";";
 		stmt.executeUpdate(sql);
@@ -141,11 +163,8 @@ public class WorkLog {
 	
 	//返回table数组
 	public static Vector<Object[]> dao(String str) throws Exception{
-		PreparedStatement stmt = connect.prepareStatement(str);
-		ResultSet rs = stmt.executeQuery();
-		while (rs.next()){
-		}
-		rs = stmt.executeQuery();
+		stmt = DBConnect.getStmt();
+		ResultSet rs = stmt.executeQuery(str);
 		ResultSetMetaData rsmd=rs.getMetaData();//用于获取关于 ResultSet 对象中列的类型和属性信息的对象
 		int colNum=rsmd.getColumnCount();	//得到列数
 		Vector<Object[]> info = new Vector<Object[]>();

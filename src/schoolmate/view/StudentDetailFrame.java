@@ -300,23 +300,21 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 						phone, tphone, address, postcode, email, qq, weixin, remark1, remark2, remark3, 
 						remark4, remark5);
 				student = temp.toArray();
-				if(!name.equals("")){
+				if(!name.trim().equals("")){
 					try {
-						if(!name.trim().equals("")){
-							String res = StudentLog.insertStudent(temp);
-							if(res!=null)
-								JOptionPane.showMessageDialog(null, res);
-							else{
-								student[1] = temp.s_id+"";
-								workTabel.getDetail(temp.s_id);
-								eduTabel.getDetail(temp.s_id);
-								this.type = 1;	//变为修改状态
-								submitBtn.setText("修改基础信息");
-								addWork.setEnabled(true);
-								addEducation.setEnabled(true);
-								JOptionPane.showMessageDialog(null, "操作成功");
-								pencil.collectDataFrame.refeshBtn.doClick();
-							}
+						String res = StudentLog.insertStudent(temp);
+						if(res!=null)
+							JOptionPane.showMessageDialog(null, res);
+						else{
+							student[1] = temp.s_id+"";
+							workTabel.getDetail(temp.s_id);
+							eduTabel.getDetail(temp.s_id);
+							this.type = 1;	//变为修改状态
+							submitBtn.setText("修改基础信息");
+							addWork.setEnabled(true);
+							addEducation.setEnabled(true);
+							JOptionPane.showMessageDialog(null, "操作成功");
+							pencil.collectDataFrame.refeshBtn.doClick(); 
 						}
 					} catch (SQLException e1) {
 						System.err.println("插入学生"+e.getClass().getName() + ": " + e1.getMessage());

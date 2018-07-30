@@ -80,6 +80,7 @@ public abstract class TabelPanel extends JPanel{
 	
 	public abstract void initTable();
 	public abstract void updateTabel();
+	
 	//表格行监听
 	public class RowListener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent event) {

@@ -57,7 +57,8 @@ public class TableLeftMouse extends JPopupMenu implements ActionListener{
 				if(res==0){
 					boolean result = StudentLog.deleteStudent(sNo);
 					if(result){
-						panel.updateTabel(null,null);
+						panel.studentModel.remove(row);
+						panel.updateUI();
 					}else
 						JOptionPane.showMessageDialog(null, "删除学生失败！");
 				}

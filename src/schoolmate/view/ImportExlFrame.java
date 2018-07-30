@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +32,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -231,6 +233,30 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 		}
     }
 
+    public String getCellValue(Cell cell){
+    	String cellValue = "";
+    	if (cell != null) {
+    		switch (cell.getCellType()) {
+    		case Cell.CELL_TYPE_NUMERIC:
+                double value = cell.getNumericCellValue();
+                NumberFormat nf = NumberFormat.getInstance();
+                nf.setGroupingUsed(false);
+                cellValue = nf.format(value);
+    			break;
+    		case Cell.CELL_TYPE_STRING:
+                cellValue = cell.getStringCellValue();
+                break;
+    		case Cell.CELL_TYPE_BOOLEAN:
+                cellValue = String.valueOf(cell.getBooleanCellValue());
+                break;
+            default:
+                cellValue = cell.toString().trim();
+                break;
+    		}
+    	}
+    	return cellValue.trim();
+    }
+    
     //导入xls的线程
     public class xlsThread extends Thread{
     	public void run(){
@@ -256,16 +282,11 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 	    	int rows = sheet.getLastRowNum() + 1;	//获得行数
 			int cols = userSize;	//得到列数
 			for (int nowRow = 1; nowRow < rows&&threadCon; nowRow++){// 读取数据,除去表头
-				try {
-					Thread.sleep(25);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
 				Row row = sheet.getRow(nowRow);
 				if(row!=null){	//该行不为空
     				try{
 	    				for (int col = 0; col < cols; col++){
-	    					String val = formatter.formatCellValue(row.getCell(col));
+	    					String val = getCellValue(row.getCell(col));
 	    					user[col] = val;
 	    				}
     				} catch (RuntimeException e) {
@@ -280,6 +301,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     				Student stu = new Student(user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
 							user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
 							user[20], user[21], user[22], user[23], user[24], user[25], user[26],user[27], user[28], user[29],user[30],user[31]);
+    				stu.s_no = user[0];
     				try {
     					String res = null;
     					if(!user[1].trim().equals("")&&!user[9].trim().equals("")){	//判断名字非空
@@ -357,16 +379,11 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 	    	int rows = sheet.getLastRowNum() + 1;// 获得行数
 			int cols = userSize;	//得到列数
 			for (int nowRow = 1; nowRow < rows&&threadCon; nowRow++){// 读取数据
-				try {
-					Thread.sleep(25);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
 				XSSFRow row = sheet.getRow(nowRow);
 				if(row!=null){	//该行不为空
 					try{
 	    				for (int col = 0; col < cols; col++){
-	    					String val = formatter.formatCellValue(row.getCell(col));
+	    					String val = getCellValue(row.getCell(col));
 	    					user[col] = val;
 	    				}
 					} catch (RuntimeException e) {
@@ -381,6 +398,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 					Student stu = new Student( user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
 							user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
 							user[20], user[21], user[22], user[23], user[24], user[25], user[26],user[27], user[28], user[29],user[30],user[31]);
+					stu.s_no = user[0];
 					try {
 						String res = null;
 						if(!user[1].trim().equals("")){

@@ -8,10 +8,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Calendar;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -20,13 +24,15 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
+
+import schoolmate.control.Helper;
 import schoolmate.database.AddressLog;
 import schoolmate.database.FacultyLog;
 import schoolmate.database.MajorLog;
 import schoolmate.database.StudentLog;
 import schoolmate.view.element.MyCheckList;
 
-public class TabbedFrame extends JInternalFrame implements ActionListener,ChangeListener,ItemListener{
+public class TabbedFrame extends JFrame implements ActionListener,ChangeListener,ItemListener{
 	private static final long serialVersionUID = -97852095904032076L;
 	private JPanel[] panels = new JPanel[7];
 	private String[] condition = new String[8];	//对其他数据库检索的数组
@@ -40,9 +46,9 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 			new JCheckBox("硕士"),new JCheckBox("博士")};
 	private JCheckBox[] facultyBox,majorBox,nationBox,provinceBox,cityBox;
 	private String[] labelName = {"其他条件","学院","专业","工作国家","工作省份","工作市区"};
-	
 	private JTabbedPane jTabbed = new JTabbedPane(JTabbedPane.TOP);
-	private String[] faculty,major,nation,province,city,work;
+	private String[] faculty,nation,province,city;
+	String[][] major;
 	private MyCheckList inList,outList;
 	private int selectIndex;
 	private Calendar date = Calendar.getInstance();
@@ -58,15 +64,12 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 	public void init(){
 		for(int now=outYear,i=0;now>=inYear;now--,i++)
 			years[i] = now+"";
-		
-		setClosable(true);//提供关闭按钮
     	setResizable(true);  //允许自由调整大小 
     	setTitle("组合搜索功能");
     	if(PencilMain.nowUser.u_role<=2){	//普通用户权限(初始化查询条件)
 	    	condition[1] = "f_name in "+collect.limitTemp;
 			dbCondition[1] = collect.limitStr;
     	}
-    	
     	GridLayout layout = new GridLayout(15,8);
 		for(int i=0;i<labelName.length;i++){
 			panels[i] = new JPanel();
@@ -77,7 +80,6 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 			}
 			jTabbed.add(panels[i],labelName[i]);
 		}
-		
 		yearPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		inLabel = new JLabel("入学年份：");
 		outLabel = new JLabel("毕业年份：");
@@ -129,7 +131,17 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 		setSize(700, 450);
 		setLocation((PencilMain.showWidth-700)/2, 0);
 		jTabbed.addChangeListener(this);
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				super.windowClosing(e);
+				collect.condition = "";
+				collect.eduContion = "";
+				collect.tabbedFrame = null;
+				dispose();
+			}
+		});
 		setVisible(true);
+		setLocationRelativeTo(null);
 	}
 	/*
 	 * 遍历所有标签页，得到数据库的筛选条件。返回数组[联合查询条件+学生教育记录的查询条件]->提高查询效率
@@ -303,35 +315,28 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 				break;
 			case 2:	//专业
 				if(majorBox==null){
-					String str = "";
-					if(condition[1]!=null)
-						str = "where "+condition[1];
 					GridLayout layout = new GridLayout(15,6);
-					int page = 15*6;
-					major = MajorLog.allMajor(str);
-					double length = major.length;
-					int ind = (int)Math.ceil(length/page);
+					major = MajorLog.allMajor();
+					int length = 0;
+					for(int i=0;i<major.length;i++)
+						length += major[i][1].split(",").length;
+					int ind = major.length;
 					String[] majorName = new String[ind];
 					JPanel[] majorPanel = new JPanel[ind];
 					for(int i=0;i<ind;i++)
-						majorName[i] = page*i+" - "+page*(i+1);
+						majorName[i] = major[i][0];
 					JTabbedPane majorTabbed = new JTabbedPane(JTabbedPane.TOP);
-					majorBox = new JCheckBox[(int) length];
+					majorBox = new JCheckBox[length];
+					int boxCount = 0;
 					for(int i=0;i<ind;i++){
 						majorPanel[i] = new JPanel();
 						majorPanel[i].setLayout(layout);
-						if(i<ind-1){
-							for(int j=i*page;j<(i+1)*page;j++){
-								majorBox[j] = new JCheckBox(major[j]);
-								majorBox[j].addItemListener(this);
-								majorPanel[i].add(majorBox[j]);
-							}
-						}else{
-							for(int j=i*90;j<length;j++){
-								majorBox[j] = new JCheckBox(major[j]);
-								majorBox[j].addItemListener(this);
-								majorPanel[i].add(majorBox[j]);
-							}
+						String[] majorTemp = major[i][1].split(",");
+						for(int j=0;j<majorTemp.length;j++){
+							majorBox[boxCount] = new JCheckBox(majorTemp[j]);
+							majorBox[boxCount].addItemListener(this);
+							majorPanel[i].add(majorBox[boxCount]);
+							boxCount++;
 						}
 						majorTabbed.add(majorPanel[i],majorName[i]);
 					}
@@ -341,10 +346,11 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 			case 3:	//国家
 				if(nationBox==null){
 					nation = AddressLog.allNation();
-					int length = nation.length;
+					Object[] temp = Helper.arrayUnique(nation);
+					int length = temp.length;
 					nationBox = new JCheckBox[length];
 					for(int i=0;i<length;i++){
-						nationBox[i] = new JCheckBox(nation[i]);
+						nationBox[i] = new JCheckBox((String)temp[i]);
 						nationBox[i].addItemListener(this);
 						panels[selectIndex].add(nationBox[i]);
 					}
@@ -355,10 +361,11 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 					provinceBox = null;
 					String str = "";
 					province = AddressLog.allProvince(str);
-					int length = province.length;
+					Object[] temp = Helper.arrayUnique(province);
+					int length = temp.length;
 					provinceBox = new JCheckBox[length];
 					for(int i=0;i<length;i++){
-						provinceBox[i] = new JCheckBox(province[i]);
+						provinceBox[i] = new JCheckBox((String)temp[i]);
 						provinceBox[i].addItemListener(this);
 						panels[selectIndex].add(provinceBox[i]);
 					}
@@ -370,7 +377,8 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 					GridLayout layout = new GridLayout(15,6);
 					int page = 15*6;
 					city = AddressLog.allCity(str);
-					double length = city.length;
+					Object[] temp = Helper.arrayUnique(city);
+					double length = temp.length;
 					int ind = (int)Math.ceil(length/page);
 					String[] cityName = new String[ind];
 					JPanel[] cityPanel = new JPanel[ind];
@@ -383,13 +391,13 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 						cityPanel[i].setLayout(layout);
 						if(i<ind-1){
 							for(int j=i*page;j<(i+1)*page;j++){
-								cityBox[j] = new JCheckBox(city[j]);
+								cityBox[j] = new JCheckBox((String)temp[j]);
 								cityBox[j].addItemListener(this);
 								cityPanel[i].add(cityBox[j]);
 							}
 						}else{
 							for(int j=i*90;j<length;j++){
-								cityBox[j] = new JCheckBox(city[j]);
+								cityBox[j] = new JCheckBox((String)temp[j]);
 								cityBox[j].addItemListener(this);
 								cityPanel[i].add(cityBox[j]);
 							}
@@ -401,12 +409,6 @@ public class TabbedFrame extends JInternalFrame implements ActionListener,Change
 				break;
 		}
 		panels[selectIndex].repaint();
-	}
-	
-	public void doDefaultCloseAction() {
-		collect.condition = "";
-		collect.eduContion = "";
-		dispose();
 	}
 
 	public void actionPerformed(ActionEvent e) {

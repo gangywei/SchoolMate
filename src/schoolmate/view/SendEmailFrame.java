@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,10 +15,10 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -32,7 +34,7 @@ import schoolmate.control.EmailManager;
 import schoolmate.control.Helper;
 import schoolmate.control.tableModel.StudentModel;
 
-public class SendEmailFrame extends JInternalFrame implements ActionListener{
+public class SendEmailFrame extends JFrame implements ActionListener{
 	private JPanel sendPanel,btnPanel;
 	private int errorCount;
 	private boolean threadCon;	//线程控制
@@ -62,8 +64,6 @@ public class SendEmailFrame extends JInternalFrame implements ActionListener{
     	init();
     }
     public void init(){	
-    	setClosable(true);	//提供关闭按钮
-    	setIconifiable(true); //设置提供图标化按钮
     	stopBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
     	stopBtn.setForeground(Color.white);  
     	stopBtn.addActionListener(this);
@@ -131,8 +131,16 @@ public class SendEmailFrame extends JInternalFrame implements ActionListener{
         add(jWebBrowser,BorderLayout.CENTER);
         btnControl(0);
 		setVisible(true);
-		setSize(800, 600);
-		setLocation((PencilMain.showWidth-800)/2, 0);
+		setSize(PencilMain.showWidth, PencilMain.showHeight);
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				pencil.sendEmailFrame = null;
+				super.windowClosing(e);
+				dispose();
+				
+			}
+		});
+		setLocationRelativeTo(null); 
     }
     
     /**
@@ -181,6 +189,7 @@ public class SendEmailFrame extends JInternalFrame implements ActionListener{
 			break;
 		case 2:	//发送结束
 			fileBtn.setEnabled(true);
+			stopBtn.setEnabled(false);
 			startBtn.setEnabled(true);
 			if(errorCount>0){
 				JOptionPane.showMessageDialog(this, "存在发送失败的邮箱，点击导出失败数据，导出失败的信息");
@@ -245,12 +254,6 @@ public class SendEmailFrame extends JInternalFrame implements ActionListener{
 			startBtn.setEnabled(false);
 			String html = jWebBrowser.getHTMLContent();
 			doc = Jsoup.parse(html);
-//			Elements images = doc.getElementsByTag("img");
-//			for (Element img : images) {
-//	            String src = img.attr("src");
-//	            String base64 = imageToBase64Head(src);
-//	            img.attr("src",base64);
-//	        }
 			content = doc.select("div.note-editable").html();
 			//发送邮件
 			if(studentModel==null){
@@ -282,6 +285,7 @@ public class SendEmailFrame extends JInternalFrame implements ActionListener{
 				new sendEmailThread().start();
 			}
 		}else if(btn==exportBtn){
+			pencil.toFront();
 			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 			pencil.outputExl(errorModel,0,df.format(new Date())+"发送邮箱失败用户信息");
 		}else if(btn==fileBtn){
@@ -309,7 +313,4 @@ public class SendEmailFrame extends JInternalFrame implements ActionListener{
 	        
 		}
     }
-    public void doDefaultCloseAction() {  
-	    dispose();
-	}
 }

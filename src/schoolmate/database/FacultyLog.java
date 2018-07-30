@@ -18,7 +18,7 @@ public class FacultyLog {
 	 */
 	public static boolean searchFaculty(String faculty) throws SQLException{
 		int count = 0;
-		stmt = connect.createStatement();
+		stmt = DBConnect.getStmt();
 		String sql = "SELECT count(*) totle FROM faculty where f_name='"+faculty+"';";
 		res = stmt.executeQuery(sql);
 		while (res.next()) {
@@ -37,7 +37,7 @@ public class FacultyLog {
 	public static String[] allFaculty(String limit){
 		int count = 0;
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "select count(*) totle from faculty "+limit+";";
 			res = stmt.executeQuery(sql);
 			while (res.next()) {
@@ -65,7 +65,7 @@ public class FacultyLog {
 	 */
 	public static boolean insertFaculty(String faculty,Statement stmt) throws SQLException{
 		if(stmt==null)
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 		String sql = "INSERT INTO faculty (f_name) VALUES ('"+faculty+"');";
 		int res = stmt.executeUpdate(sql);
 		if(stmt==null){
@@ -83,7 +83,7 @@ public class FacultyLog {
 	 */
 	public static boolean deleteFaculty(String name){
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "delete from faculty where f_name='"+name+"'";
 			StudentLog.delStuFromEdu("where s_faculty='"+name, stmt);
 			MajorLog.delMajorFac(name,stmt);
@@ -103,7 +103,7 @@ public class FacultyLog {
 	 */
 	public static boolean updateFactlty(String[] old, String[] now) {
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "update faculty set f_name='"+now[0]+"' where f_name='"+old[0]+"'";
 			MajorLog.updMajorFac(now[0],old[0],stmt);
 			EducationLog.updateEdu(old, now, stmt, 1);

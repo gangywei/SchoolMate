@@ -5,6 +5,8 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
@@ -49,4 +51,14 @@ public class Helper {
 		}else
 			return new Date().getTime()/1000;
 	}
+	
+	public static Object[] arrayUnique(String [] arr){
+        //实例化一个set集合
+        Set<String> set = new HashSet<String>();
+        //遍历数组并存入集合,如果元素已存在则不会重复存入
+        for (int i = 0; i < arr.length; i++)
+            set.add(arr[i]);
+        //返回Set集合的数组形式
+        return set.toArray();
+    }
 }

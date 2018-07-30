@@ -54,7 +54,6 @@ public class AllUserPanel extends TabelPanel implements ActionListener{
 					boolean result = UserLog.deleteUser(sNo);
 					if(result){
 						updateTabel();
-						pencil.collectDataFrame.refeshBtn.doClick();
 					}else
 						JOptionPane.showMessageDialog(null, "删除用户失败！");
 				}

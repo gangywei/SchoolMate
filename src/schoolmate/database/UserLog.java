@@ -28,7 +28,7 @@ public class UserLog {
 	 */
 	public static boolean SelectUser(String number) throws SQLException{
 		int count = 0;
-		stmt = connect.createStatement();
+		stmt = DBConnect.getStmt();
 		String sql;
 		try {
 			sql = "SELECT count(*) totle FROM user where u_count='"+number+"'";
@@ -51,7 +51,7 @@ public class UserLog {
 	 */
 	public static boolean SelectUser(String userName,int index,String ans) throws SQLException{
 		int count = 0;
-		stmt = connect.createStatement();
+		stmt = DBConnect.getStmt();
 		String sql;
 		try {
 			sql = "SELECT count(*) totle FROM user where u_count='"+userName+"' and u_problem="+index+" and u_answer='"+ans+"';";
@@ -73,7 +73,7 @@ public class UserLog {
 	 * time：2018/03/15
 	 */
 	public static boolean alterPwd(String number,String passWord,int index,String ans) throws NoSuchAlgorithmException, UnsupportedEncodingException, SQLException{
-		stmt = connect.createStatement();
+		stmt = DBConnect.getStmt();
 		String sql = "update user set u_pwd ='"+Helper.EncoderByMd5(passWord)+"' where u_count ='"+number+"' and u_problem="+index+" and u_answer='"+ans+"';";
 		try {
 			int count = stmt.executeUpdate(sql);
@@ -95,7 +95,7 @@ public class UserLog {
 		String[] user = null;
 		String sql;
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			sql = "SELECT u_name,u_role,u_count,faculty FROM user where u_id="+id+";";
 			res = stmt.executeQuery(sql);
 			while (res.next()) {
@@ -121,7 +121,7 @@ public class UserLog {
 		String[] user = null;
 		String sql;
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			sql = "SELECT u_name,u_problem,u_answer,u_role,faculty,u_sign,u_use FROM user where u_count='"+count+"' and u_pwd='"+Helper.EncoderByMd5(pwd)+"';";
 			res = stmt.executeQuery(sql);
 			long endTime = 0;
@@ -177,7 +177,7 @@ public class UserLog {
 	 */
 	public static boolean updateAns(String count,int index,String answer,String name,String faculty){
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "update user set u_problem="+index+",u_answer='"+answer+"',u_name='"+name+"',faculty='"+faculty+"' where u_count = '"+count+"';";
 			int res = stmt.executeUpdate(sql);
 			stmt.close(); 
@@ -196,7 +196,7 @@ public class UserLog {
 	 */
 	public static boolean updateUser(String Name,String count,int userRole,int index,String faculty,int sNo) throws SQLException{
 		try{
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "update user set u_problem="+index+",u_name='"+Name+"',faculty='"+faculty+"',u_count = '"+count+"',u_role='"+userRole+"' where u_id="+sNo+";";
 			System.out.println(sql);
 			int number = stmt.executeUpdate(sql);
@@ -218,7 +218,7 @@ public class UserLog {
 	 */
 	public static boolean insterUser(String Name,String userName,String passWord,int userProblem,String userAnswer,int userRole,String userFaculty){
 		try{
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "INSERT INTO user "
 					+ "(u_name,u_count,u_pwd,u_problem,u_answer,u_role,Faculty,u_sign,u_use) "
 					+ "VALUES "
@@ -242,7 +242,7 @@ public class UserLog {
 	 */
 	public static boolean deleteUser(int id){
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "delete from user where u_id="+id;
 			int number= stmt.executeUpdate(sql);
 			stmt.close();
@@ -258,9 +258,9 @@ public class UserLog {
 	}
 	
 	public static Vector<Object[]> dao(String str) throws Exception{
-		PreparedStatement stmt = connect.prepareStatement(str);
-		ResultSet rs = stmt.executeQuery();
-		rs = stmt.executeQuery();
+		stmt = DBConnect.getStmt();
+		ResultSet rs = stmt.executeQuery(str);
+		rs = stmt.executeQuery(str);
 		ResultSetMetaData rsmd=rs.getMetaData();//用于获取关于 ResultSet 对象中列的类型和属性信息的对象
 		int colNum=rsmd.getColumnCount();	//得到列数
 		Vector<Object[]> info = new Vector<Object[]>();

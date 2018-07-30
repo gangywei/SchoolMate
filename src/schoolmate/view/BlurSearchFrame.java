@@ -20,7 +20,7 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
 	public JPanel interPanel,contentPanel,bottomPanel;
 	String str = new String(
 			"<strong>模糊查询功能</strong><br/><hr>"
-			+ "<p>支持对<strong>学号、姓名、手机号、QQ、微信、职务、职称、邮箱、工作地点、家庭住址</strong><br/>字段进行模糊查找，</p>");
+			+ "<p>支持对<strong>市区、学号、姓名、手机号、QQ、微信、职务、职称、邮箱</strong>、班级字段进行模<br/>糊查找，查询较慢，请稍等。</p>");
 	JEditorPane editPane = new JEditorPane("text/html", str);
 	JTextField instantInput = new JTextField(20);
 	JLabel instantLabel = new JLabel("模糊查询字段");
@@ -61,7 +61,7 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
     	add(contentPanel,BorderLayout.CENTER);
     	
     	setVisible(true);
-    	setSize(560, 260);
+    	setSize(600, 260);
 		setLocation((PencilMain.showWidth-560)/2, 0);
 	}
 

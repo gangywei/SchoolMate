@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -51,6 +52,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 	private JLabel collectLabel = new JLabel("");
 	public JLabel collectText = new JLabel("数据统计");
 	private JPanel bottomLeft = new JPanel();
+	private JPanel bottomRight = new JPanel();
 	private JButton exportBtn = new JButton("导出数据");
 	private JButton deleteBtn = new JButton("删除数据");
 	private JButton emailBtn = new JButton("邮件群发");
@@ -152,6 +154,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		bottomLeft.add(collectLabel);
 		bottomLeft.add(collectText);
 		bottomPanel.add(bottomLeft,BorderLayout.WEST);
+		bottomPanel.add(bottomRight,BorderLayout.EAST);
 		
 		add(topPanel,BorderLayout.NORTH);
 		add(scroll);
@@ -188,7 +191,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		if(type<2){
 			btnNum = 1;
 			nowIndex = 1;
-			dataTotle = StudentLog.getNumber(sql);
+			dataTotle = studentModel.data.size();
 			collectText.setText(" 总记录数："+dataTotle);
 		}
 		if(type==1){
@@ -207,6 +210,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 	public void updateTabel(String condTemp[],String insTemp){
 		try {
 			String eId = "";
+			long startTime=System.currentTimeMillis();   //获取开始时间
 			if(insTemp!=null&&!insTemp.equals(""))
 				instant = "join (select s_id from fullsearch where fs_content match '"+insTemp+"') as fs on fs.s_id=s.s_id";
 			if(condTemp!=null){	//当数据为null时，表示不更新搜索条件。	
@@ -226,12 +230,15 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 					eduContion = " join (select * from education where "+limitStr+") ";
 			//得到不重复的人，得到不重复的教育记录。
 			data = StudentLog.dao("select "+cell+" from (select * from student "+condition+") s "+eduContion+" e on s.s_id=e.s_id "+instant+" order by s.update_time desc;");
+			long endTime=System.currentTimeMillis(); //获取结束时间
+			System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
 			studentModel.setData(data);
 			table = new MyTable(studentModel);
 			updateBottom("select count(DISTINCT(s.s_id)) totle from (select DISTINCT(s_id) from student "+condition+") s "+eduContion+" e on s.s_id=e.s_id "+instant+" ;",0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	@Override
@@ -253,9 +260,8 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		}else if(btn==refeshBtn){
 			updateTabel(null,null);
 		}else if(btn==groupBtn){
-			if(tabbedFrame==null||tabbedFrame.isClosed()){
+			if(tabbedFrame==null){
 				tabbedFrame = new TabbedFrame(this);
-				pencil.desktopPane.add(tabbedFrame);
 			}
 			tabbedFrame.toFront();
 		}else if(btn==instantBtn){

@@ -16,15 +16,15 @@ public class Student {
 		s_birth = birth;
 		s_person = person;
 		s_hometown = hometown;
-		s_faculty = faculty;
-		s_major = major;
+		s_faculty = faculty.trim();
+		s_major = major.trim();
 		s_class = classs;
 		s_enter = enter;
 		s_education = education;
-		s_nation = nation;
-		s_province = province;
+		s_nation = nation.trim();
+		s_province = province.trim();
 		s_graduate = graduate;
-		s_city = city;
+		s_city = city.trim();
 		s_workspace = workspace;
 		s_worktitle = worktitle;
 		s_work = work;
@@ -52,11 +52,11 @@ public class Student {
 		s_person = person;
 		s_hometown = hometown;
 		s_homephone = homephone;
-		s_phone = phone;
-		s_tphone = tphone;
+		s_phone = phone.trim();
+		s_tphone = tphone.trim();
 		s_address = address;
 		s_postcode = postcode;
-		s_email = email;
+		s_email = email.trim();
 		s_qq = qq;
 		s_weixin = weixin;
 		s_remark1 = remark1;
@@ -73,7 +73,7 @@ public class Student {
 		if(!s_person.equals(""))
 			if(!Helper.matchRegular(s_person, regPerson))
 				return "身份证号输入错误";
-		String regPhone = "^1([358][0-9]|4[579]|66|7[0135678]|9[89])[0-9]{8}$";
+		String regPhone = "(^[\\s\\+\\d\\\\]*\\d{7,11}$)|(^[\\d-\\s\\\\]*\\d{6,8}$)";
 		if(!s_phone.equals(""))
 			if(!Helper.matchRegular(s_phone, regPhone))
 				return "手机号输入错误";
@@ -88,7 +88,7 @@ public class Student {
 	}
 	
 	public String[] toArray(){
-		String temp[] = {"",s_name,s_sex,s_birth,s_person,s_hometown,s_faculty,s_major,s_class,
+		String temp[] = {"",s_no,s_name,s_sex,s_birth,s_person,s_hometown,s_faculty,s_major,s_class,
 				s_education,s_enter,s_graduate,s_nation,s_province,s_city,s_workspace,s_work,s_worktitle,s_workphone,
 				s_homephone,s_phone,s_tphone,s_address,s_postcode,s_email,s_qq,s_weixin,s_remark1,s_remark2,
 				s_remark3,s_remark4,s_remark5,""};	//添加一个错误信息字段

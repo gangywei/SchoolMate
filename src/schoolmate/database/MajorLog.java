@@ -18,7 +18,7 @@ public class MajorLog {
 	 */
 	public static boolean searchMajor(String major,String faculty) throws SQLException{
 		int count = 0;
-		stmt = connect.createStatement();
+		stmt = DBConnect.getStmt();
 		String sql = "SELECT count(*) totle FROM major where m_name='"+major+"' and f_name='"+faculty+"';";
 		res = stmt.executeQuery(sql);
 		while (res.next()) {
@@ -37,7 +37,7 @@ public class MajorLog {
 	public static String[] allMajor(String condition){
 		int count = 0;
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "select count(*) totle from major "+condition+";";
 			res = stmt.executeQuery(sql);
 			while (res.next()) {
@@ -57,6 +57,30 @@ public class MajorLog {
 		}
 		return null;
 	}
+	public static String[][] allMajor(){
+		int count = 0;
+		try {
+			stmt = DBConnect.getStmt();
+			String sql = "select count(*) totle from major group by f_name;";
+			res = stmt.executeQuery(sql);
+			while (res.next()) {
+				count++;
+			}
+			String data[][] = new String[count][2];
+			sql = "select group_concat(m_name) as m_name,f_name from major group by f_name;";
+			res = stmt.executeQuery(sql);
+			int i=0;
+			while (res.next()) {
+				data[i][0] = res.getString("f_name");
+				data[i][1] = res.getString("m_name");
+				i++;
+			}
+			return data;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	/* 
 	 * inter：null=在同一事务下，在一个新的事务下插入一个学院信息。
 	 * time:2018/03/15
@@ -66,7 +90,7 @@ public class MajorLog {
 		if(stmt==null)
 			pool = true;	//新建通道
 		if(pool)
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 		String sql = "INSERT INTO major (m_name,f_name) VALUES ('"+major+"','"+faculty+"');";
 		stmt.executeUpdate(sql);
 		if(pool){
@@ -96,7 +120,7 @@ public class MajorLog {
 	 */
 	public static boolean deleteMajor(String major,String faculty){
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String name = major+"' and f_name='"+faculty;
 			StudentLog.delStuFromEdu("where s_major='"+major+"'and s_faculty='"+faculty, stmt);
 			String sql = "delete from major where m_name='"+name+"'";
@@ -116,7 +140,7 @@ public class MajorLog {
 	 */
 	public static boolean updateMajor(String[] old,String[] now){
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String name = old[1]+"' and f_name='"+old[0];
 			String sql = "update major set m_name='"+now[1]+"',f_name='"+now[0]+"' where m_name='"+name+"'";
 			stmt.executeUpdate(sql);

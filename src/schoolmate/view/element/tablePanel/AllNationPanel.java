@@ -58,7 +58,6 @@ public class AllNationPanel extends TabelPanel implements ActionListener{
 					if(result)
 						try {
 							updateTabel();
-							collectFrame.refeshBtn.doClick();
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
@@ -70,7 +69,7 @@ public class AllNationPanel extends TabelPanel implements ActionListener{
 			}
 		}else if(item==alterItem){
 			if(PencilMain.dbControl){
-				collectFrame.pencil.alterLabel(this,model.nowColumn,text,0);
+				collectFrame.pencil.alterLabel(this,model.nowColumn,text,nowSelect,0);
 			}else{
 				JOptionPane.showMessageDialog(null, "正在导入数据，不允许该操作");
 			}

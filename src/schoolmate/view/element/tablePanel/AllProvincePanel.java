@@ -54,10 +54,9 @@ public class AllProvincePanel extends TabelPanel implements ActionListener{
 				int res =JOptionPane.showConfirmDialog(this,"删除该字段并删除该字段的所有数据，请先做好excel备份","删除信息提示",JOptionPane.YES_NO_OPTION);
 				if(res==0){
 					int result = AddressLog.deleteProvince(sProvince,sNation);
-					if(result==1)
+					if(result>=1)
 						try {
 							updateTabel();
-							collectFrame.refeshBtn.doClick();
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
@@ -69,7 +68,7 @@ public class AllProvincePanel extends TabelPanel implements ActionListener{
 			}
 		}else if(item==alterItem){
 			if(PencilMain.dbControl){
-				collectFrame.pencil.alterLabel(this,model.nowColumn,text,1);
+				collectFrame.pencil.alterLabel(this,model.nowColumn,text,nowSelect,1);
 			}else{
 				JOptionPane.showMessageDialog(null, "正在导入数据，不允许该操作");
 			}

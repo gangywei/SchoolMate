@@ -20,6 +20,7 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 			"手机","手机2","通讯地址","邮编","E-mail","QQ","微信","","","","",""};	//33个字段
 	public String nowColumn[];	//当前使用的表格信息
 	public String[] remarks = new String[5];	//数据库学生表备注字段
+	private int dataSize = 2000;	//一页显示的数量
 	public int type;	//判断使用哪种表头=>影响到数据的导出和数据的显示 0=>数据库(导出学生数据和发送邮件导出信息)  1=>Excel(只用于导入Excel)
 	public Vector<Object[]> data = new Vector<Object[]>();
 	public StudentModel(Vector<Object[]> data,int type){
@@ -83,19 +84,10 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 	 * inter:设置tableModle的数据，可能存在相同的学生，使用条件判断id是否存在，去除相同的学生
 	 */
 	public void setData(Vector<Object[]> data){
-		String str = "";
-		for(int i=0;i<data.size();i++){
-			String temp = data.elementAt(i)[1].toString();
-			if(str.indexOf(temp)==-1)
-				str += temp+",";
-			else{
-				data.remove(i);
-				i--;
-			}
-		}
 		this.data = data;
 		this.setRowCount(data.size());
 	}
+	
 	public Object getValueAt(int row, int col) {
 		if(this.getRowCount()>0)
 			if(col>=1&&type==0)
@@ -105,8 +97,17 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 		return "";
 	}
 	
+	public void remove(int index){
+		data.remove(index);
+		this.setRowCount(data.size());
+	}
+	
 	public Object getCell(int row,int col){
 		return data.elementAt(row)[col];
+	}
+	
+	public void setCell(int row,int col,Object obj){
+		data.elementAt(row)[col] = obj;
 	}
 
 	public Class getColumnClass(int c) {
@@ -156,7 +157,6 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 	//对表格的修改操作
     public boolean isCellEditable(int row, int col) {
         if (col < 1) {
-        	System.out.println(row);
             return true;
         } else {
             return false;

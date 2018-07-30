@@ -107,7 +107,7 @@ public class RemarksFrame extends JInternalFrame implements ActionListener{
 				}
 			}
 			if(update){
-				JOptionPane.showMessageDialog(this, "修改成功！重启系统后使用新的字段");
+				JOptionPane.showMessageDialog(this, "修改成功！重新登录后更新信息");
 			}else{
 				JOptionPane.showMessageDialog(this, "改变数据后再点击修改！");
 			}

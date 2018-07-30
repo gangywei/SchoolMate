@@ -36,7 +36,7 @@ public class PencilMain extends JFrame{
 	public static User nowUser;	//当前登陆的用户信息
 	public JDesktopPane desktopPane;	//多文档窗体容器
 	public static boolean dbControl = true;	//sqlite数据库只支持一写多读，false=>正在处理大量的写数据。
-	private SendEmailFrame sendEmailFrame;	//发送邮箱界面
+	public SendEmailFrame sendEmailFrame;	//发送邮箱界面
 	private AllUserFrame userFrame;	//用户管理界面
 	private LabelManageFrame labelFrame;	//字段修改界面
 	private FrameMenubar frameMenubar;	//顶部菜单栏
@@ -106,14 +106,6 @@ public class PencilMain extends JFrame{
 		setVisible(true);
 		setLocationRelativeTo(null); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.addWindowStateListener(new WindowStateListener () {
- 		   	public void windowStateChanged(WindowEvent e) {
- 		   		int state = e.getNewState();
-	 		    if(state == 0||state == 6) {
-	 		    	getShowSize();
-	 		    }
- 		   	}
-        });
 	}
 	
 	//得到中间面板的宽和高
@@ -139,10 +131,6 @@ public class PencilMain extends JFrame{
 	}
 		
 	public static void main(String[] args) throws Exception{
-//		String temp = " ---  ---";
-//		String swap[] = temp.split(" ");
-//		for(int i=0;i<swap.length;i++)
-//			System.out.println(swap[i]);
         try
         {
         	for (int i = 0; i < DEFAULT_FONT.length; i++)
@@ -220,8 +208,8 @@ public class PencilMain extends JFrame{
 			forgetPassword.setVisible(!forgetPassword.isShowing());
 		forgetPassword.toFront();
 	}
-	public void alterLabel(TabelPanel tableDemo,String[] label,String[] text,int type){	//修改数据库字段
-		AlterLabelFrame alterLabel = new AlterLabelFrame(tableDemo,label,text,type);
+	public void alterLabel(TabelPanel tableDemo,String[] label,String[] text,int index,int type){	//修改数据库字段
+		AlterLabelFrame alterLabel = new AlterLabelFrame(tableDemo,label,text,index,type);
 		desktopPane.add(alterLabel);
 		alterLabel.toFront();
 	}
@@ -257,11 +245,9 @@ public class PencilMain extends JFrame{
         EventQueue.invokeLater(new Runnable() {  
             public void run() {  
                 try {  
-                	if(sendEmailFrame==null||sendEmailFrame.isClosed()){
+                	if(sendEmailFrame==null){
 	                	sendEmailFrame = new SendEmailFrame(studentModel,_this);
-	                	desktopPane.add(sendEmailFrame);
                 	}
-                	sendEmailFrame.setMaximum(true);
             		sendEmailFrame.toFront();
                 } catch (Exception e) {  
                     e.printStackTrace();  
@@ -282,7 +268,7 @@ public class PencilMain extends JFrame{
 	}
 	//导出Excel
 	public void outputExl(StudentModel studentModel,int type,String title){
-		if(backupsFrame==null||backupsFrame.isClosed()){
+		if(outputFrame==null||outputFrame.isClosed()){
 			outputFrame = new OutportExlFrame(studentModel,type,title);
 			desktopPane.add(outputFrame);
 			outputFrame.toFront();

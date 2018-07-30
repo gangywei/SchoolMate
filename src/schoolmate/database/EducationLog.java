@@ -23,7 +23,7 @@ public class EducationLog {
 		boolean change = false;
 		if(stmt==null){
 			change = true;
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 		}
 		if(!searchEdu(stmt, edu.s_id, edu.s_education)){
 			if(change)
@@ -65,7 +65,7 @@ public class EducationLog {
 		boolean change = false;
 		if(stmt==null){
 			change = true;
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 		}
 		if(type&&!searchEdu(stmt, edu.s_id, edu.s_education)){
 			if(change)
@@ -94,7 +94,7 @@ public class EducationLog {
 		boolean change = false;
 		if(stmt==null){
 			change = true;
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 		}
 		String sql = "delete from Education where s_id="+s_id+"";
 		stmt.executeUpdate(sql);
@@ -111,7 +111,7 @@ public class EducationLog {
 		boolean change = false;
 		if(stmt==null){
 			change = true;
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 		}
 		String sql = "delete from Education where e_id="+e_id+"";
 		stmt.executeUpdate(sql);
@@ -131,7 +131,7 @@ public class EducationLog {
 		String[] edu = null;
 		String sql;
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			sql = "SELECT s_no,s_faculty,s_major,s_class,s_education,s_enter,s_graduate FROM education where e_id="+id+";";
 			res = stmt.executeQuery(sql);
 			while (res.next()) {
@@ -166,7 +166,7 @@ public class EducationLog {
 	public static String getEid(String condition){
 		String strId = "";
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "select group_concat(e_id) strId from education e "+condition+";";
 			res = stmt.executeQuery(sql);
 			while (res.next()) {
@@ -196,7 +196,7 @@ public class EducationLog {
 	
 	public static Vector<Object[]> getUpdate(long time) throws SQLException{
 		String sql = "select * from education where update_time>="+time;
-		stmt = connect.createStatement();
+		stmt = DBConnect.getStmt();
 		ResultSet rs = stmt.executeQuery(sql);
 		ResultSetMetaData rsmd=rs.getMetaData();//用于获取关于 ResultSet 对象中列的类型和属性信息的对象
 		int colNum=rsmd.getColumnCount()-1;	//得到列数

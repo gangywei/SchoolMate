@@ -19,7 +19,7 @@ public class AddressLog {
 	 */
 	public static boolean searchNation(String address) throws SQLException{
 		int count = 0;
-		stmt = connect.createStatement();
+		stmt = DBConnect.getStmt();
 		String sql = "SELECT count(*) totle FROM nation where n_name='"+address+"';";
 		res = stmt.executeQuery(sql);
 		while (res.next()) {
@@ -38,7 +38,7 @@ public class AddressLog {
 	 */
 	public static boolean deleteNation(String name){
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "delete from nation where n_name='"+name+"';";
 			StudentLog.delStuFromAdd("where s_nation='"+name, stmt);
 			stmt.executeUpdate(sql);
@@ -60,7 +60,7 @@ public class AddressLog {
 	 */
 	public static boolean updateNation(String old[],String now[]){
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "update nation set n_name='"+now[0]+"' where n_name='"+old[0]+"';";
 			stmt.executeUpdate(sql);
 			WorkLog.updateWork(old,now,stmt,2);
@@ -82,7 +82,7 @@ public class AddressLog {
 	public static String[] allNation(){
 		int count = 0;
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "select count(*) totle from nation;";
 			res = stmt.executeQuery(sql);
 			while (res.next()) {
@@ -117,7 +117,7 @@ public class AddressLog {
 	 */
 	public static boolean searchProvince(String address,String nation) throws SQLException{
 		int count = 0;
-		stmt = connect.createStatement();
+		stmt = DBConnect.getStmt();
 		String sql = "SELECT count(*) totle FROM province where p_name='"+address+"' and n_name= '"+nation+"';";
 		res = stmt.executeQuery(sql);
 		while (res.next()) {
@@ -136,7 +136,7 @@ public class AddressLog {
 	public static int deleteProvince(String province,String nation){
 		int a ;
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String strName = "where s_province='"+province +"' and s_nation='"+nation;
 			String name = province +"' and n_name='"+nation+"";
 			StudentLog.delStuFromAdd(strName, stmt);
@@ -159,7 +159,7 @@ public class AddressLog {
 	 */
 	public static boolean updateProvince(String old[],String now[]){
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String name = old[1] +"' and n_name='"+old[0]+"";
 			String sql = "update province set p_name='"+now[1]+"',n_name='"+now[0]+"' where p_name='"+name+"';";	
 			stmt.executeUpdate(sql);
@@ -180,7 +180,7 @@ public class AddressLog {
 	public static String[] allProvince(String str){
 		int count = 0;
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "select count(distinct(p_name)) totle from province "+str+";";
 			res = stmt.executeQuery(sql);
 			while (res.next()) {
@@ -230,7 +230,7 @@ public class AddressLog {
 	//判断是否存在该市区，判断市区的所有字段
 	public static boolean searchCity(String address,String province,String nation) throws SQLException{
 		int count = 0;
-		stmt = connect.createStatement();
+		stmt = DBConnect.getStmt();
 		String sql = "SELECT count(*) totle FROM city where c_name='"+address+"' and p_name= '"+province+"' and n_name= '"+nation+"';";
 		res = stmt.executeQuery(sql);
 		while (res.next()) {
@@ -281,7 +281,7 @@ public class AddressLog {
 	 */
 	public static boolean deleteCity(String city,String province,String nation){
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String strName = "where s_city='"+city+"' and s_province='"+province+"' and s_nation='"+nation;
 			String name = city+"' and p_name='"+province+"' and n_name='"+nation;
 			StudentLog.delStuFromAdd(strName, stmt);
@@ -301,7 +301,7 @@ public class AddressLog {
 	 */
 	public static boolean updateCity(String old[],String now[]){
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String name = old[2]+"' and p_name='"+old[1]+"' and n_name='"+old[0];
 			String sql = "update city set p_name='"+now[1]+"', n_name='"+now[0]+"', c_name='"+now[2]+"' where c_name='"+name+"';";	
 			stmt.executeUpdate(sql);
@@ -319,7 +319,7 @@ public class AddressLog {
 	public static String[] allCity(String str){
 		int count = 0;
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "select count(distinct(c_name)) totle from city "+str+";";
 			res = stmt.executeQuery(sql);
 			while (res.next()) {
@@ -327,7 +327,6 @@ public class AddressLog {
 			}
 			String data[] = new String[count];
 			sql = "select distinct(c_name) from city "+str+";";
-			System.out.println(sql);
 			res = stmt.executeQuery(sql);
 			int i=0;
 			while (res.next()) {
