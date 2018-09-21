@@ -260,9 +260,8 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		}else if(btn==refeshBtn){
 			updateTabel(null,null);
 		}else if(btn==groupBtn){
-			if(tabbedFrame==null){
+			if(tabbedFrame==null)
 				tabbedFrame = new TabbedFrame(this);
-			}
 			tabbedFrame.toFront();
 		}else if(btn==instantBtn){
 			if(blurSearchFrame==null||blurSearchFrame.isClosed()){

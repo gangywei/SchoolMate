@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import schoolmate.control.tableModel.ProvinceModel;
+import schoolmate.control.BaseModel;
 import schoolmate.database.AddressLog;
 import schoolmate.database.UserLog;
 import schoolmate.view.CollectDataFrame;
@@ -13,6 +13,7 @@ import schoolmate.view.element.MyTable;
 import schoolmate.view.element.TabelPanel;
 
 public class AllProvincePanel extends TabelPanel implements ActionListener{
+	private static String[] Column = {"国家","省份"};//5个字段
 	public AllProvincePanel(CollectDataFrame collectFrame) {
 		super(collectFrame);
 	}
@@ -23,7 +24,7 @@ public class AllProvincePanel extends TabelPanel implements ActionListener{
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-		model = new ProvinceModel(data);
+		model = new BaseModel(Column,data);
 		table = new MyTable(model);
 		alterItem.addActionListener(this);
 		deleteItem.addActionListener(this);

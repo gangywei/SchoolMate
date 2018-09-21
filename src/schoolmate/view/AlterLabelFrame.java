@@ -25,10 +25,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class AlterLabelFrame extends JInternalFrame implements ActionListener{
-	private int type;
+	private int type;	//判断修改哪一项
 	private int labSize;
 	private int rowIndex;
-	private String[] textValue;
+	private String[] textValue;	//原始的数据
 	private JLabel[] labAry;
 	private JPanel detailPanel,btnPanel;
 	private JTextField[] textAry;
@@ -77,8 +77,6 @@ public class AlterLabelFrame extends JInternalFrame implements ActionListener{
 		ParallelGroup textGroup = layout.createParallelGroup();
 		for(int i=0;i<labSize;i++)
 			textGroup.addComponent(textAry[i]);
-		for(int i=0;i<labSize-1;i++)	//设置只可以修改当前标签页的字段
-			textAry[i].setEditable(false);
 		hGroup.addGroup(textGroup);
 		layout.setHorizontalGroup(hGroup);//设置水平组
 		GroupLayout.SequentialGroup vGroup = layout.createSequentialGroup();
@@ -98,35 +96,46 @@ public class AlterLabelFrame extends JInternalFrame implements ActionListener{
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		String now[] = new String[labSize];
-		boolean change = false;
-		for(int i=0;i<labSize;i++){
-			now[i] = textAry[i].getText();
-			if(!now[i].equals(textValue[i]));
-				change = true;
-		}
-		if(change==false){
-			JOptionPane.showMessageDialog(this, "请修改数据后再提交。");
-			return;
-		}
 		JButton btn = (JButton)e.getSource();
 		if(btn==confirm){
+			String nowValue[] = new String[labSize];
+			boolean change = false;
+			for(int i=0;i<labSize;i++){
+				nowValue[i] = textAry[i].getText().trim();
+				if(!nowValue[i].equals(textValue[i]))
+					change = true;
+			}
+			if(change==false){
+				JOptionPane.showMessageDialog(this, "请修改数据后再提交。");
+				return;
+			}
 			boolean res = false;
+			int title = 0;
 			switch (type) {
 			case 0:
-				res = AddressLog.updateNation(textValue, now);
+				title =JOptionPane.showConfirmDialog(this,"该操作将修改所有关联数据的国家信息，是否继续？","任务提示",JOptionPane.YES_NO_OPTION);
+				if(title==0)
+					res = AddressLog.updateNation(textValue, nowValue);
 				break;
 			case 1:
-				res = AddressLog.updateProvince(textValue, now);
+				title =JOptionPane.showConfirmDialog(this,"该操作将修改所有关联数据的省份信息，是否继续？","任务提示",JOptionPane.YES_NO_OPTION);
+				if(title==0)
+					res = AddressLog.updateProvince(textValue, nowValue);
 				break;
 			case 2:
-				res = AddressLog.updateCity(textValue, now);
+				title =JOptionPane.showConfirmDialog(this,"该操作将修改所有关联数据的市区信息，是否继续？","任务提示",JOptionPane.YES_NO_OPTION);
+				if(title==0)
+					res = AddressLog.updateCity(textValue, nowValue);
 				break;
 			case 3:
-				res = FacultyLog.updateFactlty(textValue, now);
+				title =JOptionPane.showConfirmDialog(this,"该操作将修改所有关联数据的学院信息，是否继续？","任务提示",JOptionPane.YES_NO_OPTION);
+				if(title==0)
+					res = FacultyLog.updateFactlty(textValue, nowValue);
 				break;
 			case 4:
-				res = MajorLog.updateMajor(textValue, now);
+				title =JOptionPane.showConfirmDialog(this,"该操作将修改所有关联数据的专业信息，是否继续？","任务提示",JOptionPane.YES_NO_OPTION);
+				if(title==0)
+					res = MajorLog.updateMajor(textValue, nowValue);
 				break;
 			default:
 				break;
@@ -136,7 +145,7 @@ public class AlterLabelFrame extends JInternalFrame implements ActionListener{
 			else{
 				//更新数据
 				for(int i=0;i<labSize;i++)
-					table.model.setCell(rowIndex, i, textAry[i].getText());
+					table.model.setCell(rowIndex, i, nowValue[i]);
 				table.updateUI();
 				dispose();
 			}

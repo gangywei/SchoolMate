@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 import chrriis.common.UIUtils;
 import chrriis.dj.nativeswing.swtimpl.NativeInterface;
+import schoolmate.control.PropProxy;
 import schoolmate.control.tableModel.StudentModel;
 import schoolmate.model.User;
 import schoolmate.view.element.FrameMenubar;
@@ -53,6 +54,7 @@ public class PencilMain extends JFrame{
 	private UserDetailFrame userDetail;	//用户详情界面
 	private PencilMain _this;
 	public static final String PPATH = System.getProperty("user.dir");
+	public static final String CPATH = PPATH+"/resource/config/soft.properties";
 	private ForgetPasswordFrame forgetPassword;	//忘记密码界面
 	public static int frameWidth,frameHeight;	//屏幕宽高
 	public static int showWidth,showHeight;
@@ -86,7 +88,6 @@ public class PencilMain extends JFrame{
 	public PencilMain() throws Exception{
     	initFrame();
     }
-
 	@SuppressWarnings("serial")
 	public void initFrame() throws Exception{
 		_this = this;

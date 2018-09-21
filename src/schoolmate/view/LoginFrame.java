@@ -18,6 +18,7 @@ import javax.swing.JTextField;
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
 
 import schoolmate.control.Helper;
+import schoolmate.control.PropProxy;
 import schoolmate.database.UserLog;
 import schoolmate.model.User;
 import schoolmate.view.element.RegexDocument;
@@ -38,6 +39,7 @@ public class LoginFrame extends JInternalFrame implements ActionListener{
 	}
 	public void initPanel(){
 		setTitle("登录页面");
+		userCount.setText(PropProxy.readProperty(pencilMain.CPATH, "count"));
 		FlowLayout layout = new FlowLayout(1,30,20);
         loginContent = new JPanel();
         loginContent.setLayout(layout);
@@ -91,6 +93,7 @@ public class LoginFrame extends JInternalFrame implements ActionListener{
 				try {
 					String[] result = UserLog.getUser(uCount,uPwd,new Date().getTime()/1000);
 					if(result!=null){
+						PropProxy.WriteProperties(pencilMain.CPATH, "count", uCount);
 						PencilMain.nowUser = new User(uCount,uPwd);
 						pencilMain.nowUser.faculty = result[3];
 						pencilMain.nowUser.u_role = Integer.parseInt(result[4]);

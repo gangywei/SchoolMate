@@ -16,7 +16,7 @@ public class MajorLog {
 	 * inter：插入全文检索信息
 	 * time:2018/03/15
 	 */
-	public static boolean searchMajor(String major,String faculty) throws SQLException{
+	public static boolean searchMajor(String faculty,String major) throws SQLException{
 		int count = 0;
 		stmt = DBConnect.getStmt();
 		String sql = "SELECT count(*) totle FROM major where m_name='"+major+"' and f_name='"+faculty+"';";
@@ -26,7 +26,7 @@ public class MajorLog {
 		}
 		res.close();
 		stmt.close(); 
-		if(count==1)
+		if(count>=1)
 			return true;
 		return false;
 	}
@@ -107,6 +107,14 @@ public class MajorLog {
 		stmt.executeUpdate(sql);
 	}
 	/*
+	 * inter：根据学院和专业信息删除专业。
+	 * time:2018/03/15
+	 */
+	public static void delMajor(String faculty,String major,Statement stmt) throws SQLException{
+		String sql = "delete from major where m_name='"+major+"' and f_name='"+faculty+"'";
+		stmt.executeUpdate(sql);
+	}
+	/*
 	 * inter：根据学院的字段，更新学院对应专业下学院。
 	 * time:2018/03/15
 	 */
@@ -121,9 +129,8 @@ public class MajorLog {
 	public static boolean deleteMajor(String major,String faculty){
 		try {
 			stmt = DBConnect.getStmt();
-			String name = major+"' and f_name='"+faculty;
 			StudentLog.delStuFromEdu("where s_major='"+major+"'and s_faculty='"+faculty, stmt);
-			String sql = "delete from major where m_name='"+name+"'";
+			String sql = "delete from major where m_name='"+major+"' and f_name='"+faculty+"'";
 			stmt.executeUpdate(sql);
 			connect.commit();
 			stmt.close();
@@ -134,16 +141,22 @@ public class MajorLog {
 		}
 		return true;
 	}
-	/* old：原专业数据 ，now：修改后的数据
+	/* old：原专业数据 ，now：修改后的数据	[0=学院 1=专业]
 	 * inter：根据专业的所有字段，更新对应的专业数据
 	 * time:2018/03/15
 	 */
 	public static boolean updateMajor(String[] old,String[] now){
 		try {
 			stmt = DBConnect.getStmt();
-			String name = old[1]+"' and f_name='"+old[0];
-			String sql = "update major set m_name='"+now[1]+"',f_name='"+now[0]+"' where m_name='"+name+"'";
-			stmt.executeUpdate(sql);
+			//不存在修改成为的数据，修改数据;存在删除当前数据。
+			if(!searchMajor(now[0],now[1])){	
+				String sql = "update major set m_name='"+now[1]+"',f_name='"+now[0]+"' where m_name='"+old[1]+"' and f_name='"+old[0]+"'";
+				stmt.executeUpdate(sql);
+			}else{
+				delMajor(old[0],old[1],stmt);
+			}
+			if(!FacultyLog.searchFaculty(now[0]))
+				FacultyLog.insertFaculty(now[0], stmt);
 			EducationLog.updateEdu(old, now, stmt, 0);
 			connect.commit();
 			stmt.close();

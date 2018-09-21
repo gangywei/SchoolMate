@@ -26,7 +26,7 @@ public class FacultyLog {
 		}
 		res.close();
 		stmt.close(); 
-		if(count==1)
+		if(count>=1)
 			return true;
 		return false;
 	}

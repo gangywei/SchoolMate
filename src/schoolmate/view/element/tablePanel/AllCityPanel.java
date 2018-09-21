@@ -2,10 +2,9 @@ package schoolmate.view.element.tablePanel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import schoolmate.control.tableModel.CityModel;
+import schoolmate.control.BaseModel;
 import schoolmate.database.AddressLog;
 import schoolmate.database.UserLog;
 import schoolmate.view.CollectDataFrame;
@@ -14,7 +13,7 @@ import schoolmate.view.element.MyTable;
 import schoolmate.view.element.TabelPanel;
 
 public class AllCityPanel extends TabelPanel implements ActionListener{
-	
+	private static String[] Column = {"国家","省份","市区"};//5个字段
 	public AllCityPanel(CollectDataFrame collectFrame) {
 		super(collectFrame);
 	}
@@ -25,7 +24,7 @@ public class AllCityPanel extends TabelPanel implements ActionListener{
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-		model = new CityModel(data);
+		model = new BaseModel(Column,data);
 		table = new MyTable(model);
 		alterItem.addActionListener(this);
 		deleteItem.addActionListener(this);

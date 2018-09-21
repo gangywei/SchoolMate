@@ -60,8 +60,14 @@ public class AddressLog {
 	 */
 	public static boolean updateNation(String old[],String now[]){
 		try {
+			String sql;
 			stmt = DBConnect.getStmt();
-			String sql = "update nation set n_name='"+now[0]+"' where n_name='"+old[0]+"';";
+			//不存在修改成为的数据，修改数据;存在删除当前数据。
+			if(!searchNation(now[0])){	
+				sql = "update nation set n_name='"+now[0]+"' where n_name='"+old[0]+"';";
+			}else{
+				sql = "delete from nation where n_name='"+old[0]+"';";
+			}
 			stmt.executeUpdate(sql);
 			WorkLog.updateWork(old,now,stmt,2);
 			updProvinceNa(old, now ,stmt);
@@ -115,10 +121,10 @@ public class AddressLog {
 	 * inter：判断该省份是否存在。 true=存在 false=不存在。
 	 * time:2018/03/15
 	 */
-	public static boolean searchProvince(String address,String nation) throws SQLException{
+	public static boolean searchProvince(String province,String nation) throws SQLException{
 		int count = 0;
 		stmt = DBConnect.getStmt();
-		String sql = "SELECT count(*) totle FROM province where p_name='"+address+"' and n_name= '"+nation+"';";
+		String sql = "SELECT count(*) totle FROM province where p_name='"+province+"' and n_name= '"+nation+"';";
 		res = stmt.executeQuery(sql);
 		while (res.next()) {
 			count = res.getInt("totle");
@@ -129,20 +135,23 @@ public class AddressLog {
 			return true;
 		return false;
 	}
+	public static int delProvince(String province,String nation,Statement stat) throws SQLException{
+		String sql = "delete from province where p_name='"+province+"' and n_name='"+nation+"'";
+		return stmt.executeUpdate(sql);
+	}
 	/* 
 	 * inter：根据省份的所有字段，删除省份数据，并通过 delCityFromPro 方法，删除省份下的市区。并通过 delStuFromAdd 方法删除该地区的学生信息。
 	 * time:2018/03/15
 	 */
 	public static int deleteProvince(String province,String nation){
-		int a ;
+		int res;
 		try {
 			stmt = DBConnect.getStmt();
 			String strName = "where s_province='"+province +"' and s_nation='"+nation;
 			String name = province +"' and n_name='"+nation+"";
 			StudentLog.delStuFromAdd(strName, stmt);
 			delCityFromPro(name,stmt);
-			String sql = "delete from province where p_name='"+name+"' and n_name='"+nation+"'";
-			a= stmt.executeUpdate(sql);
+			res = delProvince(province,nation,stmt);
 			connect.commit();
 			stmt.close();
 		} catch (SQLException e) {
@@ -150,19 +159,28 @@ public class AddressLog {
 			e.printStackTrace();
 			return 0;
 		}
-		return a;
+		return res;
 	}
-	
-	/* old：原省份数据 ，now：修改后的省份数据
+	//type = 1 修改省份操作，=0 修改市区操作，不进行删除判断
+	public static void updatePLabel(String old[],String now[],Statement stat,int type) throws SQLException{
+		//不存在修改成为的数据，修改数据;存在删除当前数据。
+		if(!searchProvince(now[1],now[0])){	
+			String sql = "update province set p_name='"+now[1]+"',n_name='"+now[0]+"' where p_name='"+old[1] +"' and n_name='"+old[0]+"';";	
+			stmt.executeUpdate(sql);
+		}else if(type==1){
+			delProvince(old[1],old[0],stmt);
+		}
+		if(!searchNation(now[0]))
+			insertNation(now[0], stmt);
+	}
+	/* old：原省份数据 ，now：修改后的省份数据  [0=国家 1=省份]
 	 * inter：根据市区的所有字段，更新对应的市区数据，
 	 * time:2018/03/15
 	 */
 	public static boolean updateProvince(String old[],String now[]){
 		try {
 			stmt = DBConnect.getStmt();
-			String name = old[1] +"' and n_name='"+old[0]+"";
-			String sql = "update province set p_name='"+now[1]+"',n_name='"+now[0]+"' where p_name='"+name+"';";	
-			stmt.executeUpdate(sql);
+			updatePLabel(old,now,stmt,1);
 			WorkLog.updateWork(old,now,stmt,1);
 			updCityFromPro(old,now,stmt);
 			connect.commit();
@@ -267,6 +285,12 @@ public class AddressLog {
 		String sql = "delete from city where n_name='"+nation+"';";		
 		stmt.executeUpdate(sql);
 	}
+	public static boolean delCity(String city,String province,String nation,Statement stmt) throws SQLException{
+		String sql = "delete from city where c_name='"+city+"' and p_name='"+province+"' and n_name='"+nation+"';";		
+		if(stmt.executeUpdate(sql)>0)
+			return true;
+		return false;
+	}
 	/* 
 	 * inter：根据的更新的国家字段，更新对应的市区数据
 	 * time:2018/03/15
@@ -295,21 +319,25 @@ public class AddressLog {
 		}
 		return true;
 	}
-	/* old：原市区数据 ，now：修改后的市区数据
+	/* old：原市区数据 ，now：修改后的市区数据 [0=国家 1=省份 2=市区]
 	 * inter：根据市区的所有字段，更新对应的市区数据
 	 * time:2018/03/15
 	 */
 	public static boolean updateCity(String old[],String now[]){
 		try {
 			stmt = DBConnect.getStmt();
-			String name = old[2]+"' and p_name='"+old[1]+"' and n_name='"+old[0];
-			String sql = "update city set p_name='"+now[1]+"', n_name='"+now[0]+"', c_name='"+now[2]+"' where c_name='"+name+"';";	
-			stmt.executeUpdate(sql);
+			if(!searchCity(now[2],now[1],now[0])){
+				String sql = "update city set p_name='"+now[1]+"', n_name='"+now[0]+"', c_name='"+now[2]+"' where c_name='"+old[2]+"' and p_name='"+old[1]+"' and n_name='"+old[0]+"';";	
+				stmt.executeUpdate(sql);
+				updatePLabel(old,now,stmt,0);
+			}else{
+				if(!delCity(old[2],old[1],old[0],stmt))
+					new Exception("删除省份不成功，修改失败");
+			}
 			WorkLog.updateWork(old,now,stmt,0);
 			connect.commit();
 			stmt.close();
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+		} catch (SQLException e){
 			e.printStackTrace();
 			return false;
 		}
