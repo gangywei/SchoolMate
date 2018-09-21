@@ -196,7 +196,11 @@ public class FrameMenubar implements ActionListener{
 		if(temp instanceof JMenuItem){
 			temp = (JMenuItem)temp;
 			if(temp==exitItem){
-				pencilMain.quitLogin();
+				try {
+					pencilMain.quitLogin();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
 			}else if(temp==chPwdItem){
 				showDialog();
 			}else if(temp==userItem){

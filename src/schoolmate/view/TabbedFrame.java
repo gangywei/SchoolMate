@@ -39,7 +39,7 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 	private String[] dbCondition = new String[8];	//学生表检索条件的数组
 	private JLabel sexLabel,educationLabel,inLabel,outLabel;
 	private JPanel sexPanel,educationPanel,btnPanel,yearPanel;
-	private JButton searchBtn = new JButton("分页查询");
+	private JButton selectAll = new JButton("全部选择");
 	private JButton searchAllBtn = new JButton("查询所有");
 	private JRadioButton[] sexRadio = {new JRadioButton("男"),new JRadioButton("女"),new JRadioButton("无")};
 	private JCheckBox[] educationBox = {new JCheckBox("专科"),new JCheckBox("本科"),
@@ -52,7 +52,7 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 	private MyCheckList inList,outList;
 	private int selectIndex;
 	private Calendar date = Calendar.getInstance();
-	private int inYear = 1985,outYear = date.get(Calendar.YEAR);
+	private int inYear = 1970,outYear = date.get(Calendar.YEAR);
 	private String years[] = new String[outYear-inYear+1];
 	private CollectDataFrame collect;
 	private String[] inArray,outArray;
@@ -110,9 +110,9 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 		educationPanel.add(educationBox[3]);
 		
 		btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT,10,5));
-		searchBtn.addActionListener(this);
-		searchBtn.setForeground(Color.WHITE);
-		searchBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
+		selectAll.addActionListener(this);
+		selectAll.setForeground(Color.WHITE);
+		selectAll.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
 		searchAllBtn.addActionListener(this);
 		searchAllBtn.setForeground(Color.WHITE);
 		searchAllBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
@@ -414,10 +414,8 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 	public void actionPerformed(ActionEvent e) {
 		JButton btn = (JButton)e.getSource();
 		String str[] = getCondition();
-		if(btn==searchBtn){
-			if(str!=null){
-				collect.updateTabel(str,null);
-			}
+		if(btn==selectAll){
+			
 		}else if(btn==searchAllBtn){
 			if(str!=null)
 				collect.updateTabel(str,null);

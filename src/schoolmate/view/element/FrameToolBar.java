@@ -42,7 +42,6 @@ public class FrameToolBar extends JToolBar implements ActionListener{
 			add(remarks);
 			add(labels);
 		}
-		
 	}
 	
 	public void MenuControl(boolean state){

@@ -351,6 +351,7 @@ public class StudentLog {
 	
 	//返回table数组
 	public static Vector<Object[]> dao(String str) throws Exception{
+		System.out.println(str);
 		stmt = DBConnect.getStmt();
 		res = stmt.executeQuery(str);
 		ResultSetMetaData rsmd=res.getMetaData();//用于获取关于 ResultSet 对象中列的类型和属性信息的对象

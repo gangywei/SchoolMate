@@ -133,7 +133,6 @@ public class AddUserFrame extends JInternalFrame implements ActionListener{
 	             builder.append(",");  
 	        } 
 			String faculty = builder.toString();
-			faculty = faculty.substring(0,faculty.length()-1);
 			if(uName.equals("")||userNumber.equals("")){
 				JOptionPane.showMessageDialog(this, "姓名、账号不能为空");
 				return;
@@ -144,6 +143,7 @@ public class AddUserFrame extends JInternalFrame implements ActionListener{
 				JOptionPane.showMessageDialog(this, "请选择用户所属的学院");
 				return;
 			}
+			faculty = faculty.substring(0,faculty.length()-1);
 			try {
 				int userRole;
 				if(userRole1.isSelected())

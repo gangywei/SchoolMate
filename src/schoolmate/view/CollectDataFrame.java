@@ -10,6 +10,9 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
@@ -49,6 +52,8 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 	private JPanel conditionPanel,searchPanel;
 	private JButton instantBtn = new JButton("模糊搜索");
 	private JButton groupBtn = new JButton("组合查询");
+	private Icon icon=new ImageIcon(PencilMain.PPATH+"/resource/img/loading.gif");
+	private JLabel loadingLabel = new JLabel(icon);
 	private JLabel collectLabel = new JLabel("");
 	public JLabel collectText = new JLabel("数据统计");
 	private JPanel bottomLeft = new JPanel();
@@ -64,17 +69,14 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 	private BlurSearchFrame blurSearchFrame;
 	public CollectDataFrame(PencilMain pencil) throws Exception{
 		this.pencil = pencil;
-		if(PencilMain.nowUser.u_role<=2){
-			String[] res = PencilMain.nowUser.faculty.split(",");
-			limitTemp = "(";
-			for(int i=0;i<res.length;i++){
-				limitTemp += '"'+res[i]+"\",";
-			}
-			limitTemp += "''";	//搜索学院为空的数据
-			limitTemp += ')';
-			limitStr = "s_faculty in "+limitTemp;
-			System.out.println(limitStr);
-		}
+		//默认显示用户管理的学院
+		String[] res = PencilMain.nowUser.faculty.split(",");
+		limitTemp = "(";
+		for(int i=0;i<res.length;i++)
+			limitTemp += '"'+res[i]+"\",";
+		limitTemp += "''";	//搜索学院为空的数据
+		limitTemp += ')';
+		limitStr = "s_faculty in "+limitTemp;
 		init();
 	}
 	public void init() throws Exception{
@@ -87,6 +89,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		topPanel.setBackground(Color.WHITE);
 		searchPanel = new JPanel();
 		conditionPanel = new JPanel();
+		loadingLabel.setVisible(false);
 		allBtn.addActionListener(this);
 		allBtn.setForeground(Color.white);  
 		allBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));
@@ -113,13 +116,10 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		bottomPanel = new JPanel();
 		bottomPanel.setBackground(Color.WHITE);
 		bottomPanel.setLayout(new BorderLayout(15,15));
-		
 		pageLabel = new JLabel();
-		
 		//初始化Table显示
 		studentModel = new StudentModel(data,0);
-		updateTabel(null,null);
-		
+		table = new MyTable(studentModel);
 		rowLis = new RowListener();
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setFillsViewportHeight(true);
@@ -133,6 +133,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 				}
 			}
 		});
+		updateTabel(null, null);
 		scroll = new JScrollPane(table);
 		scroll.setBackground(Color.WHITE);
 		conditionPanel.add(groupBtn);
@@ -140,6 +141,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		if(PencilMain.nowUser.u_role>1)
 			conditionPanel.add(allBtn);
 		conditionPanel.add(refeshBtn);
+		conditionPanel.add(loadingLabel);
 		if(PencilMain.nowUser.u_role>1){
 			searchPanel.add(exportBtn);
 			searchPanel.add(deleteBtn);
@@ -205,43 +207,46 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 	}
 	
 	/*
-	 * inter：联合查询3个表得到符合条件的学生记录，并显示
+	 * inter：联合查询3个表得到符合条件的学生记录，并显示数据，
+	 * condTemp 组合查询条件，insTemp 全文检索条件
 	 */
 	public void updateTabel(String condTemp[],String insTemp){
-		try {
-			String eId = "";
-			long startTime=System.currentTimeMillis();   //获取开始时间
-			if(insTemp!=null&&!insTemp.equals(""))
-				instant = "join (select s_id from fullsearch where fs_content match '"+insTemp+"') as fs on fs.s_id=s.s_id";
-			if(condTemp!=null){	//当数据为null时，表示不更新搜索条件。	
-				condition = condTemp[0];	//student表的检索条件
-				eId = EducationLog.getEid(condTemp[1]);	//得到符合条件的所有学历信息id
-				if(eId!="")	//组装了对两个表的搜索条件
-					if(limitStr.equals(""))
-						eduContion = "join (select * from education where e_id in ("+eId+"))";
-					else
-						eduContion = "join (select * from education where e_id in ("+eId+") and "+limitStr+")";
+		new Thread(){
+			public void run(){
+				try {
+					String eId = "";
+					loadingLabel.setVisible(true);
+					long startTime=System.currentTimeMillis();   //获取开始时间
+					if(insTemp!=null&&!insTemp.equals(""))	//全文检索数据项,得到全文检索符合条件的学生 id。
+						instant = "join (select s_id from fullsearch where fs_content match '"+insTemp+"') as fs on fs.s_id=s.s_id";
+					if(condTemp!=null){	//当数据为null时，表示不更新搜索条件。	
+						condition = condTemp[0];
+						if(pencil.nowUser.u_role==3)
+							eduContion = "join (select e.* from education e "+condTemp[1]+")";
+						else
+							eduContion = "join (select e.* from education e "+condTemp[1]+" and "+limitStr+")";
+					}
+					//考虑权限定义的内容
+					if(eduContion.equals(""))
+						if(pencil.nowUser.u_role==3)
+							eduContion = " join education";
+						else
+							eduContion = " join (select * from education where "+limitStr+")";
+					//得到不重复的教育记录。
+					data = StudentLog.dao("select "+cell+" from student s "+eduContion+" e on s.s_id=e.s_id "+instant+condition+" order by s.update_time desc;");
+					long endTime=System.currentTimeMillis(); //获取结束时间
+					System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
+					studentModel.setData(data);
+					table = new MyTable(studentModel);
+					loadingLabel.setVisible(false);
+					updateBottom("select count(DISTINCT(s.s_id)) totle from (select DISTINCT(s_id) from student "+condition+") s "+eduContion+" e on s.s_id=e.s_id "+instant+" ;",0);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-			//考虑权限定义的内容
-			if(eduContion.equals(""))
-				if(limitStr.equals(""))
-					eduContion = " join education ";
-				else
-					eduContion = " join (select * from education where "+limitStr+") ";
-			//得到不重复的人，得到不重复的教育记录。
-			data = StudentLog.dao("select "+cell+" from (select * from student "+condition+") s "+eduContion+" e on s.s_id=e.s_id "+instant+" order by s.update_time desc;");
-			long endTime=System.currentTimeMillis(); //获取结束时间
-			System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
-			studentModel.setData(data);
-			table = new MyTable(studentModel);
-			updateBottom("select count(DISTINCT(s.s_id)) totle from (select DISTINCT(s_id) from student "+condition+") s "+eduContion+" e on s.s_id=e.s_id "+instant+" ;",0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+		}.start();
 	}
 	
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		JButton btn = (JButton)e.getSource();
 		if(btn==allBtn){
@@ -258,7 +263,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 				allBtn.setText("全部选中");
 			this.updateUI();
 		}else if(btn==refeshBtn){
-			updateTabel(null,null);
+			updateTabel(null,"");
 		}else if(btn==groupBtn){
 			if(tabbedFrame==null)
 				tabbedFrame = new TabbedFrame(this);
@@ -270,23 +275,27 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 			}
 			blurSearchFrame.toFront();
 		}else if(btn==deleteBtn){
-			String selectIndex = studentModel.getSelect();
-			if(selectIndex==null){
-				JOptionPane.showMessageDialog(null, "选中表格前面的选框，进行数据删除或者导出Excel");
-			}else{
-				try {
-					int res =JOptionPane.showConfirmDialog(this,"删除选中记录的所有信息？","删除信息提示",JOptionPane.YES_NO_OPTION);
-					if(res==0){
-						boolean result = StudentLog.deleteMany(selectIndex);
-						if(!result)
-							JOptionPane.showMessageDialog(null, "删除失败！");
-						else
-							updateTabel(null,null);
-						selectIndex=null;
+			int res =JOptionPane.showConfirmDialog(this,"删除选中记录的所有信息？","删除信息提示",JOptionPane.YES_NO_OPTION);
+			if(res==0){
+				new Thread(){
+					public void run(){
+						String selectIndex = studentModel.getSelect();
+						if(selectIndex==null){
+							JOptionPane.showMessageDialog(null, "选中表格前面的选框，进行数据删除或者导出Excel");
+						}else{
+							try {
+								boolean result = StudentLog.deleteMany(selectIndex);
+								if(!result)
+									JOptionPane.showMessageDialog(null, "删除失败！");
+								else
+									updateTabel(null,null);
+								selectIndex=null;
+							} catch (Exception e1) {
+								e1.printStackTrace();
+							}
+						}
 					}
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
+				}.start();
 			}
 		}else if(btn==emailBtn){
 			if(studentModel.getSelectCount()==0)

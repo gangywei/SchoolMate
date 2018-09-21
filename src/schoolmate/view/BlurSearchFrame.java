@@ -36,7 +36,6 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
 		editPane.setEnabled(false);
 		setClosable(true);//提供关闭按钮
     	setResizable(true);  //允许自由调整大小 
-    	setIconifiable(true); //设置提供图标化按钮
     	setTitle("模糊搜索功能");
     	interPanel = new JPanel(new FlowLayout(FlowLayout.LEFT,20,5));
     	bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT,10,10));
