@@ -14,7 +14,6 @@ import schoolmate.model.Work;
 public class WorkLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
-	private static ResultSet res;
 	/* old 原数据，now修改后的数据，type 0=市区，1=省市，2=国家
 	 * inter:根据教育流程标签的old（学院、专业）数据更新为now数据。在一个事务下更新。
 	 * time：2018/03/15
@@ -104,6 +103,7 @@ public class WorkLog {
 	 * time：2018/03/15
 	 */
 	public static String[] searchWork(int id){
+		ResultSet res = null;
 		String[] work = null;
 		String sql;
 		try {

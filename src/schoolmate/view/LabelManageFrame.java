@@ -35,9 +35,8 @@ public class LabelManageFrame  extends JInternalFrame implements ChangeListener{
 		panels[2] = new AllCityPanel(collectFrame);
 		panels[3] = new AllFacultyPanel(collectFrame);
 		panels[4] = new AllMajorPanel(collectFrame);
-		for(int i=0;i<labelName.length;i++){
+		for(int i=0;i<labelName.length;i++)
 			jTabbed.add(panels[i],labelName[i]);
-		}
 		add(jTabbed);
 		setSize(400, 400);
 		setVisible(true);

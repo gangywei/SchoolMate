@@ -12,10 +12,14 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
 
 public class BlurSearchFrame extends JInternalFrame implements ActionListener{
+	static String oldSearch = "";
 	public JPanel interPanel,contentPanel,bottomPanel;
 	String str = new String(
 			"<strong>模糊查询功能</strong><br/><hr>"
@@ -61,6 +65,18 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
     	setVisible(true);
     	setSize(600, 260);
 		setLocation((PencilMain.showWidth-560)/2, 0);
+		new Thread(){
+			public void run(){
+				while(true){
+					try {
+						getClipboardString();
+						sleep(500);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}.start();
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -76,6 +92,35 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
 			collect.updateTabel(null,text);
 		}
 	}
+	
+	/**
+     * 从剪贴板中获取文本（粘贴） https://blog.csdn.net/xietansheng/article/details/70478266
+     */
+    public void getClipboardString() {
+        // 获取系统剪贴板
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        // 获取剪贴板中的内容
+        Transferable trans = clipboard.getContents(null);
+        if (trans != null) {
+            // 判断剪贴板中的内容是否支持文本
+            if (trans.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                try {
+                    // 获取剪贴板中的文本内容
+                    String text = (String) trans.getTransferData(DataFlavor.stringFlavor);
+                    if(!oldSearch.equals(text)){
+                    	int res =JOptionPane.showConfirmDialog(this,"复制了数据 "+text+" 是否进行模糊查找？","任务提示",JOptionPane.YES_NO_OPTION);
+                        if(res==0){
+                            instantInput.setText(text);
+                            searchBtn.doClick();
+                        }
+                        oldSearch = text;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 	
 	public void doDefaultCloseAction() {  
 		collect.instant = "";

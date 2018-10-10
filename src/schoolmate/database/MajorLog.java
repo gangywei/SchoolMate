@@ -11,7 +11,6 @@ import schoolmate.view.PencilMain;
 public class MajorLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
-	private static ResultSet res;
 	/* 
 	 * inter：插入全文检索信息
 	 * time:2018/03/15
@@ -20,7 +19,7 @@ public class MajorLog {
 		int count = 0;
 		stmt = DBConnect.getStmt();
 		String sql = "SELECT count(*) totle FROM major where m_name='"+major+"' and f_name='"+faculty+"';";
-		res = stmt.executeQuery(sql);
+		ResultSet res = stmt.executeQuery(sql);
 		while (res.next()) {
 			count = res.getInt("totle");
 		}
@@ -39,7 +38,7 @@ public class MajorLog {
 		try {
 			stmt = DBConnect.getStmt();
 			String sql = "select count(*) totle from major "+condition+";";
-			res = stmt.executeQuery(sql);
+			ResultSet res = stmt.executeQuery(sql);
 			while (res.next()) {
 				count = res.getInt("totle");
 			}
@@ -62,7 +61,7 @@ public class MajorLog {
 		try {
 			stmt = DBConnect.getStmt();
 			String sql = "select count(*) totle from major group by f_name;";
-			res = stmt.executeQuery(sql);
+			ResultSet res = stmt.executeQuery(sql);
 			while (res.next()) {
 				count++;
 			}

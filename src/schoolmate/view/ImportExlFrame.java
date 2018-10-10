@@ -81,7 +81,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     private List<Object> facultyList;
 
     private JRadioButton imtype1 = new JRadioButton("检查学历");
-	private JRadioButton imtype2 = new JRadioButton("跳过检查");
+	private JRadioButton imtype2 = new JRadioButton("跳过学历检查");
 
     //导入Excel方法变量
     int userSize = StudentModel.excelCol.length;
@@ -304,10 +304,10 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     				stu.s_no = user[0];
     				try {
     					String res = null;
-    					if(!user[1].trim().equals("")&&!user[9].trim().equals("")){	//判断名字非空
+    					if(!user[1].trim().equals("")){	//判断名字非空
     						res = StudentLog.importExl(stmt, stu, type);
     					}else{
-    						res = "名字或者学历不可以为空";
+    						res = "名字不可以为空";
     					}
 						if(res!=null){
 							errorCount++;
@@ -458,27 +458,31 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     public void actionPerformed(ActionEvent e) {
 		JButton btn = (JButton)e.getSource();
 		if(btn==importBtn){
-			String[] arg = {"xls","xlsx"};
-			MyFileFilter filter = new MyFileFilter(arg);
-			JFileChooser fileChoose = new JFileChooser("F:");
-			fileChoose.addChoosableFileFilter(filter);
-	        //是否可多选
-	        fileChoose.setMultiSelectionEnabled(false);
-	        //以允许用户只选择文件 默认
-	        fileChoose.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	        //设置是否显示隐藏文件
-	        fileChoose.setFileHidingEnabled(false);
-	        fileChoose.setAcceptAllFileFilterUsed(false);
-	        int returnValue = fileChoose.showOpenDialog(null);
-	        if (returnValue == JFileChooser.APPROVE_OPTION){
-	        	filePath = fileChoose.getSelectedFile().toString();
-	        	file = new File(filePath);
-	        	try {
-					selectFile();
-				} catch (InvalidFormatException | IOException e2) {
-					e2.printStackTrace();
+			new Thread(){
+				public void run(){
+					String[] arg = {"xls","xlsx"};
+					MyFileFilter filter = new MyFileFilter(arg);
+					JFileChooser fileChoose = new JFileChooser("F:");
+					fileChoose.addChoosableFileFilter(filter);
+			        //是否可多选
+			        fileChoose.setMultiSelectionEnabled(false);
+			        //以允许用户只选择文件 默认
+			        fileChoose.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			        //设置是否显示隐藏文件
+			        fileChoose.setFileHidingEnabled(false);
+			        fileChoose.setAcceptAllFileFilterUsed(false);
+			        int returnValue = fileChoose.showOpenDialog(null);
+			        if (returnValue == JFileChooser.APPROVE_OPTION){
+			        	filePath = fileChoose.getSelectedFile().toString();
+			        	file = new File(filePath);
+			        	try {
+							selectFile();
+						} catch (InvalidFormatException | IOException e2) {
+							e2.printStackTrace();
+						}
+			        }
 				}
-	        }
+			}.start();
 		}else if(btn==startBtn){
 			if(file!=null){
 				btnControl(2);

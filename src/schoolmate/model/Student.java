@@ -29,7 +29,7 @@ public class Student {
 		s_worktitle = worktitle;
 		s_work = work;
 		s_homephone = homephone;
-		s_workphone = worktitle;
+		s_workphone = workphone;
 		s_phone = phone;
 		s_tphone = tphone;
 		s_address = address;

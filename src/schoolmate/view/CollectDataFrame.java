@@ -214,32 +214,33 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 		new Thread(){
 			public void run(){
 				try {
-					String eId = "";
-					loadingLabel.setVisible(true);
-					long startTime=System.currentTimeMillis();   //获取开始时间
-					if(insTemp!=null&&!insTemp.equals(""))	//全文检索数据项,得到全文检索符合条件的学生 id。
-						instant = "join (select s_id from fullsearch where fs_content match '"+insTemp+"') as fs on fs.s_id=s.s_id";
-					if(condTemp!=null){	//当数据为null时，表示不更新搜索条件。	
-						condition = condTemp[0];
-						if(pencil.nowUser.u_role==3)
-							eduContion = "join (select e.* from education e "+condTemp[1]+")";
-						else
-							eduContion = "join (select e.* from education e "+condTemp[1]+" and "+limitStr+")";
+					if(!loadingLabel.isShowing()){
+						loadingLabel.setVisible(true);
+						long startTime=System.currentTimeMillis();   //获取开始时间
+						if(insTemp!=null&&!insTemp.equals(""))	//全文检索数据项,得到全文检索符合条件的学生 id。(因为部分原因改为模糊查询)
+							instant = "join (select s_id from fullsearch where fs_content like '%"+insTemp+"%') as fs on fs.s_id=s.s_id";
+						if(condTemp!=null){	//当数据为null时，表示不更新搜索条件。	
+							condition = condTemp[0];
+							if(pencil.nowUser.u_role==3)
+								eduContion = "join (select e.* from education e "+condTemp[1]+")";
+							else
+								eduContion = "join (select e.* from education e "+condTemp[1]+" and "+limitStr+")";
+						}
+						//考虑权限定义的内容
+						if(eduContion.equals(""))
+							if(pencil.nowUser.u_role==3)
+								eduContion = " join education";
+							else
+								eduContion = " join (select * from education where "+limitStr+")";
+						//得到不重复的教育记录。
+						data = StudentLog.dao("select "+cell+" from student s "+eduContion+" e on s.s_id=e.s_id "+instant+condition+" order by s.update_time desc;");
+						long endTime=System.currentTimeMillis(); //获取结束时间
+						System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
+						studentModel.setData(data);
+						table = new MyTable(studentModel);
+						updateBottom("select count(DISTINCT(s.s_id)) totle from (select DISTINCT(s_id) from student "+condition+") s "+eduContion+" e on s.s_id=e.s_id "+instant+" ;",0);
+						loadingLabel.setVisible(false);
 					}
-					//考虑权限定义的内容
-					if(eduContion.equals(""))
-						if(pencil.nowUser.u_role==3)
-							eduContion = " join education";
-						else
-							eduContion = " join (select * from education where "+limitStr+")";
-					//得到不重复的教育记录。
-					data = StudentLog.dao("select "+cell+" from student s "+eduContion+" e on s.s_id=e.s_id "+instant+condition+" order by s.update_time desc;");
-					long endTime=System.currentTimeMillis(); //获取结束时间
-					System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
-					studentModel.setData(data);
-					table = new MyTable(studentModel);
-					loadingLabel.setVisible(false);
-					updateBottom("select count(DISTINCT(s.s_id)) totle from (select DISTINCT(s_id) from student "+condition+") s "+eduContion+" e on s.s_id=e.s_id "+instant+" ;",0);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

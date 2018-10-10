@@ -11,7 +11,6 @@ import schoolmate.view.PencilMain;
 public class FacultyLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
-	private static ResultSet res;
 	/* 
 	 * inter：判断该学院是否存在。 true=存在 false=不存在。
 	 * time:2018/03/15
@@ -20,7 +19,7 @@ public class FacultyLog {
 		int count = 0;
 		stmt = DBConnect.getStmt();
 		String sql = "SELECT count(*) totle FROM faculty where f_name='"+faculty+"';";
-		res = stmt.executeQuery(sql);
+		ResultSet res = stmt.executeQuery(sql);
 		while (res.next()) {
 			count = res.getInt("totle");
 		}
@@ -39,7 +38,7 @@ public class FacultyLog {
 		try {
 			stmt = DBConnect.getStmt();
 			String sql = "select count(*) totle from faculty "+limit+";";
-			res = stmt.executeQuery(sql);
+			ResultSet res = stmt.executeQuery(sql);
 			while (res.next()) {
 				count = res.getInt("totle");
 			}

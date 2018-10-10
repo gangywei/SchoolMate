@@ -41,7 +41,7 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 	private JPanel sexPanel,educationPanel,btnPanel,yearPanel;
 	private JButton selectAll = new JButton("全部选择");
 	private JButton searchAllBtn = new JButton("查询所有");
-	private JRadioButton[] sexRadio = {new JRadioButton("男"),new JRadioButton("女"),new JRadioButton("无")};
+	private JCheckBox[] sexRadio = {new JCheckBox("男"),new JCheckBox("女")};
 	private JCheckBox[] educationBox = {new JCheckBox("专科"),new JCheckBox("本科"),
 			new JCheckBox("硕士"),new JCheckBox("博士")};
 	private JCheckBox[] facultyBox,majorBox,nationBox,provinceBox,cityBox;
@@ -52,7 +52,7 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 	private MyCheckList inList,outList;
 	private int selectIndex;
 	private Calendar date = Calendar.getInstance();
-	private int inYear = 1970,outYear = date.get(Calendar.YEAR);
+	private int inYear = 1952,outYear = date.get(Calendar.YEAR);
 	private String years[] = new String[outYear-inYear+1];
 	private CollectDataFrame collect;
 	private String[] inArray,outArray;
@@ -93,14 +93,9 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 		sexLabel = new JLabel("性别：");
 		educationLabel = new JLabel("学历：");
 		sexPanel = new JPanel(new FlowLayout(FlowLayout.CENTER,10,10));
-		ButtonGroup sexGroup = new ButtonGroup();
-		sexGroup.add(sexRadio[0]);
-		sexGroup.add(sexRadio[1]);
-		sexGroup.add(sexRadio[2]);
 		sexPanel.add(sexLabel);
 		sexPanel.add(sexRadio[0]);
 		sexPanel.add(sexRadio[1]);
-		sexPanel.add(sexRadio[2]);
 		
 		educationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER,10,10));
 		educationPanel.add(educationLabel);
@@ -152,11 +147,12 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 		int i;
 		//性别
 		dbCondition[0] = null;
-		for(i=0;i<sexRadio.length;i++){
-			if(i<2&&sexRadio[i].isSelected()){
-				dbCondition[0] = "(s_sex='"+sexRadio[i].getText()+"')";
-			}
-		}
+		if(sexRadio[1].isSelected()&&sexRadio[0].isSelected())
+			dbCondition[0] = "(s_sex!='')";
+		else if(sexRadio[1].isSelected())
+			dbCondition[0] = "(s_sex='女')";
+		else if(sexRadio[0].isSelected())
+			dbCondition[0] = "(s_sex='男')";
 		//学历
 		dbCondition[7] = null;
 		for(i=0;i<educationBox.length;i++){
@@ -320,15 +316,15 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 					int length = 0;
 					for(int i=0;i<major.length;i++)
 						length += major[i][1].split(",").length;
-					int ind = major.length;
-					String[] majorName = new String[ind];
-					JPanel[] majorPanel = new JPanel[ind];
-					for(int i=0;i<ind;i++)
+					int index = major.length;
+					String[] majorName = new String[index];
+					JPanel[] majorPanel = new JPanel[index];
+					for(int i=0;i<index;i++)
 						majorName[i] = major[i][0];
 					JTabbedPane majorTabbed = new JTabbedPane(JTabbedPane.TOP);
 					majorBox = new JCheckBox[length];
 					int boxCount = 0;
-					for(int i=0;i<ind;i++){
+					for(int i=0;i<index;i++){
 						majorPanel[i] = new JPanel();
 						majorPanel[i].setLayout(layout);
 						String[] majorTemp = major[i][1].split(",");

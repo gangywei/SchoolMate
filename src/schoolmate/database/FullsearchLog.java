@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class FullsearchLog {
-	private static ResultSet res;
 	/* 
 	 * inter：插入全文检索信息
 	 * time:2018/03/15
@@ -17,7 +16,7 @@ public class FullsearchLog {
 	public static String searchFullsearch(int id,Statement stmt) throws SQLException{
 		String log = null;
 		String sql = "SELECT fs_content FROM fullsearch where s_id="+id+";";
-		res = stmt.executeQuery(sql);
+		ResultSet res = stmt.executeQuery(sql);
 		while (res.next()) {
 			log = res.getString("fs_content");
 		}

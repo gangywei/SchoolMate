@@ -15,7 +15,6 @@ import schoolmate.model.Work;
 public class StudentLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
-	private static ResultSet res;
 	/* 
 	 * inter：判断是否有这个人的学历信息，根据 姓名、学院、毕业年份、学历判断。count=1 得到学生ID，返回count（推测为同一个人的人数）
 	 * time:2018/03/15
@@ -28,7 +27,7 @@ public class StudentLog {
 		if(!stu.s_enter.equals(""))
 			condition += " and s_enter='"+stu.s_enter+"'";
 		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_faculty='"+stu.s_faculty+"'"+condition+" and s_education='"+stu.s_education+"';";
-		res = stmt.executeQuery(str);
+		ResultSet res = stmt.executeQuery(str);
 		while (res.next()) {
 			count = res.getInt("totle");
 			if(count==1)
@@ -51,8 +50,8 @@ public class StudentLog {
 			condition = "' and (s_enter<'"+(Integer.parseInt(stu.s_enter)-4)+"' or s_enter>'"+(Integer.parseInt(stu.s_enter)+4)+"');";
 		else
 			return count;	//如果没有年份，就直接导入
-		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_faculty!='"+stu.s_faculty+condition;
-		res = stmt.executeQuery(str);
+		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_education!='"+stu.s_education+condition;
+		ResultSet res = stmt.executeQuery(str);
 		while (res.next()) {
 			count = res.getInt("totle");
 			if(count==1)
@@ -120,15 +119,15 @@ public class StudentLog {
 						+stu.s_weixin+"','"+stu.s_remark2+"','"+stu.s_remark3+"'"+ ",'"+stu.s_remark4+"','"+stu.s_remark5+"',"+Helper.dataTime(null)+");";
 				stmt.executeUpdate(sql);
 				int id = 0;
-				res = stmt.executeQuery("select max(s_id) as id from student;");
+				ResultSet res = stmt.executeQuery("select max(s_id) as id from student;");
 				while (res.next()) {
 					id = res.getInt("id");
 					stu.s_id = id;
 				}
-				boolean res = false;
+				boolean resbool = false;
 				Education edu = new Education(stu.s_id,"","","","","","","");
-				res = EducationLog.insertEdu(stmt,edu);
-				if(!res)
+				resbool = EducationLog.insertEdu(stmt,edu);
+				if(!resbool)
 					throw new Exception("【推测学历重复】存在该校友的学历信息，请检查信息是否重复");
 				Work work = new Work("", "", "", "", "", "", "");
 				work.s_id = id;
@@ -169,32 +168,28 @@ public class StudentLog {
 				if(degCount==0&&count==0){	//导入学生记录+学历信息。
 					String sql = "INSERT INTO student "
 							+ "(s_name,s_sex,s_birth,s_person,s_hometown,s_province,"
-							+ "s_city,s_workspace,s_worktitle,s_work,s_homephone,s_phone,"
+							+ "s_city,s_workspace,s_worktitle,s_work,s_workphone,s_homephone,s_phone,"
 							+ "s_tphone,s_address,s_postcode,s_email,s_qq,s_remark1,s_nation,"
 							+ "s_weixin,s_remark2,s_remark3,s_remark4,s_remark5,update_time) "
 							+ "VALUES "
 							+ "('"+stu.s_name+"','"+stu.s_sex+"','"+stu.s_birth+"','"+stu.s_person+"','"+stu.s_hometown+"','"+stu.s_province+"','"
-							+stu.s_city+"','"+stu.s_workspace+"','"+stu.s_worktitle+"','"+stu.s_work+"','"+stu.s_homephone+"','"+stu.s_phone+"','"
+							+stu.s_city+"','"+stu.s_workspace+"','"+stu.s_worktitle+"','"+stu.s_work+"','"+stu.s_workphone+"','"+stu.s_homephone+"','"+stu.s_phone+"','"
 							+stu.s_tphone+"','"+stu.s_address+"','"+stu.s_postcode+"','"+stu.s_email+"','"+stu.s_qq+"','"+stu.s_remark1+"','"+stu.s_nation+"','"
 							+stu.s_weixin+"','"+stu.s_remark2+"','"+stu.s_remark3+"'"+ ",'"+stu.s_remark4+"','"+stu.s_remark5+"',"+Helper.dataTime(null)+");";
 					stmt.executeUpdate(sql);
 					int id = 0;
-					res = stmt.executeQuery("select max(s_id) as id from student;");
+					ResultSet res = stmt.executeQuery("select max(s_id) as id from student;");
 					while (res.next()) {
 						id = res.getInt("id");
 						stu.s_id = id;
 					}
 					insertOption(stu.s_faculty, stu.s_major,stu.s_nation, stu.s_province, stu.s_city,stmt);
-					if(!stu.s_education.equals("")){
-						boolean res = false;
-						Education edu = new Education(stu.s_id,stu.s_no,stu.s_education,stu.s_faculty,stu.s_major,stu.s_class,stu.s_enter,stu.s_graduate);
-						res = EducationLog.insertEdu(stmt,edu);
-						if(!res){
-							throw new Exception("【推测学历重复】存在该校友的学历信息，请检查信息是否重复");
-						}
+					boolean resbool = false;
+					Education edu = new Education(stu.s_id,stu.s_no,stu.s_education,stu.s_faculty,stu.s_major,stu.s_class,stu.s_enter,stu.s_graduate);
+					resbool = EducationLog.insertEdu(stmt,edu);
+					if(!resbool){
+						throw new Exception("【推测学历重复】存在该校友的学历信息，请检查信息是否重复");
 					}
-					else
-						throw new Exception("学历信息为空，请补充学历信息");
 					Work work = new Work(stu.s_nation, stu.s_province, stu.s_city, stu.s_work, stu.s_worktitle, stu.s_workspace, stu.s_workphone);
 					work.s_id = id;
 					WorkLog.insertWork(work, stmt);	//学生工作记录
@@ -258,9 +253,9 @@ public class StudentLog {
 	 */
 	public static String[] SelectRemarks() throws SQLException{
 		String[] str = new String[5];
-		stmt = connect.createStatement();
+		stmt = DBConnect.getStmt();
 		String sql = "select r_title from remark";
-		res = stmt.executeQuery(sql);
+		ResultSet res = stmt.executeQuery(sql);
 		int i = 0;
 		while (res.next()) {
 			str[i] = res.getString("r_title");
@@ -272,7 +267,7 @@ public class StudentLog {
 	 * time:2018/03/15
 	 */
 	public static boolean updateRemarks(String str,int i) throws SQLException{
-		stmt = connect.createStatement();
+		stmt = DBConnect.getStmt();
 		String sql = "update remark set r_title = '"+str+"' where  r_id ="+(i+1);
 		int res = stmt.executeUpdate(sql);
 		if(res==1){
@@ -330,7 +325,7 @@ public class StudentLog {
 		try {
 			stmt = connect.createStatement();
 			String sql = "select count( distinct s_worktitle) as totle from student;";
-			res = stmt.executeQuery(sql);
+			ResultSet res = stmt.executeQuery(sql);
 			while (res.next()) {
 				count = res.getInt("totle");
 			}
@@ -353,21 +348,25 @@ public class StudentLog {
 	public static Vector<Object[]> dao(String str) throws Exception{
 		System.out.println(str);
 		stmt = DBConnect.getStmt();
-		res = stmt.executeQuery(str);
+		ResultSet res = stmt.executeQuery(str);
 		ResultSetMetaData rsmd=res.getMetaData();//用于获取关于 ResultSet 对象中列的类型和属性信息的对象
-		
 		int colNum=rsmd.getColumnCount();	//得到列数
 		Vector<Object[]> info = new Vector<Object[]>();
 		int i=0;
 		while (res.next()){
 			info.add((new Object[colNum+1]));
 			info.elementAt(i)[0] = false;
-			for (int j=1;j<=colNum;j++){
-				info.elementAt(i)[j]=(Object) res.getObject(j);
+			if(res!=null){
+				for (int j=1;j<=colNum;j++){
+					try {
+						info.elementAt(i)[j]=res.getObject(j);
+					} catch (NullPointerException e) {
+						System.out.println("Hello");
+					}
+				}
+				i++;
 			}
-			i++;
 		}
-		
 		return info;
 	}
 	
@@ -433,7 +432,7 @@ public class StudentLog {
 		String strId = "";
 		String sql = "select group_concat(distinct(s_id)) strId from education "+str+"';";	//得到所有的学生Id。删除工作记录，检索信息。
 		try {
-			res = stmt.executeQuery(sql);
+			ResultSet res = stmt.executeQuery(sql);
 			while (res.next()) {
 				strId = res.getString("strId");
 			}	
@@ -450,7 +449,7 @@ public class StudentLog {
 		String strId = "";
 		String sql = "select group_concat(distinct(s_id)) strId from student "+str+"';";	//得到所有的学生Id。删除工作记录，检索信息。
 		try {
-			res = stmt.executeQuery(sql);
+			ResultSet res = stmt.executeQuery(sql);
 			while (res.next()) {
 				strId = res.getString("strId");
 			}	

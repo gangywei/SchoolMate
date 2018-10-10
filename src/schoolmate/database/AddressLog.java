@@ -12,7 +12,6 @@ public class AddressLog {
 	//type=1代表可以进行搜索功能的省和市。type=0不可以进行汇总
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
-	private static ResultSet res;
 	/* 
 	 * inter：判断该国家是否存在。 true=存在 false=不存在。
 	 * time:2018/03/15
@@ -21,7 +20,7 @@ public class AddressLog {
 		int count = 0;
 		stmt = DBConnect.getStmt();
 		String sql = "SELECT count(*) totle FROM nation where n_name='"+address+"';";
-		res = stmt.executeQuery(sql);
+		ResultSet res = stmt.executeQuery(sql);
 		while (res.next()) {
 			count = res.getInt("totle");
 		}
@@ -90,7 +89,7 @@ public class AddressLog {
 		try {
 			stmt = DBConnect.getStmt();
 			String sql = "select count(*) totle from nation;";
-			res = stmt.executeQuery(sql);
+			ResultSet res = stmt.executeQuery(sql);
 			while (res.next()) {
 				count = res.getInt("totle");
 			}
@@ -125,7 +124,7 @@ public class AddressLog {
 		int count = 0;
 		stmt = DBConnect.getStmt();
 		String sql = "SELECT count(*) totle FROM province where p_name='"+province+"' and n_name= '"+nation+"';";
-		res = stmt.executeQuery(sql);
+		ResultSet res = stmt.executeQuery(sql);
 		while (res.next()) {
 			count = res.getInt("totle");
 		}
@@ -200,7 +199,7 @@ public class AddressLog {
 		try {
 			stmt = DBConnect.getStmt();
 			String sql = "select count(distinct(p_name)) totle from province "+str+";";
-			res = stmt.executeQuery(sql);
+			ResultSet res = stmt.executeQuery(sql);
 			while (res.next()) {
 				count = res.getInt("totle");
 			}
@@ -250,7 +249,7 @@ public class AddressLog {
 		int count = 0;
 		stmt = DBConnect.getStmt();
 		String sql = "SELECT count(*) totle FROM city where c_name='"+address+"' and p_name= '"+province+"' and n_name= '"+nation+"';";
-		res = stmt.executeQuery(sql);
+		ResultSet res = stmt.executeQuery(sql);
 		while (res.next()) {
 			count = res.getInt("totle");
 		}
@@ -349,7 +348,7 @@ public class AddressLog {
 		try {
 			stmt = DBConnect.getStmt();
 			String sql = "select count(distinct(c_name)) totle from city "+str+";";
-			res = stmt.executeQuery(sql);
+			ResultSet res = stmt.executeQuery(sql);
 			while (res.next()) {
 				count = res.getInt("totle");
 			}

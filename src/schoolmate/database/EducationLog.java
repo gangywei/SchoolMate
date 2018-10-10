@@ -14,7 +14,6 @@ import schoolmate.model.Education;
 public class EducationLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
-	private static ResultSet res;
 	/* 
 	 * inter：searchEdu 判断是否存在该记录，在学生该学历信息不存在的情况下，插入该学历信息。
 	 * time:2018/03/15
@@ -133,7 +132,7 @@ public class EducationLog {
 		try {
 			stmt = DBConnect.getStmt();
 			sql = "SELECT s_no,s_faculty,s_major,s_class,s_education,s_enter,s_graduate FROM education where e_id="+id+";";
-			res = stmt.executeQuery(sql);
+			ResultSet res = stmt.executeQuery(sql);
 			while (res.next()) {
 				edu = new String[7];
 				edu[0] = res.getString("s_no");
@@ -168,7 +167,7 @@ public class EducationLog {
 		try {
 			stmt = DBConnect.getStmt();
 			String sql = "select group_concat(e_id) strId from education e "+condition+";";
-			res = stmt.executeQuery(sql);
+			ResultSet res = stmt.executeQuery(sql);
 			while (res.next()) {
 				strId = res.getString("strId");
 			}	
@@ -184,7 +183,7 @@ public class EducationLog {
 	public static boolean searchEdu(Statement stmt,int s_id,String education) throws SQLException{
 		int count = 0;
 		String sql = "SELECT count(*) totle FROM Education where s_id="+s_id+" and s_education='"+education+"';";
-		res = stmt.executeQuery(sql);
+		ResultSet res = stmt.executeQuery(sql);
 		while (res.next()) {
 			count = res.getInt("totle");
 		}

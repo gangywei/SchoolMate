@@ -21,12 +21,12 @@ import schoolmate.view.PencilMain;
 public class UserLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
-	private static ResultSet res;
 	/* 
 	 * inter: 判断数据库中是否存在该账号。 存在=true 不存在=false
 	 * time：2018/03/15
 	 */
 	public static boolean SelectUser(String number) throws SQLException{
+		ResultSet res = null;
 		int count = 0;
 		stmt = DBConnect.getStmt();
 		String sql;
@@ -50,6 +50,7 @@ public class UserLog {
 	 * time：2018/03/15
 	 */
 	public static boolean SelectUser(String userName,int index,String ans) throws SQLException{
+		ResultSet res = null;
 		int count = 0;
 		stmt = DBConnect.getStmt();
 		String sql;
@@ -92,6 +93,7 @@ public class UserLog {
 	 * time：2018/03/15
 	 */
 	public static String[] getUserBID(int id){
+		ResultSet res = null;
 		String[] user = null;
 		String sql;
 		try {
@@ -118,6 +120,7 @@ public class UserLog {
 	 * time：2018/03/15
 	 */
 	public static String[] getUser(String count,String pwd,long time){
+		ResultSet res = null;
 		String[] user = null;
 		String sql;
 		try {
