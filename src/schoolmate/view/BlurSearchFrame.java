@@ -29,7 +29,7 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
 	JLabel instantLabel = new JLabel("模糊查询字段");
 	private JButton searchBtn = new JButton("分页查询");
 	private JButton searchAllBtn = new JButton("查询所有");
-	
+	private Thread copyThread;
 	private CollectDataFrame collect;
 	public BlurSearchFrame(CollectDataFrame collect){
 		init();
@@ -65,7 +65,7 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
     	setVisible(true);
     	setSize(600, 260);
 		setLocation((PencilMain.showWidth-560)/2, 0);
-		new Thread(){
+		copyThread = new Thread(){
 			public void run(){
 				while(true){
 					try {
@@ -76,7 +76,8 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
 					}
 				}
 			}
-		}.start();
+		};
+		copyThread.start();
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -122,7 +123,8 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
         }
     }
 	
-	public void doDefaultCloseAction() {  
+	public void doDefaultCloseAction() { 
+		this.copyThread.stop();
 		collect.instant = "";
 		instantInput.setText("");
 	    dispose();

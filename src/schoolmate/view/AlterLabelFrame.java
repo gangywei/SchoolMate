@@ -36,11 +36,6 @@ public class AlterLabelFrame extends JInternalFrame implements ActionListener{
 	private JButton confirm = new JButton("确    认");  
 	private JButton cancel = new JButton("取    消");
 	public AlterLabelFrame(TabelPanel tableDemo,String[] label,String[] text,int index,int type){
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		this.type = type;
 		textValue = text;
 		table = tableDemo;

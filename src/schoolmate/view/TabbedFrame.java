@@ -11,13 +11,17 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
@@ -31,6 +35,7 @@ import schoolmate.database.FacultyLog;
 import schoolmate.database.MajorLog;
 import schoolmate.database.StudentLog;
 import schoolmate.view.element.MyCheckList;
+import schoolmate.view.element.MyTextField;
 
 public class TabbedFrame extends JFrame implements ActionListener,ChangeListener,ItemListener{
 	private static final long serialVersionUID = -97852095904032076L;
@@ -38,14 +43,18 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 	private String[] condition = new String[8];	//对其他数据库检索的数组
 	private String[] dbCondition = new String[8];	//学生表检索条件的数组
 	private JLabel sexLabel,educationLabel,inLabel,outLabel;
-	private JPanel sexPanel,educationPanel,btnPanel,yearPanel;
+	private JPanel sexPanel,educationPanel,btnPanel,yearPanel,cityTopPanel,cityMidPanel;
 	private JButton selectAll = new JButton("全部选择");
 	private JButton searchAllBtn = new JButton("查询所有");
 	private JCheckBox[] sexRadio = {new JCheckBox("男"),new JCheckBox("女")};
 	private JCheckBox[] educationBox = {new JCheckBox("专科"),new JCheckBox("本科"),
 			new JCheckBox("硕士"),new JCheckBox("博士")};
-	private JCheckBox[] facultyBox,majorBox,nationBox,provinceBox,cityBox;
+	private JCheckBox[] facultyBox,majorBox,nationBox,provinceBox;
 	private String[] labelName = {"其他条件","学院","专业","工作国家","工作省份","工作市区"};
+	private MyTextField cityField; //市区的模糊搜索按钮
+	private JButton cityBtn = new JButton("确认选择");
+	private List<Object> cityList;
+	private ArrayList<JCheckBox> cityBox;
 	private JTabbedPane jTabbed = new JTabbedPane(JTabbedPane.TOP);
 	private String[] faculty,nation,province,city;
 	String[][] major;
@@ -222,12 +231,12 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 			dbCondition[4]+=')';
 		//市区
 		dbCondition[5] = null;
-		for(i=0;(cityBox!=null)&&i<cityBox.length;i++){
-			if(cityBox[i].isSelected()){
+		for(i=0;(cityBox!=null)&&i<cityBox.size();i++){
+			if(cityBox.get(i).isSelected()){
 				if(dbCondition[5]==null){
-					dbCondition[5] = "(s_city='"+cityBox[i].getText()+"'";
+					dbCondition[5] = "(s_city='"+cityBox.get(i).getText()+"'";
 					}else{
-						dbCondition[5] += " or s_city='"+cityBox[i].getText()+"'";
+						dbCondition[5] += " or s_city='"+cityBox.get(i).getText()+"'";
 					}
 			}
 		}
@@ -369,38 +378,22 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 				break;
 			case 5:	//市区
 				if(cityBox==null){
-					String str = "";
-					GridLayout layout = new GridLayout(15,6);
-					int page = 15*6;
-					city = AddressLog.allCity(str);
-					Object[] temp = Helper.arrayUnique(city);
-					double length = temp.length;
-					int ind = (int)Math.ceil(length/page);
-					String[] cityName = new String[ind];
-					JPanel[] cityPanel = new JPanel[ind];
-					for(int i=0;i<ind;i++)
-						cityName[i] = page*i+" - "+page*(i+1);
-					JTabbedPane cityTabbed = new JTabbedPane(JTabbedPane.TOP);
-					cityBox = new JCheckBox[(int) length];
-					for(int i=0;i<ind;i++){
-						cityPanel[i] = new JPanel();
-						cityPanel[i].setLayout(layout);
-						if(i<ind-1){
-							for(int j=i*page;j<(i+1)*page;j++){
-								cityBox[j] = new JCheckBox((String)temp[j]);
-								cityBox[j].addItemListener(this);
-								cityPanel[i].add(cityBox[j]);
-							}
-						}else{
-							for(int j=i*90;j<length;j++){
-								cityBox[j] = new JCheckBox((String)temp[j]);
-								cityBox[j].addItemListener(this);
-								cityPanel[i].add(cityBox[j]);
-							}
-						}
-						cityTabbed.add(cityPanel[i],cityName[i]);
-					}
-					panels[selectIndex].add(cityTabbed);
+					cityBox = new ArrayList<JCheckBox>();
+					cityBtn.addActionListener(this);
+					cityBtn.setForeground(Color.WHITE);
+					cityBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
+					cityMidPanel = new JPanel();
+					cityField = new MyTextField("请在这里输入检索的市区数据！！", 15);
+					cityTopPanel = new JPanel(new BorderLayout());
+					city = AddressLog.allCity("");
+					cityList = new ArrayList<Object>();
+					for(int i=1;i<city.length;i++)
+						cityList.add(city[i]);
+					cityField.setMenu(cityList);
+					cityTopPanel.add(cityField,BorderLayout.CENTER);
+					cityTopPanel.add(cityBtn,BorderLayout.EAST);
+					panels[selectIndex].add(cityTopPanel,BorderLayout.NORTH);
+					panels[selectIndex].add(cityMidPanel,BorderLayout.CENTER);
 				}
 				break;
 		}
@@ -415,6 +408,23 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 		}else if(btn==searchAllBtn){
 			if(str!=null)
 				collect.updateTabel(str,null);
+		}else if(btn==cityBtn) {
+			String cityStr = cityField.getText().trim();
+			boolean state = false;
+			for(int i=0;i<cityBox.size();i++)
+				if(cityBox.get(i).getText().equals(cityStr)) {
+					state = true;
+					break;
+				}	
+			if(state==false) {
+				JCheckBox newBox = new JCheckBox(cityStr,true);
+				cityBox.add(newBox);
+				for(int i=0;i<cityBox.size();i++) 
+					cityMidPanel.add(cityBox.get(i));
+				this.repaint();
+			}else {
+				JOptionPane.showMessageDialog(this, "检索的数据已存在，请重新选择");
+			}
 		}
 	}
 

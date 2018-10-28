@@ -7,21 +7,17 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
-
 import javax.swing.JButton;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
-
 import schoolmate.control.Helper;
 import schoolmate.control.PropProxy;
 import schoolmate.database.UserLog;
 import schoolmate.model.User;
-import schoolmate.view.element.RegexDocument;
 
 public class LoginFrame extends JInternalFrame implements ActionListener{
 	private PencilMain pencilMain;

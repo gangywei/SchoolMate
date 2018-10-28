@@ -194,7 +194,7 @@ public class StudentLog {
 					work.s_id = id;
 					WorkLog.insertWork(work, stmt);	//学生工作记录
 					String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "
-							+stu.s_work+" "+stu.s_worktitle+" & "+stu.s_class+" "+stu.s_no;
+							+stu.s_work+" "+stu.s_worktitle+" "+stu.s_workspace+" & "+stu.s_class+" "+stu.s_no;
 					FullsearchLog.insertFullsearch(log, id, stmt);	//检索表
 				}	
 			}else{
