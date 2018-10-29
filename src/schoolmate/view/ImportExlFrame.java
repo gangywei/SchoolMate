@@ -300,7 +300,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     				importPanel.repaint();
     				Student stu = new Student(user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
 							user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
-							user[20], user[21], user[22], user[23], user[24], user[25], user[26],user[27], user[28], user[29],user[30],user[31]);
+							user[20], user[21], user[22], user[23], user[24], user[27], user[25], user[26],user[28], user[29],user[30],user[31]);
     				stu.s_no = user[0];
     				try {
     					String res = null;
@@ -397,7 +397,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 					importPanel.repaint();
 					Student stu = new Student( user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
 							user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
-							user[20], user[21], user[22], user[23], user[24], user[25], user[26],user[27], user[28], user[29],user[30],user[31]);
+							user[20], user[21], user[22], user[23], user[24], user[27], user[25], user[26], user[28], user[29],user[30],user[31]);
 					stu.s_no = user[0];
 					try {
 						String res = null;

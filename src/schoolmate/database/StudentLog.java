@@ -74,7 +74,7 @@ public class StudentLog {
 			}
 		}
 		if(!major.equals("")){
-			boolean majorRes = MajorLog.searchMajor(major,faculty);
+			boolean majorRes = MajorLog.searchMajor(faculty,major);
 			if(!majorRes){
 				MajorLog.insertMajor(major,faculty,stmt);
 			}

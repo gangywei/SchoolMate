@@ -11,13 +11,13 @@ import schoolmate.database.StudentLog;
 public class StudentModel extends DefaultTableModel implements TableModelListener{
 	private static String[] dbCol = {"选择框","学号","姓名","性别","出生日期","身份证号","籍贯","学院","专业","班级",
 			"学历","入学年份","毕业年份","工作国家","工作省份","工作市区","工作单位","职称","职务","办公电话",
-			"家用电话","手机","手机2","通讯地址","邮编","E-mail","QQ","微信","","","","",""};	//33个字段。 隐藏了一个id字段
+			"家用电话","手机","手机2","通讯地址","邮编","邮箱1","","QQ","微信","","","",""};	//33个字段。 隐藏了一个id字段
 	public static String[] excelCol = {"学号","姓名","性别","出生日期","身份证号","籍贯","学院","专业","班级","学历","入学年份",
 			"毕业年份","工作国家","工作省份","工作市区","工作单位","职称","职务","办公电话","家用电话","手机",
-			"手机2","通讯地址","邮编","E-mail","QQ","微信","","","","",""};	//32个字段
+			"手机2","通讯地址","邮编","邮箱1","","QQ","微信","","","",""};	//32个字段
 	public static String[] errorCol = {"错误信息","学号","姓名","性别","出生日期","身份证号","籍贯","学院","专业","班级","学历",
 			"入学年份","毕业年份","工作国家","工作省份","工作市区","工作单位","职称","职务","办公电话","家用电话",
-			"手机","手机2","通讯地址","邮编","E-mail","QQ","微信","","","","",""};	//33个字段
+			"手机","手机2","通讯地址","邮编","邮箱1","","QQ","微信","","","",""};	//33个字段
 	public String nowColumn[];	//当前使用的表格信息
 	public String[] remarks = new String[5];	//数据库学生表备注字段
 	private int dataSize = 2000;	//一页显示的数量
@@ -42,9 +42,13 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 			e.printStackTrace();
 		}
 		for(int i = 5;i>0;i--){
-			dbCol[dbCol.length-i] = remarks[5-i];
-			excelCol[excelCol.length-i] = remarks[5-i];
-			errorCol[errorCol.length-i] = remarks[5-i];
+			if(i==5) {
+				dbCol[dbCol.length-i-2] = remarks[0];
+			}else {
+				dbCol[dbCol.length-i] = remarks[5-i];
+				excelCol[excelCol.length-i] = remarks[5-i];
+				errorCol[errorCol.length-i] = remarks[5-i];
+			}
 		}
 	}
 	

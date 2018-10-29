@@ -61,12 +61,12 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
     private JTextField addressInput = new JTextField(10);
     private JLabel postcodeLabel = new JLabel("邮编：");
     private JTextField postcodeInput = new JTextField(10);
-    private JLabel emailLabel = new JLabel("Email：");
+    private JLabel emailLabel = new JLabel("邮箱1：");
     private JTextField emailInput = new MyTextField("123456@qq.com",10);
     private JLabel qqLabel = new JLabel("QQ：");
     private JTextField qqInput = new JTextField(10);
     private JLabel remarkLabel1 = new JLabel("备注1：");
-    private JTextField remarkInput1 = new JTextField(10);
+    private JTextField remarkInput1 = new JTextField("123456@qq.com",10);
     private JLabel remarkLabel2 = new JLabel("备注2：");
     private JTextField remarkInput2 = new JTextField(10);
     private JLabel remarkLabel3 = new JLabel("备注3：");

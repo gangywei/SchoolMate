@@ -35,7 +35,7 @@ import schoolmate.view.element.TableLeftMouse;
 public class CollectDataFrame extends JInternalFrame implements ActionListener{
 	private String cell = "s.s_id,e.s_no,s_name,s_sex,s_birth,s_person,s_hometown,e.s_faculty,e.s_major,"
 			+ "e.s_class,e.s_education,e.s_enter,e.s_graduate,s_nation,s_province,s_city,s_workspace,s_worktitle,"
-			+ "s_work,s_workphone,s_homephone,s_phone,s_tphone,s_address,s_postcode,s_email,s_qq,s_weixin,s_remark1,"
+			+ "s_work,s_workphone,s_homephone,s_phone,s_tphone,s_address,s_postcode,s_email,s_remark1,s_qq,s_weixin,"
 			+ "s_remark2,s_remark3,s_remark4,s_remark5,s.update_time";
 	public int dataNum = 30,dataTotle = 0,nowIndex = 1,nowSelect=-1;
 	double btnNum = 0;
