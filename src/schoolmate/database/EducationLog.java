@@ -15,34 +15,40 @@ public class EducationLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
 	/* 
-	 * inter：searchEdu 判断是否存在该记录，在学生该学历信息不存在的情况下，插入该学历信息。
+	 * searchEdu 判断是否存在该记录，在学生该学历信息不存在的情况下，插入该学历信息。
+	 * stmt 是否独立的一个事务
+	 * check 检查学历是否存在
 	 * time:2018/03/15
 	 */
-	public static boolean insertEdu(Statement stmt,Education edu) throws SQLException{
-		boolean change = false;
+	public static boolean insertEdu(Statement stmt,Education edu,boolean check) throws SQLException{
+		boolean change = false;	//判断更新学历是一个单独的操作还是导入 excel 时的操作。导入 excel 不用更新模糊查询表和变比数据库连接
 		if(stmt==null){
 			change = true;
 			stmt = DBConnect.getStmt();
 		}
-		if(!searchEdu(stmt, edu.s_id, edu.s_education)){
-			if(change)
-				stmt.close();
-			return false;
-		}
+		
+		if(check)
+			if(!searchEdu(edu.s_id, edu.s_education)){
+				if(change)
+					stmt.close();
+				return false;
+			}
+		
 		String sql = "INSERT INTO Education (s_id,s_no,s_faculty,s_major,s_class,s_education,s_enter,s_graduate,update_time) VALUES "
 				+ "("+edu.s_id+",'"+edu.s_no+"','"+edu.s_faculty+"','"+edu.s_major+"','"+edu.s_class+"','"+edu.s_education+"','"+edu.s_enter+"','"+edu.s_graduate+"',"+Helper.dataTime(null)+");";
 		stmt.executeUpdate(sql);
-		if(change){	//如果是直接插入一条教育记录更新搜索表
+		
+		if(change){
 			String log = edu.s_no+";---; "+edu.s_class+";---";
 			String str = FullsearchLog.getLog(edu.s_id, 2, log, stmt);
 			FullsearchLog.updateFullsearch(str,edu.s_id,stmt);
-		}
-		if(change){
 			connect.commit();
 			stmt.close();
 		}
 		return true;
 	}
+	
+	
 	
 	/* old 原数据，now修改后的数据，type 0=专业，1=学院
 	 * inter:根据教育流程标签的old（学院、专业）数据更新为now数据。在一个事务下更新 
@@ -66,7 +72,7 @@ public class EducationLog {
 			change = true;
 			stmt = DBConnect.getStmt();
 		}
-		if(type&&!searchEdu(stmt, edu.s_id, edu.s_education)){
+		if(type&&!searchEdu(edu.s_id, edu.s_education)){
 			if(change)
 				stmt.close();
 			return false;
@@ -180,7 +186,8 @@ public class EducationLog {
 	 * inter：判断是否存在该学生的该教育记录。
 	 * time:2018/03/15
 	 */
-	public static boolean searchEdu(Statement stmt,int s_id,String education) throws SQLException{
+	public static boolean searchEdu(int s_id,String education) throws SQLException{
+		stmt = DBConnect.getStmt();
 		int count = 0;
 		String sql = "SELECT count(*) totle FROM Education where s_id="+s_id+" and s_education='"+education+"';";
 		ResultSet res = stmt.executeQuery(sql);

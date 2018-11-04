@@ -111,9 +111,9 @@ public class AddressLog {
 	 * inter：一般用于国家不存在时，在一个事务的情况下插入一个国家。
 	 * time:2018/03/15
 	 */
-	public static void insertNation(String address,Statement stmt) throws SQLException{
+	public static void insertNation(String address) throws SQLException{
 		String sql = "INSERT INTO nation (n_name) VALUES ('"+address+"');";
-		stmt.executeUpdate(sql);
+		DBConnect.getStmt().executeUpdate(sql);
 	}
 	
 	/* 
@@ -161,16 +161,16 @@ public class AddressLog {
 		return res;
 	}
 	//type = 1 修改省份操作，=0 修改市区操作，不进行删除判断
-	public static void updatePLabel(String old[],String now[],Statement stat,int type) throws SQLException{
+	public static void updatePLabel(String old[],String now[],int type) throws SQLException{
 		//不存在修改成为的数据，修改数据;存在删除当前数据。
 		if(!searchProvince(now[1],now[0])){	
 			String sql = "update province set p_name='"+now[1]+"',n_name='"+now[0]+"' where p_name='"+old[1] +"' and n_name='"+old[0]+"';";	
-			stmt.executeUpdate(sql);
+			DBConnect.getStmt().executeUpdate(sql);
 		}else if(type==1){
 			delProvince(old[1],old[0],stmt);
 		}
 		if(!searchNation(now[0]))
-			insertNation(now[0], stmt);
+			insertNation(now[0]);
 	}
 	/* old：原省份数据 ，now：修改后的省份数据  [0=国家 1=省份]
 	 * inter：根据市区的所有字段，更新对应的市区数据，
@@ -179,7 +179,7 @@ public class AddressLog {
 	public static boolean updateProvince(String old[],String now[]){
 		try {
 			stmt = DBConnect.getStmt();
-			updatePLabel(old,now,stmt,1);
+			updatePLabel(old,now,1);
 			WorkLog.updateWork(old,now,stmt,1);
 			updCityFromPro(old,now,stmt);
 			connect.commit();
@@ -221,9 +221,9 @@ public class AddressLog {
 	 * inter：用于省份不存在时，在一个事务的情况下插入一个省份。
 	 * time:2018/03/15
 	 */
-	public static void insertProvince(String address,String nation,Statement stmt) throws SQLException{
+	public static void insertProvince(String address,String nation) throws SQLException{
 		String sql = "INSERT INTO province (p_name,n_name) VALUES ('"+address+"','"+nation+"');";
-		stmt.executeUpdate(sql);
+		DBConnect.getStmt().executeUpdate(sql);
 	}
 	
 	/* 
@@ -328,7 +328,7 @@ public class AddressLog {
 			if(!searchCity(now[2],now[1],now[0])){
 				String sql = "update city set p_name='"+now[1]+"', n_name='"+now[0]+"', c_name='"+now[2]+"' where c_name='"+old[2]+"' and p_name='"+old[1]+"' and n_name='"+old[0]+"';";	
 				stmt.executeUpdate(sql);
-				updatePLabel(old,now,stmt,0);
+				updatePLabel(old,now,0);
 			}else{
 				if(!delCity(old[2],old[1],old[0],stmt))
 					new Exception("删除省份不成功，修改失败");
@@ -370,8 +370,8 @@ public class AddressLog {
 	 * inter：用于市区不存在时，在一个事务的情况下插入一个市区。
 	 * time:2018/03/15
 	 */
-	public static void insertCity(String address,String province,String nation,Statement stmt) throws SQLException{
+	public static void insertCity(String address,String province,String nation) throws SQLException{
 		String sql = "INSERT INTO city (c_name,p_name,n_name) VALUES ('"+address+"','"+province+"','"+nation+"');";
-		stmt.executeUpdate(sql);
+		DBConnect.getStmt().executeUpdate(sql);
 	}
 }

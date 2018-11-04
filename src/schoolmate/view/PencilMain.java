@@ -9,6 +9,8 @@ import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.sql.Statement;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
@@ -19,6 +21,7 @@ import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 import chrriis.common.UIUtils;
 import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 import schoolmate.control.tableModel.StudentModel;
+import schoolmate.model.Student;
 import schoolmate.model.User;
 import schoolmate.view.element.FrameMenubar;
 import schoolmate.view.element.FrameToolBar;
@@ -207,6 +210,11 @@ public class PencilMain extends JFrame{
 		AlterLabelFrame alterLabel = new AlterLabelFrame(tableDemo,label,text,index,type);
 		desktopPane.add(alterLabel);
 		alterLabel.toFront();
+	}
+	public void showSelectUser(Thread thread,Student stu,int checkRes) {
+		SelectUpdateFrame temp = new SelectUpdateFrame(thread,stu,checkRes);
+		desktopPane.add(temp);
+		temp.toFront();
 	}
 	public void userDetail(){	//显示用户详情
 		if(userDetail==null||userDetail.isClosed()){

@@ -9,7 +9,7 @@ import javax.swing.table.DefaultTableModel;
 import schoolmate.database.StudentLog;
 
 public class StudentModel extends DefaultTableModel implements TableModelListener{
-	private static String[] dbCol = {"选择框","学号","姓名","性别","出生日期","身份证号","籍贯","学院","专业","班级",
+	private static String[] dbCol = {"选择框","导入时间","学号","姓名","性别","出生日期","身份证号","籍贯","学院","专业","班级",
 			"学历","入学年份","毕业年份","工作国家","工作省份","工作市区","工作单位","职称","职务","办公电话",
 			"家用电话","手机","手机2","通讯地址","邮编","邮箱1","","QQ","微信","","","",""};	//33个字段。 隐藏了一个id字段
 	public static String[] excelCol = {"学号","姓名","性别","出生日期","身份证号","籍贯","学院","专业","班级","学历","入学年份",
@@ -94,7 +94,7 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 	
 	public Object getValueAt(int row, int col) {
 		if(this.getRowCount()>0)
-			if(col>=1&&type==0)
+			if(col>=2&&type==0)
 				return data.elementAt(row)[col+1];	//隐藏数据库中的ID字段。
 			else
 				return data.elementAt(row)[col];
@@ -124,13 +124,25 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 		String condition = "";
 		for(int i=0;i<data.size();i++){
 			if((Boolean)data.elementAt(i)[0]){
-				condition+=data.elementAt(i)[1]+",";
+				condition+=data.elementAt(i)[2]+",";
 			}
 		}
 		if(condition.equals(""))
 			return null;
 		else
 			return condition.substring(0,condition.length()-1);
+	}
+	/*
+	 * inter:得到选中学生信息的下标
+	 */
+	public int getSelectIndex() {
+		int i;
+		for(i=0;i<data.size();i++){
+			if((Boolean)data.elementAt(i)[0]){
+				break;
+			}
+		}
+		return i;
 	}
 	
 	public void addRow(Object[] temp){

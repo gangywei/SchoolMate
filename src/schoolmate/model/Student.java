@@ -84,6 +84,20 @@ public class Student {
 		if(!s_email.equals(""))
 			if(!Helper.matchRegular(s_email, regEmail))
 				return "邮箱输入错误";
+		if(s_graduate!=null&&!s_graduate.equals("")) {
+			try {
+				Integer.parseInt(s_graduate);
+			} catch (NumberFormatException e) {
+				return "毕业年份格式错误";
+			}
+		}
+		if(s_enter!=null&&!s_enter.equals("")) {
+			try {
+				Integer.parseInt(s_enter);
+			} catch (NumberFormatException e) {
+				return "入学年份格式错误";
+			}
+		}
 		return null;
 	}
 	

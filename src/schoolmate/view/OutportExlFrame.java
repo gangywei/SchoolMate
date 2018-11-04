@@ -85,15 +85,15 @@ public class OutportExlFrame extends JInternalFrame implements ActionListener{
     	
     	//根据tableModel的类型显示可以选择的导出字段
     	columNum = studentModel.nowColumn.length;
-    	if(modelType==0){	//当表格类型为0时，去掉选择框的表头字段
-    		columNum-=1;
+    	if(modelType==0){	//当表格类型为0时，去掉选择框的表头和导入时间字段
+    		columNum-=2;
     	}
     	checkRes = new boolean[columNum];
     	checkBox = new JCheckBox[columNum];
     	//table表头字段的判断。
     	for(int i=0;i<columNum;i++){	
     		if(modelType==0)
-    			checkBox[i] = new JCheckBox(studentModel.nowColumn[i+1],true);
+    			checkBox[i] = new JCheckBox(studentModel.nowColumn[i+2],true);
     		else
     			checkBox[i] = new JCheckBox(studentModel.nowColumn[i],true);
     		checkPanel.add(checkBox[i]);
@@ -175,7 +175,6 @@ public class OutportExlFrame extends JInternalFrame implements ActionListener{
 			break;
 		}
     }
-    
     //导出EXCEL文件（文件路径，文件名）
     public void outputExcel(String path,String name) throws IOException{
     	btnControl(1);
@@ -185,9 +184,9 @@ public class OutportExlFrame extends JInternalFrame implements ActionListener{
 	    int colLength = studentModel.nowColumn.length;
 	    int nowSpan = 0;	//连接上一个导出的单元格
 	    if(modelType==0){
-		    for(int i=1;i<colLength;i++)	//表头数据,去掉一个选择框
-		    	if(checkRes[i-1])
-		    		headRow.createCell(i-1-nowSpan).setCellValue(studentModel.nowColumn[i]); 
+		    for(int i=2;i<colLength;i++)	//表头数据,去掉一个选择框
+		    	if(checkRes[i-2])
+		    		headRow.createCell(i-2-nowSpan).setCellValue(studentModel.nowColumn[i]); 
 		    	else
 		    		nowSpan++;
 	    }else{
@@ -216,7 +215,7 @@ public class OutportExlFrame extends JInternalFrame implements ActionListener{
 	    		threadCon = true;
 	    		int begin = 0;
 	    		if(modelType==0){	//因为数据库中有一个隐藏的ID字段，位于index=1，初始化begin=2，并且数组长度+1；
-	    	    	begin = 2;
+	    	    	begin = 3;
 	    	    	colLength+=1;
 	    		}
 	    		int nowOut = 0;//当前导出的选中的记录数
@@ -239,14 +238,7 @@ public class OutportExlFrame extends JInternalFrame implements ActionListener{
     							HSSFCell contentCell = rows.createCell(nowCell-nowSpan);
     							Object data = studentModel.data.elementAt(row-1)[col];
     							if(data!=null){
-	    							boolean isNum = ((String) data).matches("^(-?\\d+)(\\.\\d+)?$");
-	    							if(isNum){
-	    								contextstyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,#0"));//数据格式只显示整数
-	    								contentCell.setCellStyle(contextstyle);
-	    								contentCell.setCellValue(Double.parseDouble(data.toString()));
-	    							}else{
-	    								contentCell.setCellValue(data.toString());
-	    							}
+	    							contentCell.setCellValue(data.toString());
     							}else
     								contentCell.setCellValue("");
     						}else

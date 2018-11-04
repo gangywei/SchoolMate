@@ -37,23 +37,23 @@ public class WorkLog {
 		stmt.executeUpdate(sql2);
 	}
 	//检查是否需要更新数据库字段
-	public static void checkField(String nation,String province,String city,Statement stmt) throws SQLException{
+	public static void checkField(String nation,String province,String city) throws SQLException{
 		if(!nation.equals("")){
 			boolean nationRes = AddressLog.searchNation(nation);
 			if(!nationRes){
-				AddressLog.insertNation(nation,stmt);
+				AddressLog.insertNation(nation);
 			}
 		}
 		if(!province.equals("")){
 			boolean provinceRes = AddressLog.searchProvince(province,nation);
 			if(!provinceRes){
-				AddressLog.insertProvince(province,nation,stmt);
+				AddressLog.insertProvince(province,nation);
 			}
 		}
 		if(!city.equals("")){
 			boolean cityRes = AddressLog.searchCity(city,province,nation);
 			if(!cityRes){
-				AddressLog.insertCity(city,province,nation,stmt);
+				AddressLog.insertCity(city,province,nation);
 			}
 		}
 	}
@@ -67,7 +67,7 @@ public class WorkLog {
 			change = true;
 			stmt = DBConnect.getStmt();
 		}
-		checkField(work.nation,work.province,work.city,stmt);
+		checkField(work.nation,work.province,work.city);
 		String sql = "INSERT INTO worklog (s_id,s_workspace,s_work,s_worktitle,province,city,nation,s_workphone,update_time) VALUES "
 				+ "("+work.s_id+",'"+work.s_workspace+"','"+work.s_work+"','"+work.s_worktitle+"','"+work.province+"','"+work.city+"','"+work.nation+"','"+work.s_workphone+"',"+Helper.dataTime(null)+");";
 		stmt.executeUpdate(sql);
@@ -87,7 +87,7 @@ public class WorkLog {
 			change = true;
 			stmt = DBConnect.getStmt();
 		}
-		checkField(work.nation,work.province,work.city,stmt);
+		checkField(work.nation,work.province,work.city);
 		String sql = "update worklog set s_workspace='"+work.s_workspace+"',s_work='"+work.s_work+"',s_worktitle='"+work.s_worktitle+"',province='"+work.province+"',city='"
 		+work.city+"',nation='"+work.nation+"',s_workphone='"+work.s_workphone+"',update_time="+time+" where wl_id="+work.wl_id;
 		stmt.executeUpdate(sql);
@@ -127,10 +127,29 @@ public class WorkLog {
 		} 
 		return work;
 	}
-	/* 学生修改工作记录时，插入工作记录，并更新学生的工作记录，修改时间+更新检索表
+	public static Work searchWorkOne(int s_id) throws SQLException {
+		ResultSet res = null;
+		stmt = DBConnect.getStmt();
+		Work work = new Work("", "", "", "", "", "", "");
+		String sql = "select s_workspace,s_work,s_worktitle,nation,province,s_workphone,city from worklog where s_id="+s_id+" order by update_time desc limit 1";
+		res = stmt.executeQuery(sql);
+		while (res.next()) {
+			work.nation = res.getString("nation");
+			work.province = res.getString("province");
+			work.city = res.getString("city");
+			work.s_work = res.getString("s_work");
+			work.s_worktitle = res.getString("s_worktitle");
+			work.s_workspace = res.getString("s_workspace");
+			work.s_workphone = res.getString("s_workphone");
+		}
+		work.s_id = s_id;
+		return work;
+	}
+	
+	/* 删除工作记录时，并更新学生的工作记录，修改时间+更新检索表
 	 * time：2018/03/15
 	 */
-	public static void deleteWork(Work work,Statement stmt,int type) throws SQLException{
+	public static void deleteWork(Work work,Statement stmt) throws SQLException{
 		boolean change = false;
 		if(stmt==null){
 			change = true;
@@ -138,9 +157,6 @@ public class WorkLog {
 		}
 		String sql = "delete from worklog where wl_id="+work.wl_id+";";
 		stmt.executeUpdate(sql);
-		if(type==1){	//更新学生表的工作记录+检索表信息
-			StudentLog.updateWork(work, stmt);
-		}
 		if(change){
 			connect.commit();
 			stmt.close();

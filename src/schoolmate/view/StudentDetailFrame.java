@@ -30,7 +30,7 @@ import schoolmate.view.element.tablePanel.EduDetailPanel;
 import schoolmate.view.element.tablePanel.WorkDetailPanel;
 
 public  class StudentDetailFrame extends JInternalFrame implements ActionListener{
-	private String[] student;
+	private String[] student;	//存储的学生信息
 	private String sexArray[]={"","男","女"};
 	public JPanel detailPanel;
 	private JPanel detailTabel;
@@ -66,7 +66,7 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
     private JLabel qqLabel = new JLabel("QQ：");
     private JTextField qqInput = new JTextField(10);
     private JLabel remarkLabel1 = new JLabel("备注1：");
-    private JTextField remarkInput1 = new JTextField("123456@qq.com",10);
+    private JTextField remarkInput1 = new MyTextField("123456@qq.com",10);
     private JLabel remarkLabel2 = new JLabel("备注2：");
     private JTextField remarkInput2 = new JTextField(10);
     private JLabel remarkLabel3 = new JLabel("备注3：");
@@ -85,7 +85,10 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 		this.type = type;
 		this.pencil = pencil;
 		collect = pencil.collectDataFrame;
-		this.student = student;
+		if(student==null)
+			this.student = new String[34];
+		else
+			this.student = student;
 		init();
 		if(type<2)
 			setData();
@@ -209,7 +212,6 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
         	workTabel = new WorkDetailPanel(pencil, Integer.parseInt(student[1]),this);
             eduTabel = new EduDetailPanel(pencil, Integer.parseInt(student[1]),this);
         }
-        
         detailTabel = new JPanel(new BorderLayout());
         if(pencil.nowUser.u_role>1)
         	detailTabel.add(centerPanel);
@@ -270,46 +272,47 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 		}
 	}
 	
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent e){
 		JButton btn = (JButton)e.getSource();
 		if(btn==addWork){
 			pencil.addStudentLog(0,Integer.parseInt(student[1]),this,0);
 		}else if(btn==addEducation){
 			pencil.addStudentLog(1,Integer.parseInt(student[1]),this,0);
 		}else if(btn==submitBtn){
-			if(type==2){	//添加学生信息
-				String name = nameInput.getText();
-				String sex = (String) sexBox.getSelectedItem();
-				String birth = birthInput.getText();
-				String person = personInput.getText();
-				String hometown = hometownInput.getText();
-				String homephone = homephoneInput.getText();
-				String phone = phoneInput.getText();
-				String tphone = tphoneInput.getText();
-				String address = addressInput.getText();
-				String postcode = postcodeInput.getText();
-				String email = emailInput.getText();
-				String qq = qqInput.getText();
-				String remark1 = remarkInput1.getText();
-				String remark2 = remarkInput2.getText();
-				String remark3 = remarkInput3.getText();
-				String remark4 = remarkInput4.getText();
-				String remark5 = remarkInput5.getText();
-				String weixin = weixinInput.getText();
-				Student temp = new Student(name, sex, birth, person, hometown, homephone, 
-						phone, tphone, address, postcode, email, qq, weixin, remark1, remark2, remark3, 
-						remark4, remark5);
-				student = temp.toArray();
-				if(!name.trim().equals("")){
+			student[3] = nameInput.getText();
+			student[4] = (String) sexBox.getSelectedItem();
+			student[5] = birthInput.getText();
+			student[6] = personInput.getText();
+			student[7] = hometownInput.getText();
+			student[21] = homephoneInput.getText();
+			student[22] = phoneInput.getText();
+			student[23] = tphoneInput.getText();
+			student[24] = addressInput.getText();
+			student[25] = postcodeInput.getText();
+			student[26] = emailInput.getText();
+			student[27] = qqInput.getText();
+			student[28] = weixinInput.getText();
+			student[29] = remarkInput1.getText();
+			student[30] = remarkInput2.getText();
+			student[31] = remarkInput3.getText();
+			student[32] = remarkInput4.getText();
+			student[33] = remarkInput5.getText();
+			Student temp = new Student(student[3], student[4], student[5], student[6],student[7],
+					student[21], student[22], student[23], student[24], student[25], student[26], student[27],student[28],student[29], 									
+					student[30], student[31], student[32], student[33]);
+			if(!temp.s_name.equals("")){
+				if(type==2){	//添加学生信息
 					try {
-						String res = StudentLog.insertStudent(temp);
+						String res = temp.judgeStudent();
 						if(res!=null)
 							JOptionPane.showMessageDialog(null, res);
 						else{
+							StudentLog.insertStudent(temp);
 							student[1] = temp.s_id+"";
 							workTabel.getDetail(temp.s_id);
 							eduTabel.getDetail(temp.s_id);
-							this.type = 1;	//变为修改状态
+							//弹出框状态从添加学历信息改为修改学历信息
+							this.type = 1;
 							submitBtn.setText("修改基础信息");
 							addWork.setEnabled(true);
 							addEducation.setEnabled(true);
@@ -317,35 +320,10 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 							pencil.collectDataFrame.refeshBtn.doClick(); 
 						}
 					} catch (SQLException e1) {
-						System.err.println("插入学生"+e.getClass().getName() + ": " + e1.getMessage());
+						System.err.println("添加学生信息"+e.getClass().getName() + ": " + e1.getMessage());
 					}
 				}else{
-					JOptionPane.showMessageDialog(null, "姓名不允许为空");
-				}
-			}else{
-				student[3] = nameInput.getText();
-				student[4] = (String) sexBox.getSelectedItem();
-				student[5] = birthInput.getText();
-				student[6] = personInput.getText();
-				student[7] = hometownInput.getText();
-				student[21] = homephoneInput.getText();
-				student[22] = phoneInput.getText();
-				student[23] = tphoneInput.getText();
-				student[24] = addressInput.getText();
-				student[25] = postcodeInput.getText();
-				student[26] = emailInput.getText();
-				student[27] = qqInput.getText();
-				student[28] = weixinInput.getText();
-				student[29] = remarkInput1.getText();
-				student[30] = remarkInput2.getText();
-				student[31] = remarkInput3.getText();
-				student[32] = remarkInput4.getText();
-				student[33] = remarkInput5.getText();
-				if(!student[3].trim().equals("")){
 					try {
-						Student temp = new Student(student[3], student[4], student[5], student[6],
-								student[20],student[21], student[22], student[23], student[24], student[25], student[26], student[27],student[28],student[29], 									
-								student[30], student[31], student[32], student[33]);
 						String res = StudentLog.updateStudent(temp, Integer.parseInt(student[1]));
 						if(res!=null)
 							JOptionPane.showMessageDialog(this, res);
@@ -354,11 +332,11 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 							pencil.collectDataFrame.refeshBtn.doClick();
 						}
 					} catch (SQLException e1) {
-						System.err.println("添加学生"+e.getClass().getName() + ": " + e1.getMessage());
+						System.err.println("修改学生信息"+e.getClass().getName() + ": " + e1.getMessage());
 					}
-				}else{
-					JOptionPane.showMessageDialog(null, "姓名不允许为空");
 				}
+			}else{
+				JOptionPane.showMessageDialog(null, "姓名不允许为空");
 			}
 		}
 	}

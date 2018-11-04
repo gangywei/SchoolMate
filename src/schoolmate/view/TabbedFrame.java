@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -25,6 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
@@ -378,11 +380,13 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 				break;
 			case 5:	//市区
 				if(cityBox==null){
+					Border titleBorder=BorderFactory.createTitledBorder("搜索的市区字段");
 					cityBox = new ArrayList<JCheckBox>();
 					cityBtn.addActionListener(this);
 					cityBtn.setForeground(Color.WHITE);
 					cityBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
 					cityMidPanel = new JPanel();
+					cityMidPanel.setBorder(titleBorder);   
 					cityField = new MyTextField("请在这里输入检索的市区数据！！", 15);
 					cityTopPanel = new JPanel(new BorderLayout());
 					city = AddressLog.allCity("");

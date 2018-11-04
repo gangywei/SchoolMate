@@ -33,11 +33,11 @@ import schoolmate.view.element.MyTable;
 import schoolmate.view.element.TableLeftMouse;
 
 public class CollectDataFrame extends JInternalFrame implements ActionListener{
-	private String cell = "s.s_id,e.s_no,s_name,s_sex,s_birth,s_person,s_hometown,e.s_faculty,e.s_major,"
+	private String cell = "strftime('%Y-%m-%d',datetime(s.update_time, 'unixepoch')),s.s_id,e.s_no,s_name,s_sex,s_birth,s_person,s_hometown,e.s_faculty,e.s_major,"
 			+ "e.s_class,e.s_education,e.s_enter,e.s_graduate,s_nation,s_province,s_city,s_workspace,s_worktitle,"
 			+ "s_work,s_workphone,s_homephone,s_phone,s_tphone,s_address,s_postcode,s_email,s_remark1,s_qq,s_weixin,"
-			+ "s_remark2,s_remark3,s_remark4,s_remark5,s.update_time";
-	public int dataNum = 30,dataTotle = 0,nowIndex = 1,nowSelect=-1;
+			+ "s_remark2,s_remark3,s_remark4,s_remark5";
+	public int dataNum = 30,dataTotle = 0,nowIndex = 1,nowSelect=-1; 
 	double btnNum = 0;
 	private JScrollPane scroll;
 	public MyTable table;
@@ -224,7 +224,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 							if(pencil.nowUser.u_role==3)
 								eduContion = "join (select e.* from education e "+condTemp[1]+")";
 							else
-								eduContion = "join (select e.* from education e "+condTemp[1]+" and "+limitStr+")";
+								eduContion = "join (select e.* from education e "+condTemp[1]+" and "+limitStr+" order by update_time desc)";
 						}
 						//考虑权限定义的内容
 						if(eduContion.equals(""))
@@ -233,7 +233,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 							else
 								eduContion = " join (select * from education where "+limitStr+")";
 						//得到不重复的教育记录。
-						data = StudentLog.dao("select "+cell+" from student s "+eduContion+" e on s.s_id=e.s_id "+instant+condition+" order by s.update_time desc;");
+						data = StudentLog.dao("select "+cell+" from student s "+eduContion+" e on s.s_id=e.s_id "+instant+condition+" order by s.update_time desc,e.update_time desc;");
 						long endTime=System.currentTimeMillis(); //获取结束时间
 						System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
 						studentModel.setData(data);

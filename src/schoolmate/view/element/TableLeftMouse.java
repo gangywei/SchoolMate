@@ -43,8 +43,8 @@ public class TableLeftMouse extends JPopupMenu implements ActionListener{
 		JMenuItem item = (JMenuItem) e.getSource();
 		if(item==updateItem){
 			if(PencilMain.dbControl){
-				for(int i=1;i<length;i++){
-					student[i] = panel.studentModel.getCell(row, i).toString();
+				for(int i=2;i<length;i++){
+					student[i-1] = panel.studentModel.getCell(row, i).toString();
 				}
 				panel.pencil.studentDetail(student,1);
 			}else{
@@ -52,7 +52,7 @@ public class TableLeftMouse extends JPopupMenu implements ActionListener{
 			}
 		}else if(item==deleteItem){
 			if(PencilMain.dbControl){
-				int sNo = (int)panel.studentModel.getCell(row, 1);
+				int sNo = (int)panel.studentModel.getCell(row, 2);
 				int res =JOptionPane.showConfirmDialog(panel,"删除这条记录的所有信息","删除信息提示",JOptionPane.YES_NO_OPTION);
 				if(res==0){
 					boolean result = StudentLog.deleteStudent(sNo);
@@ -69,11 +69,11 @@ public class TableLeftMouse extends JPopupMenu implements ActionListener{
 			if(PencilMain.dbControl){
 				if(PencilMain.dbControl){
 					DataFormatter formatter = new DataFormatter();
-					for(int i=1;i<length;i++){
+					for(int i=2;i<length;i++){
 						if(panel.studentModel.getCell(row, i)==null)
-							student[i] = "";	//防止数据库出现为空的字段
+							student[i-1] = "";	//防止数据库出现为空的字段
 						else
-							student[i] = panel.studentModel.getCell(row, i).toString();
+							student[i-1] = panel.studentModel.getCell(row, i).toString();
 					}
 					panel.pencil.studentDetail(student,0);
 				}else{

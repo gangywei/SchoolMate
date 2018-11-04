@@ -43,12 +43,11 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 	private StudentDetailFrame detail;
 	private Calendar date = Calendar.getInstance();
 	private int inYear = 1985,outYear = date.get(Calendar.YEAR);
-	//type 判断0=工作记录 1=教育记录 2=需要修改学生表的工作记录
-	//n_id 修改信息的now_ID,0=不修改
+	
 	public AddStudentLogFrame(int type,int sId,StudentDetailFrame detail,int n_id){
-		this.nowId = n_id;
+		this.nowId = n_id;	//n_id 修改信息的now_ID,0=不修改
 		this.detail = detail;
-		this.type = type;
+		this.type = type;	//type 0=工作记录 1=教育记录 2=需要修改学生表的工作记录
 		this.sId = sId;
 		initFrame();
 	}
@@ -215,7 +214,7 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 				boolean res = false;
 				try {
 					if(nowId==0){
-						res = EducationLog.insertEdu(null, temp);
+						res = EducationLog.insertEdu(null,temp,true);
 					}else{
 						String old[] = {data[0],data[3]};
 						//如果学历没变，直接修改数据

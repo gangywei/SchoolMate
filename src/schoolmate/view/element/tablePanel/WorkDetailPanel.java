@@ -8,8 +8,10 @@ import java.sql.SQLException;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import schoolmate.control.tableModel.WorkModel;
+import schoolmate.database.StudentLog;
 import schoolmate.database.UserLog;
 import schoolmate.database.WorkLog;
+import schoolmate.model.DBConnect;
 import schoolmate.model.Work;
 import schoolmate.view.PencilMain;
 import schoolmate.view.StudentDetailFrame;
@@ -63,25 +65,27 @@ public class WorkDetailPanel extends TabelPanel implements ActionListener{
 		int wlId = (int)model.getCell(nowSelect, 0);
 		if(item==deleteItem){
 			if(PencilMain.dbControl){
-				int res =JOptionPane.showConfirmDialog(this,"删除这条记录的所有信息","删除信息提示",JOptionPane.YES_NO_OPTION);
+				int res =JOptionPane.showConfirmDialog(this,"删除这条记录的信息吗？","删除信息提示",JOptionPane.YES_NO_OPTION);
 				if(res==0){
 					boolean result = true;
 					try {
-						Work temp = new Work("", "", "", "", "", "", "");
-						temp.s_id = sId;
-						temp.wl_id = wlId;
-						if(nowSelect==model.data.size()-1&&nowSelect==0){
-							int now =JOptionPane.showConfirmDialog(this,"删除该记录,该校友的当前工作记录将为空","删除信息提示",JOptionPane.YES_NO_OPTION);
-							if(now==0)
-								WorkLog.deleteWork(temp, null, 1);
-						}else
-							WorkLog.deleteWork(temp, null, 0);	
+						Work work = new Work("", "", "", "", "", "", "");
+						work.s_id = sId;
+						work.wl_id = wlId;
+						WorkLog.deleteWork(work, null);
+						if(nowSelect==model.data.size()-1){	//更新校友记录
+							if(nowSelect==0) {
+								StudentLog.updateWork(work, DBConnect.getStmt());
+							}else
+								StudentLog.updateWork(WorkLog.searchWorkOne(sId), DBConnect.getStmt());	
+						}
 					} catch (SQLException e1) {
 						result = false;
 						e1.printStackTrace();
 					}
 					if(result){
 						updateTabel();
+						pencil.collectDataFrame.updateTabel(null,"");
 					}else
 						JOptionPane.showMessageDialog(null, "删除记录失败！");
 				}

@@ -213,12 +213,12 @@ public class SendEmailFrame extends JFrame implements ActionListener{
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
-    				String toEmail = (String)studentModel.data.elementAt(i)[26];
+    				String toEmail = (String)studentModel.data.elementAt(i)[27];
     				processBar.setString("正在发送邮件到 "+toEmail+" 发送成功数量："+ successCount);
     				if(!toEmail.equals("")&&Helper.matchRegular(toEmail, regEmail)){
     					nameInput.setText(toEmail);
     					try {
-    						doc.select("#name").html((String) studentModel.data.elementAt(i)[3]);
+    						doc.select("#name").html((String) studentModel.data.elementAt(i)[4]);
     						doc.select("#name").attr("style","");
 							content = doc.select("div.note-editable").html();
 							emailManage.sendMail(toEmail,content,fileList);

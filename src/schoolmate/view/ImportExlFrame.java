@@ -51,6 +51,7 @@ import schoolmate.view.element.MyFileFilter;
 import schoolmate.view.element.MyTextField;
 
 public class ImportExlFrame extends JInternalFrame implements ActionListener{
+	public static int importState = 0;
 	public int errorCount;	//导入信息的错误数量
 	public JPanel importPanel,btnPanel,bottomPanel;
 	public String filePath;
@@ -80,8 +81,8 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     private String[] facultyAry;
     private List<Object> facultyList;
 
-    private JRadioButton imtype1 = new JRadioButton("检查学历");
-	private JRadioButton imtype2 = new JRadioButton("跳过学历检查");
+    private JRadioButton imtype1 = new JRadioButton("筛选导入");
+	private JRadioButton imtype2 = new JRadioButton("直接导入");
 
     //导入Excel方法变量
     int userSize = StudentModel.excelCol.length;
@@ -260,7 +261,8 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     //导入xls的线程
     public class xlsThread extends Thread{
     	public void run(){
-    		int type = 0;
+    		int type = 0;	//默认筛选导入
+    		int checkRes = 3;	//默认正常导入
     		if(imtype2.isSelected())
 				type = 1;
     		Connection connect=DBConnect.getConnection();
@@ -273,7 +275,6 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     		threadCon = true;
     		errorCount = 0;
     		pencil.dbControl(false);
-        	DataFormatter formatter = new DataFormatter();
         	int nowCount = 0;
         	/*线程开始执行时 重置为true,程序执行报错时修改为false
         	 * 当变量为true时提交数据库更新，线程为一整个事务操作。
@@ -300,12 +301,29 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     				importPanel.repaint();
     				Student stu = new Student(user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
 							user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
-							user[20], user[21], user[22], user[23], user[24], user[27], user[25], user[26],user[28], user[29],user[30],user[31]);
+							user[20], user[21], user[22], user[23], user[24], user[26], user[27], user[25], user[28], user[29],user[30],user[31]);
     				stu.s_no = user[0];
     				try {
     					String res = null;
     					if(!user[1].trim().equals("")){	//判断名字非空
-    						res = StudentLog.importExl(stmt, stu, type);
+    						res = stu.judgeStudent();
+    						if(res==null) {
+    							if(type==0)
+    								checkRes = StudentLog.checkEducation(stu);
+    							if(checkRes==3)
+    								StudentLog.importExl(stmt, stu);
+    							else if(checkRes==2) {
+    								res = "校友信息已存在";
+    							}else {	//实现人工排查的功能
+    								pencil.showSelectUser(importThreat, stu, checkRes);
+    								synchronized (importThreat) {   
+    								    wait();
+    								    sleep(1000);
+    								}
+    								if(importState==1)
+    									res = "暂时跳过导入";
+    							}
+    						}	
     					}else{
     						res = "名字不可以为空";
     					}
@@ -320,6 +338,8 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 						JOptionPane.showMessageDialog(null,"导入的Excel文件内容不符合要求");
 						btnControl(4);
 						break;
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}else{
 					processBar.setString(nowCount+" 跳过空行");// 设置提示信息
@@ -360,13 +380,15 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     //导入xlsx的线程
     public class xlsxThread extends Thread{
     	public void run(){
-    		int type = 0;
+    		int type = 0;	//默认筛选导入
+    		int checkRes = 3;	//默认正常导入
     		if(imtype2.isSelected())
 				type = 1;
     		Connection connect=DBConnect.getConnection();
     		Statement stmt = null;
 			try {
 				stmt = connect.createStatement();
+				
 			} catch (SQLException e2) {
 				e2.printStackTrace();
 			}
@@ -395,17 +417,35 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 					nowCount++;
 					processBar.setString("正在导入第"+nowCount+"条记录 姓名"+user[1]);// 设置提示信息
 					importPanel.repaint();
-					Student stu = new Student( user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
+					Student stu = new Student(user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
 							user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
-							user[20], user[21], user[22], user[23], user[24], user[27], user[25], user[26], user[28], user[29],user[30],user[31]);
+							user[20], user[21], user[22], user[23], user[24], user[26], user[27], user[25], user[28], user[29],user[30],user[31]);
 					stu.s_no = user[0];
 					try {
 						String res = null;
-						if(!user[1].trim().equals("")){
-							res = StudentLog.importExl(stmt, stu, type);
-						}else{
-							res = "名字不可以为空";
-						}
+						if(!user[1].trim().equals("")){	//判断名字非空
+    						res = stu.judgeStudent();
+    						if(res==null) {
+    							if(type==0)
+    								checkRes = StudentLog.checkEducation(stu);
+    							if(checkRes==3)
+    								StudentLog.importExl(stmt, stu);
+    							else if(checkRes==2) {
+    								res = "校友信息已存在";
+    							}else {	//实现人工排查的功能
+    								pencil.showSelectUser(importThreat, stu, checkRes);
+    								synchronized (importThreat) {   
+    								    wait();
+    								    sleep(1000);
+    								}
+    								if(importState==1)
+    									res = "暂时跳过导入";
+    							}
+    						}
+    							
+    					}else{
+    						res = "名字不可以为空";
+    					}
 						if(res!=null){
 							errorCount++;
 							String[] temp = stu.toArray();
@@ -417,33 +457,27 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 						JOptionPane.showMessageDialog(null,"导入的Excel文件内容不符合要求");
 						btnControl(4);
 						break;
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}else{
 					processBar.setString(nowCount+" 跳过空行");// 设置提示信息
 				}
 			}
-
-        	if(threadCon){
-        		try {
+			
+			try {
+				if(threadCon){
 					connect.commit();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-				if(errorCount==0){
-					processBar.setString("导入成功！！");
+					if(errorCount==0){
+						processBar.setString("导入成功！！");
+					}else{
+						processBar.setString("导入失败的数目  "+errorCount+"！！请导出错误Excel,修改错误数据并重新导入");
+					}
+					btnControl(3);
 				}else{
-					processBar.setString("导入失败的数目  "+errorCount+"！！请导出错误Excel,修改错误数据并重新导入");
-				}
-				btnControl(3);
-			}else{
-				try {
 					connect.rollback();
-				} catch (SQLException e) {
-					e.printStackTrace();
+					processBar.setString("任务终止 ");
 				}
-				processBar.setString("任务终止 ");
-			}
-        	try {
 				stmt.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
