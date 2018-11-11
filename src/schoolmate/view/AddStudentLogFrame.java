@@ -78,8 +78,12 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 		if(type!=1){
 			if(nowId!=0)
 				setTitle("修改工作记录");
-			else
+			else {
 				setTitle("添加工作记录");
+				inputAry[0].setShowText("中国");
+				inputAry[1].setShowText("河南");
+				inputAry[2].setShowText("新乡");
+			}
 			nationList = new ArrayList<Object>();
 			provinceList = new ArrayList<Object>();
 			cityList = new ArrayList<Object>();
@@ -104,12 +108,10 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 		}else{
 			if(nowId!=0)
 				setTitle("修改学历记录");
-			else
+			else {
 				setTitle("添加学历记录");
-			if(nowId==0){
-				inputAry[4].setShowText("必填内容");
-				inputAry[1].setShowText("必填内容");
-				inputAry[6].setShowText("必填内容");
+				inputAry[1].setShowText("计算机与信息工程学院");
+				inputAry[2].setShowText("计算机科学与技术");
 			}
 			eduList = new ArrayList<Object>();
 			yearList = new ArrayList<Object>();
@@ -173,7 +175,7 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 	public void actionPerformed(ActionEvent e) {
 		JButton btn = (JButton)e.getSource();
 		if(btn==submitBtn){
-			if(type!=1){	//0 2 导入和修改工作记录
+			if(type!=1){	//0  导入和 2 修改工作记录
 				Work temp = new Work(inputAry[0].getText(),inputAry[1].getText(),inputAry[2].getText(),inputAry[3].getText(),
 						inputAry[4].getText(),inputAry[5].getText(),inputAry[6].getText());
 				temp.s_id = sId;

@@ -10,32 +10,25 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
-
 import schoolmate.control.Helper;
 import schoolmate.database.AddressLog;
 import schoolmate.database.FacultyLog;
 import schoolmate.database.MajorLog;
-import schoolmate.database.StudentLog;
 import schoolmate.view.element.MyCheckList;
 import schoolmate.view.element.MyTextField;
 
@@ -169,9 +162,9 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 		for(i=0;i<educationBox.length;i++){
 			if(educationBox[i].isSelected()){
 				if(dbCondition[7]==null){
-					dbCondition[7] = "(e.s_education='"+educationBox[i].getText()+"'";
+					dbCondition[7] = "(e.s_education like '%"+educationBox[i].getText()+"%'";
 				}else{
-					dbCondition[7] += " or e.s_education='"+educationBox[i].getText()+"'";
+					dbCondition[7] += " or e.s_education like '%"+educationBox[i].getText()+"%'";
 				}
 			}
 		}
@@ -323,7 +316,10 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 			case 2:	//专业
 				if(majorBox==null){
 					GridLayout layout = new GridLayout(15,6);
-					major = MajorLog.allMajor();
+					if(PencilMain.nowUser.u_role==3)
+						major = MajorLog.allMajor1("");
+					else
+						major = MajorLog.allMajor1(" where f_name in "+collect.limitTemp);
 					int length = 0;
 					for(int i=0;i<major.length;i++)
 						length += major[i][1].split(",").length;

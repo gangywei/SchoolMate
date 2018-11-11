@@ -1,18 +1,13 @@
 package schoolmate.view.element;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -23,25 +18,17 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 
 public class MyTextField extends JTextField implements FocusListener{
-	private int state = 0;	//1->输入了内容	 0->提示  2->正在输入内容
+	private int state = 0;	//1->输入了内容 0->提示  2->正在输入内容
 	private int index = -1;	//焦点的坐标
 	private String showText;
 	private MyPopupMenu popupMenu;
 	private List<Object> model;
-	private boolean isCaretListener = false;	//启动对输入内容的监听，点弹出的一项时去除监听
 	public MyTextField(String text,int column){
 		super(text,column);
 		showText = text;
 		setForeground(Color.GRAY);
 		addFocusListener(this);
 	}
-	
-	public void setShowText(String value){
-		showText = value;
-		setText(value);
-		setForeground(Color.GRAY);
-	}
-	
 	public void setMenu(List<Object> model){
 		if(model!=null){
 			this.model = model; 
@@ -56,33 +43,35 @@ public class MyTextField extends JTextField implements FocusListener{
 		}
 		return "";
 	}
+	//设置提示信息
+	public void setShowText(String value){
+		showText = value;
+		super.setText(value);
+		setForeground(Color.GRAY);
+	}
 	//输入框修改事件
 	public void setText(String str){
 		if(str!=showText){
 			state = 1;
-			setForeground(Color.BLACK);
 		}
 		super.setText(str);
+		setForeground(Color.BLACK);
 	}
 	//鼠标点击事件
     public void focusGained(FocusEvent e) {
-    	isCaretListener = true;
-    	if(state==0)
-            this.setText("");
+    	if(state==0) {
+    		super.setText("");
+    		setForeground(Color.BLACK);
+    	}	
         state = 2;
     }
     //失去焦点事件
     public void focusLost(FocusEvent e) {
-	    isCaretListener = false;
     	String temp = getText();
     	if(temp.equals("")){
         	state = 0;
-        	index = -1;
-            this.setText(showText);
-            setForeground(Color.GRAY);
         }else{
         	state = 1;
-        	this.setText(temp);
         } 
     }
     //显示列表事件
@@ -105,7 +94,7 @@ public class MyTextField extends JTextField implements FocusListener{
     		this.textFile = textFile;
     	}
 		public void caretUpdate(CaretEvent e) {
-			if(isCaretListener&&index!=e.getDot()){
+			if(state!=1&&index==-1){
 				try {
 					popupList(getText(0, e.getDot()));
 				} catch (BadLocationException e1) {
@@ -114,13 +103,6 @@ public class MyTextField extends JTextField implements FocusListener{
 				index = e.getDot();
 			}
 		}
-	}
-    public void setTextValue(String str){
-		this.setText(str);
-	}
-	private void setVisibleFalseAndLostFocus(){
-		popupMenu.setVisible(false);
-		state = 1;
 	}
     //要显示的弹出菜单
     private class MyPopupMenu extends JPopupMenu{
@@ -136,7 +118,8 @@ public class MyTextField extends JTextField implements FocusListener{
 			showList.addMouseListener(new MouseAdapter(){
 				 public void mouseClicked(MouseEvent e){
 				  	   if (e.getClickCount()==1){
-				  		   setVisibleFalseAndLostFocus();
+				  		   popupMenu.setVisible(false);
+				  		   state = 1;
 				  	   }	
 				 }
 			});
@@ -146,9 +129,8 @@ public class MyTextField extends JTextField implements FocusListener{
 		}
 		//更新文本框选择的元素
 		public int updataPopupMenu(String key){		
-			if(model==null){
+			if(model==null)
 				return 0;
-			}
 			int i = 0;		
 			listModel.clear();
 			for(Object obj: model){
@@ -169,7 +151,7 @@ public class MyTextField extends JTextField implements FocusListener{
 		public void valueChanged(ListSelectionEvent e) {
 			Object o  = popupMenu.getSelectObj();
 			if(o!=null){
-				setTextValue(o.toString());
+				setText(o.toString());
 			}			
 		}		
 	}

@@ -25,6 +25,7 @@ import javax.swing.filechooser.FileFilter;
 
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
 
+import schoolmate.database.AddressLog;
 import schoolmate.database.StudentLog;
 
 public class RemarksFrame extends JInternalFrame implements ActionListener{
@@ -35,7 +36,9 @@ public class RemarksFrame extends JInternalFrame implements ActionListener{
     private JTextField[] Remarks = new JTextField[5];
     private JButton Update = new JButton("修    改");
     private JButton Back = new JButton("返    回");
-	public RemarksFrame() {
+    private CollectDataFrame collect;
+	public RemarksFrame(CollectDataFrame collect) {
+		this.collect = collect;
 		Backups();
 	}
 	public void Backups() {
@@ -81,11 +84,7 @@ public class RemarksFrame extends JInternalFrame implements ActionListener{
 		vGroup.addGap(30);
 		layout.setVerticalGroup(vGroup);//设置垂直组
 		add(BackupsPanel);
-		try {
-			RemarksDate = StudentLog.SelectRemarks();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		RemarksDate = StudentLog.SelectRemarks();
 		for(int i = 0;i<5;i++){
 			Remarks[i].setText(RemarksDate[i]);
 		}
@@ -107,7 +106,12 @@ public class RemarksFrame extends JInternalFrame implements ActionListener{
 				}
 			}
 			if(update){
-				JOptionPane.showMessageDialog(this, "修改成功！重新登录后更新信息");
+				int res =JOptionPane.showConfirmDialog(this,"重新登录后显示新的表头信息，是否立即重启？","任务提示",JOptionPane.YES_NO_OPTION);
+				if(res==0)
+					collect.pencil.dispose();
+				else {
+					this.dispose();
+				}
 			}else{
 				JOptionPane.showMessageDialog(this, "改变数据后再点击修改！");
 			}

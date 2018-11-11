@@ -19,7 +19,6 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -29,7 +28,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
+import com.teamdev.jxbrowser.chromium.Browser;
+import com.teamdev.jxbrowser.chromium.swing.BrowserView;
 import schoolmate.control.EmailManager;
 import schoolmate.control.Helper;
 import schoolmate.control.tableModel.StudentModel;
@@ -43,7 +43,8 @@ public class SendEmailFrame extends JFrame implements ActionListener{
 	private StudentModel studentModel = null;
 	private int sendCount = 1;
 	public String[] fileList = null;	//	选择的文件
-	private JWebBrowser jWebBrowser;	//浏览器模型
+	private Browser jxBrowser;	//浏览器模型
+	private BrowserView browserView;
     private JLabel nameLabel = new JLabel("邮件地址：");
     private JTextField nameInput = new JTextField(20);
     private JButton fileBtn = new JButton("添加附件");
@@ -121,14 +122,10 @@ public class SendEmailFrame extends JFrame implements ActionListener{
 		layout.setVerticalGroup(vGroup);//设置垂直组
 		add(sendPanel,BorderLayout.SOUTH);
 		
-		jWebBrowser = new JWebBrowser();  
-        jWebBrowser.navigate(URL);  
-        jWebBrowser.setPreferredSize(new Dimension(800,400));
-        jWebBrowser.setBarsVisible(false);  
-        jWebBrowser.setMenuBarVisible(false); 
-        jWebBrowser.setButtonBarVisible(false);  
-        jWebBrowser.setStatusBarVisible(false);
-        add(jWebBrowser,BorderLayout.CENTER);
+		jxBrowser = new Browser();
+		jxBrowser.loadURL(URL);
+		browserView = new BrowserView(jxBrowser);
+        add(browserView,BorderLayout.CENTER);
         btnControl(0);
 		setVisible(true);
 		setSize(PencilMain.showWidth, PencilMain.showHeight);
@@ -252,7 +249,7 @@ public class SendEmailFrame extends JFrame implements ActionListener{
 		}else if(btn==startBtn){
 			//解析要发送的内容
 			startBtn.setEnabled(false);
-			String html = jWebBrowser.getHTMLContent();
+			String html = jxBrowser.getHTML();
 			doc = Jsoup.parse(html);
 			content = doc.select("div.note-editable").html();
 			//发送邮件

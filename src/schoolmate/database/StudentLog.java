@@ -145,7 +145,7 @@ public class StudentLog {
 		Work work = new Work("", "", "", "", "", "", "");
 		work.s_id = id;
 		WorkLog.insertWork(work, stmt);
-		String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "+" & ";
+		String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "+" & ";
 		FullsearchLog.insertFullsearch(log, id, stmt);	//检索表
 		connect.commit();
 		stmt.close();
@@ -205,7 +205,7 @@ public class StudentLog {
 			Work work = new Work(stu.s_nation, stu.s_province, stu.s_city, stu.s_work, stu.s_worktitle, stu.s_workspace, stu.s_workphone);
 			work.s_id = id;
 			WorkLog.insertWork(work, stmt);	//学生工作记录
-			String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "
+			String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "
 					+stu.s_work+" "+stu.s_worktitle+" "+stu.s_workspace+" & "+stu.s_class+" "+stu.s_no;
 			FullsearchLog.insertFullsearch(log, id, stmt);	//检索表
 		}catch(Exception e){
@@ -228,7 +228,7 @@ public class StudentLog {
 						+"' where s_id='"+sId+"';";
 				int count = stmt.executeUpdate(sql);
 				if(count==1){
-					String log = stu.s_name+" "+stu.s_phone+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email;
+					String log = stu.s_name+" "+stu.s_phone+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email;
 					String str = FullsearchLog.getLog(sId, 0, log, stmt);
 					FullsearchLog.updateFullsearch(str,sId,stmt);
 					connect.commit();
@@ -258,15 +258,20 @@ public class StudentLog {
 	/* 得到所有的备注字段
 	 * time:2018/03/15
 	 */
-	public static String[] SelectRemarks() throws SQLException{
+	public static String[] SelectRemarks(){
 		String[] str = new String[5];
 		stmt = DBConnect.getStmt();
 		String sql = "select r_title from remark";
-		ResultSet res = stmt.executeQuery(sql);
-		int i = 0;
-		while (res.next()) {
-			str[i] = res.getString("r_title");
-			i++;
+		ResultSet res;
+		try {
+			res = stmt.executeQuery(sql);
+			int i = 0;
+			while (res.next()) {
+				str[i] = res.getString("r_title");
+				i++;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		return str;
 	}
@@ -419,6 +424,7 @@ public class StudentLog {
 			+ "s_remark2,s_remark3,s_remark4,s_remark5 from"+" (select * from student where update_time>="+time+" and update_time<="+eTime+") s join ("
 			+ "select * from education  where update_time>="+time+" and update_time<="+eTime+option+") e on s.s_id=e.s_id left join "
 			+ "(select * from worklog where update_time>="+time+" and update_time<="+eTime+") w on s.s_id=w.s_id order by s.update_time asc;";
+		System.out.println(sql);
 		stmt = DBConnect.getStmt();
 		ResultSet rs = stmt.executeQuery(sql);
 		ResultSetMetaData rsmd=rs.getMetaData();//用于获取关于 ResultSet 对象中列的类型和属性信息的对象

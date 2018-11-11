@@ -52,6 +52,7 @@ public class SelectUpdateFrame extends JInternalFrame implements ActionListener{
 		else{
 			msgLabel.setText("工作信息可能需要更新");
 		}
+		String[] remarks = StudentLog.SelectRemarks();
 		msgLabel.setFont(new java.awt.Font("幼园", 1, 20));
 		this.stu = stu;
 		this.thread = thread;
@@ -85,13 +86,13 @@ public class SelectUpdateFrame extends JInternalFrame implements ActionListener{
 				+ "<li>通讯地址："+stu.s_address+"</li>"
 				+ "<li>邮编："+stu.s_postcode+"</li>"
 				+ "<li>邮箱："+stu.s_email+"</li>"
-				+ "<li>邮箱2："+stu.s_remark1+"</li>"
+				+ "<li>"+remarks[0]+"："+stu.s_remark1+"</li>"
 				+ "<li>QQ："+stu.s_qq+"</li>"
 				+ "<li>微信："+stu.s_weixin+"</li>"
-				+ "<li>备注1："+stu.s_remark2+"</li>"
-				+ "<li>备注1："+stu.s_remark3+"</li>"
-				+ "<li>备注1："+stu.s_remark4+"</li>"
-				+ "<li>备注1："+stu.s_remark5+"</li>"
+				+ "<li>"+remarks[1]+"："+stu.s_remark2+"</li>"
+				+ "<li>"+remarks[2]+"："+stu.s_remark3+"</li>"
+				+ "<li>"+remarks[3]+"："+stu.s_remark4+"</li>"
+				+ "<li>"+remarks[4]+"："+stu.s_remark5+"</li>"
 				+ "</ul>"
 				);
 		editPane = new JEditorPane("text/html", userStr);

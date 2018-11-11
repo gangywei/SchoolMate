@@ -127,10 +127,13 @@ public class BackupUpdateFrame extends JInternalFrame implements ActionListener{
 	//导出EXCEL文件（文件路径，文件名）
     public void outputExcel(String path,String name,long beginTime,long endTime) throws IOException{
     	try {
-			studentLog = StudentLog.getUpdate(beginTime,endTime,pencil.collectDataFrame.limitStr);
+    		if(pencil.nowUser.u_role==3)
+    			studentLog = StudentLog.getUpdate(beginTime,endTime,"");
+    		else
+    			studentLog = StudentLog.getUpdate(beginTime,endTime,pencil.collectDataFrame.limitStr);
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			JOptionPane.showMessageDialog(this, "导入信息错误");
+			JOptionPane.showMessageDialog(this, "导入信息数据量过大或者信息错误");
 			return;
 		}
 		HSSFWorkbook workbook = new HSSFWorkbook();

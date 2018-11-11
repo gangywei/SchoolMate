@@ -310,6 +310,10 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     						if(res==null) {
     							if(type==0)
     								checkRes = StudentLog.checkEducation(stu);
+    							else {
+    								if(StudentLog.uniqueStu(stu)>0)
+    									checkRes = 2;
+    							}
     							if(checkRes==3)
     								StudentLog.importExl(stmt, stu);
     							else if(checkRes==2) {

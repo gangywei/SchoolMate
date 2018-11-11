@@ -56,17 +56,18 @@ public class MajorLog {
 		}
 		return null;
 	}
-	public static String[][] allMajor(){
+	public static String[][] allMajor1(String condition){
 		int count = 0;
 		try {
 			stmt = DBConnect.getStmt();
-			String sql = "select count(*) totle from major group by f_name;";
+			String sql = "select count(*) totle from major "+condition+" group by f_name;";
+			System.out.println(sql);
 			ResultSet res = stmt.executeQuery(sql);
 			while (res.next()) {
 				count++;
 			}
 			String data[][] = new String[count][2];
-			sql = "select group_concat(m_name) as m_name,f_name from major group by f_name;";
+			sql = "select group_concat(m_name) as m_name,f_name from major "+condition+" group by f_name;";
 			res = stmt.executeQuery(sql);
 			int i=0;
 			while (res.next()) {

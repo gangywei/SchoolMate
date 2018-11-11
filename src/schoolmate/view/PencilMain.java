@@ -8,6 +8,9 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -18,8 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 import org.apache.log4j.Logger;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
-import chrriis.common.UIUtils;
-import chrriis.dj.nativeswing.swtimpl.NativeInterface;
+import com.teamdev.jxbrowser.chromium.ba;
 import schoolmate.control.tableModel.StudentModel;
 import schoolmate.model.Student;
 import schoolmate.model.User;
@@ -84,6 +86,23 @@ public class PencilMain extends JFrame{
 	public static Logger logger = Logger.getLogger(PencilMain.class);
 	public PencilMain() throws Exception{
     	initFrame();
+    }
+	 static {
+        try {
+            Field e = ba.class.getDeclaredField("e");
+            e.setAccessible(true);
+            Field f = ba.class.getDeclaredField("f");
+            f.setAccessible(true);
+            Field modifersField = Field.class.getDeclaredField("modifiers");
+            modifersField.setAccessible(true);
+            modifersField.setInt(e, e.getModifiers() & ~Modifier.FINAL);
+            modifersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+            e.set(null, new BigInteger("1"));
+            f.set(null, new BigInteger("1"));
+            modifersField.setAccessible(false);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
     }
 	@SuppressWarnings("serial")
 	public void initFrame() throws Exception{
@@ -240,25 +259,10 @@ public class PencilMain extends JFrame{
 		addWorkLogFrame.toFront();
 	}
 	public void sendEmail(StudentModel studentModel){
-		UIUtils.setPreferredLookAndFeel();   
-		if(!NativeInterface.isOpen()){
-			NativeInterface.initialize();
-			NativeInterface.open();  
-		}
-        EventQueue.invokeLater(new Runnable() {  
-            public void run() {  
-                try {  
-                	if(sendEmailFrame==null){
-	                	sendEmailFrame = new SendEmailFrame(studentModel,_this);
-                	}
-            		sendEmailFrame.toFront();
-                } catch (Exception e) {  
-                    e.printStackTrace();  
-                }  
-            }  
-        });  
-        //介绍网站https://sourceforge.net/p/djproject/discussion/671154/thread/e813001e/
-        //NativeInterface.runEventPump();  
+		if(sendEmailFrame==null){
+        	sendEmailFrame = new SendEmailFrame(studentModel,_this);
+    	}
+		sendEmailFrame.toFront();
 	}
 	/*
 	 * temp=学生记录，type：0=展示，1=修改，2=添加
@@ -304,7 +308,7 @@ public class PencilMain extends JFrame{
 	}
 	public void remarkFrame(){	//修改备注
 		if(remarkFrame==null||remarkFrame.isClosed()){
-			remarkFrame = new RemarksFrame();
+			remarkFrame = new RemarksFrame(collectDataFrame);
 			desktopPane.add(remarkFrame);
 		}
 		remarkFrame.toFront();

@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.Vector;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -14,15 +13,9 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
-
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
-
-import schoolmate.control.tableModel.WorkModel;
 import schoolmate.database.StudentLog;
-import schoolmate.database.WorkLog;
 import schoolmate.model.Student;
 import schoolmate.view.element.DateChooser;
 import schoolmate.view.element.MyTextField;
@@ -95,11 +88,7 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 	}
 	public void init(){
 		String Remarks[] = null;
-		try {
-			Remarks = StudentLog.SelectRemarks();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
+		Remarks = StudentLog.SelectRemarks();
 		remarkLabel1.setText(Remarks[0]);
 		remarkLabel2.setText(Remarks[1]);
 		remarkLabel3.setText(Remarks[2]);

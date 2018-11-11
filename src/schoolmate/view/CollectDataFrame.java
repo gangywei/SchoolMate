@@ -26,14 +26,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
 import schoolmate.control.tableModel.StudentModel;
-import schoolmate.database.EducationLog;
 import schoolmate.database.StudentLog;
-import schoolmate.model.User;
 import schoolmate.view.element.MyTable;
 import schoolmate.view.element.TableLeftMouse;
 
 public class CollectDataFrame extends JInternalFrame implements ActionListener{
-	private String cell = "strftime('%Y-%m-%d',datetime(s.update_time, 'unixepoch')),s.s_id,e.s_no,s_name,s_sex,s_birth,s_person,s_hometown,e.s_faculty,e.s_major,"
+	private String cell = "datetime(s.update_time, 'unixepoch'),s.s_id,e.s_no,s_name,s_sex,s_birth,s_person,s_hometown,e.s_faculty,e.s_major,"
 			+ "e.s_class,e.s_education,e.s_enter,e.s_graduate,s_nation,s_province,s_city,s_workspace,s_worktitle,"
 			+ "s_work,s_workphone,s_homephone,s_phone,s_tphone,s_address,s_postcode,s_email,s_remark1,s_qq,s_weixin,"
 			+ "s_remark2,s_remark3,s_remark4,s_remark5";
@@ -208,7 +206,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 	
 	/*
 	 * inter：联合查询3个表得到符合条件的学生记录，并显示数据，
-	 * condTemp 组合查询条件，insTemp 全文检索条件
+	 * condTemp 组合查询条件(null时不更新检索条件)，insTemp 全文检索条件
 	 */
 	public void updateTabel(String condTemp[],String insTemp){
 		new Thread(){

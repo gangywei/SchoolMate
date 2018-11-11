@@ -24,42 +24,40 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 	public int type;	//判断使用哪种表头=>影响到数据的导出和数据的显示 0=>数据库(导出学生数据和发送邮件导出信息)  1=>Excel(只用于导入Excel)
 	public Vector<Object[]> data = new Vector<Object[]>();
 	public StudentModel(Vector<Object[]> data,int type){
-		updateRemark();
 		this.type = type;
-		if(type==0)
-			nowColumn = dbCol;
-		else if(type==1)
-			nowColumn = excelCol;
-		else if(type==2)
-			nowColumn = errorCol;
+		updateRemark();
 		this.setData(data);
 	}
+	
 	//更新备注字段
 	public void updateRemark(){
-		try {
-			remarks = StudentLog.SelectRemarks();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		remarks = StudentLog.SelectRemarks();
 		for(int i = 5;i>0;i--){
-			if(i==5) {
+			if(i==5){
 				dbCol[dbCol.length-i-2] = remarks[0];
+				excelCol[excelCol.length-i-2] = remarks[0];
+				errorCol[errorCol.length-i-2] = remarks[0];
 			}else {
 				dbCol[dbCol.length-i] = remarks[5-i];
 				excelCol[excelCol.length-i] = remarks[5-i];
 				errorCol[errorCol.length-i] = remarks[5-i];
 			}
 		}
+		setHead();
 	}
-	
-	public StudentModel(int type){
-		this.type = type;
+	//设置 table 显示的表头信息
+	public void setHead() {
 		if(type==0)
 			nowColumn = dbCol;
 		else if(type==1)
 			nowColumn = excelCol;
 		else if(type==2) 
 			nowColumn = errorCol;
+	}
+	
+	public StudentModel(int type){
+		this.type = type;
+		setHead();
 	}
 	public int getColumnCount() {
 		return nowColumn.length;
