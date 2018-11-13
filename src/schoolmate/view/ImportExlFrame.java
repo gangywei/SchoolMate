@@ -82,7 +82,8 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     private List<Object> facultyList;
 
     private JRadioButton imtype1 = new JRadioButton("筛选导入");
-	private JRadioButton imtype2 = new JRadioButton("直接导入");
+	private JRadioButton imtype2 = new JRadioButton("检查导入");
+	private JRadioButton imtype3 = new JRadioButton("直接导入");
 
     //导入Excel方法变量
     int userSize = StudentModel.excelCol.length;
@@ -127,14 +128,14 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     	btnControl(0);
 
     	ButtonGroup grp = new ButtonGroup();
-    	grp.add(imtype1);grp.add(imtype2);
+    	grp.add(imtype1);grp.add(imtype2);grp.add(imtype3);
 
     	bottomPanel = new JPanel(new BorderLayout());
 
     	btnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     	btnPanel.setBackground(Color.WHITE);
     	btnPanel.add(downloadBtn);btnPanel.add(importBtn);btnPanel.add(startBtn);btnPanel.add(stopBtn);
-    	btnPanel.add(exportBtn);btnPanel.add(imtype1);btnPanel.add(imtype2);
+    	btnPanel.add(exportBtn);btnPanel.add(imtype1);btnPanel.add(imtype2);btnPanel.add(imtype3);
 
     	importPanel = new JPanel();
     	importPanel.setBackground(Color.white);
@@ -265,6 +266,8 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     		int checkRes = 3;	//默认正常导入
     		if(imtype2.isSelected())
 				type = 1;
+    		else if(imtype3.isSelected())
+    			type = 2;
     		Connection connect=DBConnect.getConnection();
     		Statement stmt = null;
 			try {
@@ -306,13 +309,18 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     				try {
     					String res = null;
     					if(!user[1].trim().equals("")){	//判断名字非空
-    						res = stu.judgeStudent();
+    						if(type!=2)
+    							res = stu.judgeStudent();
+    						else 
+    							stu.setStudent();
     						if(res==null) {
     							if(type==0)
     								checkRes = StudentLog.checkEducation(stu);
-    							else {
+    							else if(type==1) {
     								if(StudentLog.uniqueStu(stu)>0)
     									checkRes = 2;
+    								else
+    									checkRes = 3;
     							}
     							if(checkRes==3)
     								StudentLog.importExl(stmt, stu);
@@ -377,7 +385,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 			}
         	importPanel.updateUI();
         	pencil.dbControl(true);
-        	pencil.collectDataFrame.refeshBtn.doClick();
+        	pencil.collectDataFrame.updateTabel(null, "", true, true);;
     	}
     }
 
@@ -428,10 +436,19 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 					try {
 						String res = null;
 						if(!user[1].trim().equals("")){	//判断名字非空
-    						res = stu.judgeStudent();
+							if(type!=2)
+    							res = stu.judgeStudent();
+    						else 
+    							stu.setStudent();
     						if(res==null) {
     							if(type==0)
     								checkRes = StudentLog.checkEducation(stu);
+    							else {
+    								if(StudentLog.uniqueStu(stu)>0)
+    									checkRes = 2;
+    								else
+    									checkRes = 3;
+    							}
     							if(checkRes==3)
     								StudentLog.importExl(stmt, stu);
     							else if(checkRes==2) {
@@ -488,7 +505,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 			}
         	importPanel.updateUI();
         	pencil.dbControl(true);
-        	pencil.collectDataFrame.refeshBtn.doClick();
+        	pencil.collectDataFrame.updateTabel(null, null, true, true);
     	}
     }
 

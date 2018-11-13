@@ -1,5 +1,7 @@
 package schoolmate.model;
 
+import java.util.regex.Pattern;
+
 import schoolmate.control.Helper;
 
 public class Student {
@@ -64,6 +66,31 @@ public class Student {
 		s_remark3 = remark3;
 		s_remark4 = remark4;
 		s_remark5 = remark5;
+	}
+	
+	public void setStudent() {
+		String pattern = "^(-?\\d+)(\\.\\d+)?$";
+		Pattern reg = Pattern.compile(pattern);
+		if(s_graduate!=null&&!s_graduate.equals("")) {
+			try {
+				Integer.parseInt(s_graduate);
+			} catch (NumberFormatException e) {
+				if(reg.matcher(s_graduate).matches())
+					this.s_graduate = (int)Double.parseDouble(s_graduate)+"";
+				else
+					this.s_graduate = "";
+			}
+		}
+		if(s_enter!=null&&!s_enter.equals("")) {
+			try {
+				Integer.parseInt(s_enter);
+			} catch (NumberFormatException e) {
+				if(reg.matcher(s_enter).matches())
+					this.s_enter = (int)Double.parseDouble(s_enter)+"";
+				else
+					this.s_enter = "";
+			}
+		}
 	}
 	
 	public String judgeStudent(){

@@ -23,7 +23,7 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
 	public JPanel interPanel,contentPanel,bottomPanel;
 	String str = new String(
 			"<strong>模糊查询功能</strong><br/><hr>"
-			+ "<p>支持对<strong>市区、学号、姓名、手机号、QQ、微信、职务、职称、邮箱</strong>、班级、籍贯、<br/>工作单位字段进行模糊查找，查询较慢，请稍等。</p>");
+			+ "<p>支持对<strong>市区、学号、姓名、手机号、QQ、微信、职务、职称、邮箱、班级、籍贯、<br/>工作单位字段</strong>进行模糊查找，查询较慢，请稍等。</p>");
 	JEditorPane editPane = new JEditorPane("text/html", str);
 	JTextField instantInput = new JTextField(20);
 	JLabel instantLabel = new JLabel("模糊查询字段");
@@ -84,13 +84,16 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
 		String text = instantInput.getText().trim();
 		JButton btn = (JButton)e.getSource();
 		if(btn==searchBtn){
-			collect.updateTabel(null,text);
+			if(text.equals(""))
+				collect.updateTabel(null,null,false,false);
+			else
+				collect.updateTabel(null,text,true,false);
 		}else if(btn==searchAllBtn){
 			if(text.equals("")){
 				JOptionPane.showMessageDialog(this, "查询不可以为空");
 				return;
 			}
-			collect.updateTabel(null,text);
+			collect.updateTabel(null,text,true,false);
 		}
 	}
 	

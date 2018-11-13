@@ -46,6 +46,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 			limitStr = "",	limitTemp;	//用户的权限字段
 	public StudentModel studentModel;
 	public Vector<Object[]> data = new Vector<Object[]>();
+	public Vector<Object[]> oldData = new Vector<Object[]>();
 	private JPanel topPanel,bottomPanel;
 	private JPanel conditionPanel,searchPanel;
 	private JButton instantBtn = new JButton("模糊搜索");
@@ -131,7 +132,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 				}
 			}
 		});
-		updateTabel(null, null);
+		updateTabel(null, null,true,true);
 		scroll = new JScrollPane(table);
 		scroll.setBackground(Color.WHITE);
 		conditionPanel.add(groupBtn);
@@ -205,36 +206,48 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 	}
 	
 	/*
-	 * inter：联合查询3个表得到符合条件的学生记录，并显示数据，
+	 * inter：联合查询3个表得到符合条件的学生记录，并显示数据，search 是否执行查询，refersh 是否更新旧的数据
 	 * condTemp 组合查询条件(null时不更新检索条件)，insTemp 全文检索条件
 	 */
-	public void updateTabel(String condTemp[],String insTemp){
+	public void updateTabel(String condTemp[],String insTemp,boolean search,boolean refresh){
 		new Thread(){
 			public void run(){
 				try {
 					if(!loadingLabel.isShowing()){
 						loadingLabel.setVisible(true);
-						long startTime=System.currentTimeMillis();   //获取开始时间
-						if(insTemp!=null&&!insTemp.equals(""))	//全文检索数据项,得到全文检索符合条件的学生 id。(因为部分原因改为模糊查询)
-							instant = "join (select s_id from fullsearch where fs_content like '%"+insTemp+"%') as fs on fs.s_id=s.s_id";
-						if(condTemp!=null){	//当数据为null时，表示不更新搜索条件。	
-							condition = condTemp[0];
-							if(pencil.nowUser.u_role==3)
-								eduContion = "join (select e.* from education e "+condTemp[1]+")";
-							else
-								eduContion = "join (select e.* from education e "+condTemp[1]+" and "+limitStr+" order by update_time desc)";
+						if(search) {
+							long startTime=System.currentTimeMillis();   //获取开始时间
+							if(insTemp!=null&&!insTemp.equals(""))	//全文检索数据项,得到全文检索符合条件的学生 id。(因为部分原因改为模糊查询)
+								instant = "join (select s_id from fullsearch where fs_content like '%"+insTemp+"%') as fs on fs.s_id=s.s_id";
+							if(condTemp!=null){	//当数据为null时，表示不更新搜索条件。	
+								condition = condTemp[0];
+								if(pencil.nowUser.u_role==3)
+									eduContion = "join (select e.* from education e "+condTemp[1]+")";
+								else
+									eduContion = "join (select e.* from education e "+condTemp[1]+" and "+limitStr+" order by update_time desc)";
+							}
+							//考虑权限定义的内容
+							if(eduContion.equals(""))
+								if(pencil.nowUser.u_role==3)
+									eduContion = " join education";
+								else
+									eduContion = " join (select * from education where "+limitStr+")";
+							//得到不重复的教育记录。
+							data = StudentLog.dao("select "+cell+" from student s "+eduContion+" e on s.s_id=e.s_id "+instant+condition+" order by s.update_time desc,e.update_time desc;");
+							long endTime=System.currentTimeMillis(); //获取结束时间
+							System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
+							studentModel.setData(data);
+							if(refresh) {
+								oldData = data;
+							}
+						}else {
+							data = oldData;
+							for(int i=0;i<data.size();i++){
+								data.elementAt(i)[0] = false;
+							}
+							studentModel.setData(oldData);
 						}
-						//考虑权限定义的内容
-						if(eduContion.equals(""))
-							if(pencil.nowUser.u_role==3)
-								eduContion = " join education";
-							else
-								eduContion = " join (select * from education where "+limitStr+")";
-						//得到不重复的教育记录。
-						data = StudentLog.dao("select "+cell+" from student s "+eduContion+" e on s.s_id=e.s_id "+instant+condition+" order by s.update_time desc,e.update_time desc;");
-						long endTime=System.currentTimeMillis(); //获取结束时间
-						System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
-						studentModel.setData(data);
+						
 						table = new MyTable(studentModel);
 						updateBottom("select count(DISTINCT(s.s_id)) totle from (select DISTINCT(s_id) from student "+condition+") s "+eduContion+" e on s.s_id=e.s_id "+instant+" ;",0);
 						loadingLabel.setVisible(false);
@@ -262,7 +275,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 				allBtn.setText("全部选中");
 			this.updateUI();
 		}else if(btn==refeshBtn){
-			updateTabel(null,"");
+			updateTabel(null,"",false,true);
 		}else if(btn==groupBtn){
 			if(tabbedFrame==null)
 				tabbedFrame = new TabbedFrame(this);
@@ -278,6 +291,7 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 			if(res==0){
 				new Thread(){
 					public void run(){
+						loadingLabel.setVisible(true);
 						String selectIndex = studentModel.getSelect();
 						if(selectIndex==null){
 							JOptionPane.showMessageDialog(null, "选中表格前面的选框，进行数据删除或者导出Excel");
@@ -287,12 +301,13 @@ public class CollectDataFrame extends JInternalFrame implements ActionListener{
 								if(!result)
 									JOptionPane.showMessageDialog(null, "删除失败！");
 								else
-									updateTabel(null,null);
+									updateTabel(null,null,true,true);
 								selectIndex=null;
 							} catch (Exception e1) {
 								e1.printStackTrace();
 							}
 						}
+						loadingLabel.setVisible(false);
 					}
 				}.start();
 			}

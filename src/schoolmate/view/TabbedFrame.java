@@ -383,7 +383,7 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 					cityBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
 					cityMidPanel = new JPanel();
 					cityMidPanel.setBorder(titleBorder);   
-					cityField = new MyTextField("请在这里输入检索的市区数据！！", 15);
+					cityField = new MyTextField("请在这里输入检索的市区数据后请点击 -- 确认选择按钮", 15);
 					cityTopPanel = new JPanel(new BorderLayout());
 					city = AddressLog.allCity("");
 					cityList = new ArrayList<Object>();
@@ -406,8 +406,10 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 		if(btn==selectAll){
 			
 		}else if(btn==searchAllBtn){
-			if(str!=null)
-				collect.updateTabel(str,null);
+			if(str[0].equals("")&&str[1].equals(""))
+				collect.updateTabel(str,null,false,false);
+			else
+				collect.updateTabel(str,null,true,false);
 		}else if(btn==cityBtn) {
 			String cityStr = cityField.getText().trim();
 			boolean state = false;

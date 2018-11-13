@@ -9,7 +9,6 @@ import schoolmate.view.PencilMain;
 
 public class DBConnect {
 	private static Connection conn = null;
-	private static Statement stmt = null;
     public static Connection getConnection() {
     	if(conn==null){
     		try {

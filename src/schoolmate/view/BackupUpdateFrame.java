@@ -163,7 +163,10 @@ public class BackupUpdateFrame extends JInternalFrame implements ActionListener{
 	    		if(size==0){
 	    			JOptionPane.showMessageDialog(null, "没有数据需要导出，请重新选择日期");
 	    			return;
-	    		}	
+	    		}else if(size>50000) {
+	    			JOptionPane.showMessageDialog(null, "数据量过大，请先选择部分进行导入");
+	    			return;
+	    		}
 	    		cellNum = studentLog.elementAt(0).length;
 	    		backupsStatus.setText("正在导出更新的学生数据");
 	    		HSSFCellStyle contextstyle =workbook.createCellStyle();	//单元格数据格式

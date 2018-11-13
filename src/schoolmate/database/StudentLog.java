@@ -28,14 +28,10 @@ public class StudentLog {
 			condition = " and s_graduate='"+stu.s_graduate+"'";
 		if(!stu.s_enter.equals(""))
 			condition += " and s_enter='"+stu.s_enter+"'";
-		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_faculty='"+stu.s_faculty+"' and s_major='"+stu.s_major+"' and s_workspace='"+stu.s_workspace+"' and s_worktitle='"+stu.s_worktitle+"' "+condition+" and s_education='"+stu.s_education+"';";
+		String str = "select count(s.s_id) as totle from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_faculty='"+stu.s_faculty+"' and s_major='"+stu.s_major+"' and s_workspace='"+stu.s_workspace+"' and s_worktitle='"+stu.s_worktitle+"' "+condition+" and s_education='"+stu.s_education+"';";
 		ResultSet res = DBConnect.getStmt().executeQuery(str);
 		while (res.next()) {
 			count = res.getInt("totle");
-			if(count==1)
-				stu.s_id = res.getInt("s_id");
-			else
-				break;
 		}
 		return count;
 	}
@@ -45,22 +41,22 @@ public class StudentLog {
 	 */
 	public static int uniqueStuDegree(Student stu) throws SQLException{
 		int count = 0;
-			String condition = "";
-			if(!stu.s_graduate.equals("")) {	//毕业年份 >= 当前-4 <=当前-2 
-				int graduate = Integer.parseInt(stu.s_graduate);
-				condition = " and ((s_graduate>='"+(graduate-4)+"' and s_graduate<='"+(graduate-2)+"')"
-						+" or (s_graduate<='"+(graduate+4)+"' and s_graduate>='"+(graduate+2)+"'))";
-			}else if(stu.s_graduate.equals("")&&!stu.s_enter.equals("")) {
-				int enter = Integer.parseInt(stu.s_enter);
-				condition = " and ((s_enter>='"+(enter-4)+"' and s_enter<='"+(enter-2)+"')"
-						+" or (s_enter<='"+(enter+4)+"' and s_enter>='"+(enter+2)+"'))";
-			}else
-				return count;	//如果没有年份，就直接导入
-			String str = "select count(s.s_id) as totle from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_sex='"+stu.s_sex+"' and s_education!='"+stu.s_education+"'and s_education!=''"+condition;
-			ResultSet res = DBConnect.getStmt().executeQuery(str);
-			while (res.next()) {
-				count = res.getInt("totle");
-			}
+		String condition = "";
+		if(!stu.s_graduate.equals("")) {	//毕业年份 >= 当前-4 <=当前-2 
+			int graduate = Integer.parseInt(stu.s_graduate);
+			condition = " and ((s_graduate>='"+(graduate-4)+"' and s_graduate<='"+(graduate-2)+"')"
+					+" or (s_graduate<='"+(graduate+4)+"' and s_graduate>='"+(graduate+2)+"'))";
+		}else if(stu.s_graduate.equals("")&&!stu.s_enter.equals("")) {
+			int enter = Integer.parseInt(stu.s_enter);
+			condition = " and ((s_enter>='"+(enter-4)+"' and s_enter<='"+(enter-2)+"')"
+					+" or (s_enter<='"+(enter+4)+"' and s_enter>='"+(enter+2)+"'))";
+		}else
+			return count;	//如果没有年份，就直接导入
+		String str = "select count(s.s_id) as totle from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_sex='"+stu.s_sex+"' and s_education!='"+stu.s_education+"'and s_education!=''"+condition;
+		ResultSet res = DBConnect.getStmt().executeQuery(str);
+		while (res.next()) {
+			count = res.getInt("totle");
+		}
 		return count;
 	}
 	/*
@@ -375,7 +371,7 @@ public class StudentLog {
 						try {
 							info.elementAt(i)[j]=res.getObject(j);
 						} catch (NullPointerException e) {
-							
+							e.printStackTrace();
 						}
 					}
 					i++;

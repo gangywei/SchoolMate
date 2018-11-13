@@ -85,7 +85,7 @@ public class WorkDetailPanel extends TabelPanel implements ActionListener{
 					}
 					if(result){
 						updateTabel();
-						pencil.collectDataFrame.updateTabel(null,"");
+						pencil.collectDataFrame.updateTabel(null,"",true,true);
 					}else
 						JOptionPane.showMessageDialog(null, "删除记录失败！");
 				}
