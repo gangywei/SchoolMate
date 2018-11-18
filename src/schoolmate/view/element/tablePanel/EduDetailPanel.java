@@ -73,7 +73,7 @@ public class EduDetailPanel extends TabelPanel implements ActionListener{
 					}
 					if(result){
 						updateTabel();
-						pencil.collectDataFrame.updateTabel(null,"",true,true);
+						pencil.collectDataFrame.updateTabel(null,null,true,true,-1);
 					}else
 						JOptionPane.showMessageDialog(null, "删除记录失败！");
 				}

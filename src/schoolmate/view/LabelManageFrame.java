@@ -48,4 +48,8 @@ public class LabelManageFrame  extends JInternalFrame implements ChangeListener{
 		selectIndex = jTabbed.getSelectedIndex();
 		panels[selectIndex].updateTabel();
 	}
+	
+	public void doDefaultCloseAction() {  
+	    dispose();
+	}
 }

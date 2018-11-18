@@ -1,1 +1,4 @@
-2018-11-10 11:20:24  [ Thread-8:0 ] - [ ERROR ]  邮件群发出现异常Unknown SMTP host: smtp.163.com
+2018-11-18 16:50:03  [ Thread-8:0 ] - [ ERROR ]  邮件群发出现异常535 Error: authentication failed
+
+2018-11-18 16:52:06  [ Thread-8:0 ] - [ ERROR ]  邮件群发出现异常535 Error: authentication failed
+

@@ -33,13 +33,23 @@ import schoolmate.view.PencilMain;
  */
 public class EmailManager {
 	
-	private static String smtpHost = "smtp.163.com";
-	private static String userName = "18439331592@163.com";
-	private static String userPwd = "ab121961";
-	private static String sendName = "河南师范大学校友办";
-	private static Session session;
+	private String smtpHost = PropProxy.readProperty(PencilMain.CPATH, "smtpHost");
+	private String userName = PropProxy.readProperty(PencilMain.CPATH, "userName");
+	private String userPwd  = PropProxy.readProperty(PencilMain.CPATH, "userPwd");
+	private String sendName = PropProxy.readProperty(PencilMain.CPATH, "sendName");
+	private Session session;
 	
 	public EmailManager() {  
+		if(smtpHost.equals(""))
+			smtpHost = "smtp.163.com";
+		if(userName.equals(""))
+			userName = "18439331592@163.com";
+		if(userPwd.equals(""))
+			userPwd = "ab121961";
+		else
+			userPwd = AesEncrpytion.AESDncode(userPwd);
+		if(sendName.equals(""))
+			sendName = "河南师范大学校友办";
 		Properties prop=new Properties();  // 配置  
 		prop.put("mail.host",smtpHost);  // 设置邮件服务器主机名，这里是163  
 		prop.put("mail.transport.protocol", "smtp");  // 发送邮件协议名称  
@@ -67,7 +77,7 @@ public class EmailManager {
 		}  
 	}
 	
-	public void sendMail(String toEmail,String main,String[] fileList) throws UnsupportedEncodingException{
+	public int sendMail(String toEmail,String main,String[] fileList) throws UnsupportedEncodingException{
 		Message mimeMsg = new MimeMessage(session);  // MIME邮件对象 
 		Multipart mPart = new MimeMultipart(); //// Multipart对象,邮件内容,标题,附件等内容均添加到其中后再生成MimeMessage对象 
 		try{
@@ -97,13 +107,16 @@ public class EmailManager {
 			Transport transport = session.getTransport();
 			transport.connect();  
 			transport.sendMessage(mimeMsg, mimeMsg.getAllRecipients());  
-			transport.close();  
+			transport.close(); 
+			return 1;
 		} catch (MessagingException e) {
 			if(e.getMessage().indexOf("SMTP host")>0){
-				JOptionPane.showMessageDialog(null, "连接不上网络，检查网络连接是否正确！");
+				JOptionPane.showMessageDialog(null, "连接不上邮件服务器，检查网络连接是否正确！");
+				return 0;
 			}
 			System.out.println(e.getMessage());
 			PencilMain.logger.error("邮件群发出现异常"+e.getMessage());
+			return 3;
 		}
 	}
 }

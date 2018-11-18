@@ -1,10 +1,7 @@
 package schoolmate.view;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,7 +11,6 @@ import java.io.IOException;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
@@ -22,15 +18,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
-
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
-
 import schoolmate.control.tableModel.StudentModel;
 import schoolmate.view.element.MyTextField;
 
@@ -322,7 +315,7 @@ public class OutportExlFrame extends JInternalFrame implements ActionListener{
     }
     
 	public void doDefaultCloseAction() {  
-	    this.setVisible(false);// 我们只让该JInternalFrame隐藏，并不是真正的关闭  
+	    this.dispose();
 	}
 }
 

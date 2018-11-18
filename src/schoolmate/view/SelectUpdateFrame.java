@@ -137,7 +137,7 @@ public class SelectUpdateFrame extends JInternalFrame implements ActionListener{
 					condition = " and s_graduate='"+stu.s_graduate+"'";
 				if(!stu.s_enter.equals(""))
 					condition += " and s_enter='"+stu.s_enter+"'";
-				str = "select "+cell+" from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_faculty='"+stu.s_faculty+"' and s_major='"+stu.s_major+"' and (s_workspace!='"+stu.s_workspace+"' or s_worktitle!='"+stu.s_worktitle+"') "+condition+" and s_education='"+stu.s_education+"' and s_education!='';";
+				str = "select "+cell+" from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_faculty='"+stu.s_faculty+"' and s_major='"+stu.s_major+"' and (s_workspace!='"+stu.s_workspace+"' or s_worktitle!='"+stu.s_worktitle+"') "+condition+" and s_education='"+stu.s_education+"';";
 			}else {
 				if(!stu.s_graduate.equals(""))	//毕业年份 >= 当前-4 <=当前-2 
 					condition = "' and ((s_graduate>='"+(Integer.parseInt(stu.s_graduate)-4)+"' and s_graduate<='"+(Integer.parseInt(stu.s_graduate)-2)+"')"
@@ -208,5 +208,8 @@ public class SelectUpdateFrame extends JInternalFrame implements ActionListener{
 			this.dispose();
 		}  
 	}
-
+	
+	public void doDefaultCloseAction() {  
+	    dispose();
+	}
 }

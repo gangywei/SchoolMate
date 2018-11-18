@@ -39,7 +39,7 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 	private String[] dbCondition = new String[8];	//学生表检索条件的数组
 	private JLabel sexLabel,educationLabel,inLabel,outLabel;
 	private JPanel sexPanel,educationPanel,btnPanel,yearPanel,cityTopPanel,cityMidPanel;
-	private JButton selectAll = new JButton("全部选择");
+	private JButton selectPage = new JButton("分页查询");
 	private JButton searchAllBtn = new JButton("查询所有");
 	private JCheckBox[] sexRadio = {new JCheckBox("男"),new JCheckBox("女")};
 	private JCheckBox[] educationBox = {new JCheckBox("专科"),new JCheckBox("本科"),
@@ -109,14 +109,14 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 		educationPanel.add(educationBox[3]);
 		
 		btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT,10,5));
-		selectAll.addActionListener(this);
-		selectAll.setForeground(Color.WHITE);
-		selectAll.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
+		selectPage.addActionListener(this);
+		selectPage.setForeground(Color.WHITE);
+		selectPage.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
 		searchAllBtn.addActionListener(this);
 		searchAllBtn.setForeground(Color.WHITE);
 		searchAllBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
 		
-		//btnPanel.add(searchBtn);
+		btnPanel.add(selectPage);
 		btnPanel.add(searchAllBtn);
 		
 		
@@ -290,7 +290,7 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 				str2+="and "+outCondition;
 			}
 		}
-		String[] strAry = {str,str2};//{学生表条件，教育记录条件}
+		String[] strAry = {str,str2};//{学生表条件,教育记录条件}
 		return strAry;
 	}
 	//{"其他","学院","专业","国家","省份","市区","职务"};
@@ -403,13 +403,13 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 	public void actionPerformed(ActionEvent e) {
 		JButton btn = (JButton)e.getSource();
 		String str[] = getCondition();
-		if(btn==selectAll){
-			
-		}else if(btn==searchAllBtn){
+		if(btn==selectPage){
 			if(str[0].equals("")&&str[1].equals(""))
-				collect.updateTabel(str,null,false,false);
+				collect.updateTabel(str,null,false,false,1);
 			else
-				collect.updateTabel(str,null,true,false);
+				collect.updateTabel(str,null,true,false,1);
+		}else if(btn==searchAllBtn){
+			collect.updateTabel(str,null,true,false,0);
 		}else if(btn==cityBtn) {
 			String cityStr = cityField.getText().trim();
 			boolean state = false;

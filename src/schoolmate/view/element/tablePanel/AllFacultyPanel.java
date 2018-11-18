@@ -59,6 +59,8 @@ public class AllFacultyPanel extends TabelPanel implements ActionListener{
 					if(result)
 						try {
 							updateTabel();
+							collectFrame.updatePageNum();
+							collectFrame.updateTabel(null, null, true, true, -1);
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}

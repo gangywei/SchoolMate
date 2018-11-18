@@ -108,7 +108,7 @@ public class RemarksFrame extends JInternalFrame implements ActionListener{
 			if(update){
 				int res =JOptionPane.showConfirmDialog(this,"重新登录后显示新的表头信息，是否立即重启？","任务提示",JOptionPane.YES_NO_OPTION);
 				if(res==0)
-					collect.pencil.dispose();
+					System.exit(0);
 				else {
 					this.dispose();
 				}

@@ -305,8 +305,7 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 							submitBtn.setText("修改基础信息");
 							addWork.setEnabled(true);
 							addEducation.setEnabled(true);
-							JOptionPane.showMessageDialog(null, "操作成功");
-							pencil.collectDataFrame.updateTabel(null, null, true, true);;
+							pencil.collectDataFrame.updateTabel(null, null, true, true, -1);
 						}
 					} catch (SQLException e1) {
 						System.err.println("添加学生信息"+e.getClass().getName() + ": " + e1.getMessage());
@@ -318,7 +317,7 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 							JOptionPane.showMessageDialog(this, res);
 						else{
 							JOptionPane.showMessageDialog(this, "操作成功");
-							pencil.collectDataFrame.updateTabel(null, null, true, true);
+							pencil.collectDataFrame.updateTabel(null, null, true, true, -1);
 						}
 					} catch (SQLException e1) {
 						System.err.println("修改学生信息"+e.getClass().getName() + ": " + e1.getMessage());
@@ -329,5 +328,8 @@ public  class StudentDetailFrame extends JInternalFrame implements ActionListene
 			}
 		}
 	}
-
+	
+	public void doDefaultCloseAction() {  
+	    dispose();
+	}
 }

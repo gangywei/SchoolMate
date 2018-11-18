@@ -2,7 +2,6 @@ package schoolmate.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +14,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Vector;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -30,8 +30,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.swing.BrowserView;
+
+import schoolmate.control.AesEncrpytion;
 import schoolmate.control.EmailManager;
 import schoolmate.control.Helper;
+import schoolmate.control.PropProxy;
 import schoolmate.control.tableModel.StudentModel;
 
 public class SendEmailFrame extends JFrame implements ActionListener{
@@ -40,7 +43,7 @@ public class SendEmailFrame extends JFrame implements ActionListener{
 	private boolean threadCon;	//线程控制
 	private Document doc; //发送的文档流
 	private String content;	//发送的主要内容
-	private StudentModel studentModel = null;
+	private Vector<Object[]> emailData = null;
 	private int sendCount = 1;
 	public String[] fileList = null;	//	选择的文件
 	private Browser jxBrowser;	//浏览器模型
@@ -53,15 +56,16 @@ public class SendEmailFrame extends JFrame implements ActionListener{
     private JButton stopBtn = new JButton("暂  停");
     private JButton exportBtn = new JButton("导出失败数据");
     private JButton startBtn = new JButton("开  始"); 
+    private JButton emailPwdBtn = new JButton("设置邮箱密码");
     private String regEmail = "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
-    private EmailManager emailManage = new EmailManager();
+    private EmailManager emailManage;
     private final String URL = "file:///"+PencilMain.PPATH+"/summer/index.html";
     private StudentModel errorModel = new StudentModel(0);
     private JProgressBar processBar = new JProgressBar();	//创建进度条 
     private PencilMain pencil;
-    public SendEmailFrame(StudentModel studentModel,PencilMain pencil){
+    public SendEmailFrame(Vector<Object[]> emailData,PencilMain pencil){
     	this.pencil = pencil;
-    	this.studentModel = studentModel;
+    	this.emailData = emailData;
     	init();
     }
     public void init(){	
@@ -71,6 +75,9 @@ public class SendEmailFrame extends JFrame implements ActionListener{
     	startBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
     	startBtn.setForeground(Color.white);  
     	startBtn.addActionListener(this);
+    	emailPwdBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
+    	emailPwdBtn.setForeground(Color.white);  
+    	emailPwdBtn.addActionListener(this);
     	exportBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));  
     	exportBtn.setForeground(Color.white);  
     	exportBtn.addActionListener(this);
@@ -81,6 +88,9 @@ public class SendEmailFrame extends JFrame implements ActionListener{
     	//底部按钮栏
     	btnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     	btnPanel.add(startBtn);btnPanel.add(stopBtn);btnPanel.add(exportBtn);
+    	System.out.println(PencilMain.nowUser.u_role);
+    	if(PencilMain.nowUser.u_role==3)
+    		btnPanel.add(emailPwdBtn);
     	
     	sendPanel = new JPanel();
     	sendPanel.setBackground(Color.WHITE);
@@ -89,10 +99,10 @@ public class SendEmailFrame extends JFrame implements ActionListener{
     	
     	processBar.setStringPainted(true);// 设置进度条上的字符串显示，false则不能显示  
     	
-    	if(studentModel!=null){
+    	if(emailData!=null){
     		nameInput.setEditable(false);
     		nameInput.setText("点击开始按钮，开始发送邮件");
-    		sendCount = studentModel.getSelectCount();
+    		sendCount = emailData.size();
     		processBar.setString("点击开始按钮发送邮件，待发送的邮件数量 "+sendCount);
     	}else{
     		processBar.setString("输入想要发送的邮件地址，发送邮件");
@@ -121,7 +131,7 @@ public class SendEmailFrame extends JFrame implements ActionListener{
 		vGroup.addGap(20);
 		layout.setVerticalGroup(vGroup);//设置垂直组
 		add(sendPanel,BorderLayout.SOUTH);
-		
+		emailManage = new EmailManager();
 		jxBrowser = new Browser();
 		jxBrowser.loadURL(URL);
 		browserView = new BrowserView(jxBrowser);
@@ -131,10 +141,11 @@ public class SendEmailFrame extends JFrame implements ActionListener{
 		setSize(PencilMain.showWidth, PencilMain.showHeight);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
+				if(emailData!=null)
+					emailData.clear();
 				pencil.sendEmailFrame = null;
 				super.windowClosing(e);
 				dispose();
-				
 			}
 		});
 		setLocationRelativeTo(null); 
@@ -183,11 +194,13 @@ public class SendEmailFrame extends JFrame implements ActionListener{
 			stopBtn.setEnabled(true);
 			fileBtn.setEnabled(false);
 			startBtn.setEnabled(false);
+			emailPwdBtn.setEnabled(false);
 			break;
 		case 2:	//发送结束
 			fileBtn.setEnabled(true);
 			stopBtn.setEnabled(false);
 			startBtn.setEnabled(true);
+			emailPwdBtn.setEnabled(true);
 			if(errorCount>0){
 				JOptionPane.showMessageDialog(this, "存在发送失败的邮箱，点击导出失败数据，导出失败的信息");
 				exportBtn.setEnabled(true);
@@ -202,35 +215,34 @@ public class SendEmailFrame extends JFrame implements ActionListener{
     		threadCon = true;
     		int successCount = 0;
     		errorCount = 0;
-    		int rowTotle = studentModel.data.size();
-    		for(int i=0;i<rowTotle&&threadCon;i++){
-    			if((Boolean)studentModel.data.elementAt(i)[0]){
-    				try {
-						Thread.sleep(50);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-    				String toEmail = (String)studentModel.data.elementAt(i)[27];
-    				processBar.setString("正在发送邮件到 "+toEmail+" 发送成功数量："+ successCount);
-    				if(!toEmail.equals("")&&Helper.matchRegular(toEmail, regEmail)){
-    					nameInput.setText(toEmail);
-    					try {
-    						doc.select("#name").html((String) studentModel.data.elementAt(i)[4]);
-    						doc.select("#name").attr("style","");
-							content = doc.select("div.note-editable").html();
-							emailManage.sendMail(toEmail,content,fileList);
+    		for(int i=0;i<sendCount&&threadCon;i++){
+				String toEmail = (String)emailData.elementAt(i)[27];
+				processBar.setString("正在发送邮件到 "+toEmail+" 发送成功数量："+ successCount);
+				if(!toEmail.equals("")&&Helper.matchRegular(toEmail, regEmail)){
+					nameInput.setText(toEmail);
+					try {
+						doc.select("#name").html((String) emailData.elementAt(i)[4]);
+						doc.select("#name").attr("style","");
+						content = doc.select("div.note-editable").html();
+						int res = emailManage.sendMail(toEmail,content,fileList);
+						if(res==1)
 							successCount++;
-						} catch (UnsupportedEncodingException e) {
+						else if(res==0) {
+							threadCon = false;
+							processBar.setString("请连接网络");
+						}else if(res==3) {
 							errorCount++;
-							errorModel.addRow(studentModel.data.elementAt(i));
-							JOptionPane.showMessageDialog(null, e.getMessage());
+							errorModel.addRow(emailData.elementAt(i));
 						}
-    				}else{
-    					errorCount++;
-    					processBar.setString("第 "+(i+1)+"个邮箱的格式不合法！");
-     					errorModel.addRow(studentModel.data.elementAt(i));
-    				}
-    			}
+					} catch (UnsupportedEncodingException e) {
+						errorCount++;
+						errorModel.addRow(emailData.elementAt(i));
+					}
+				}else{
+					errorCount++;
+					processBar.setString("第 "+(i+1)+"个邮箱的格式不合法！");
+ 					errorModel.addRow(emailData.elementAt(i));
+				}
     		}
 			if(threadCon)
 				processBar.setString("发送完成！发送成功的数量为 "+successCount+" 失败的数量为 "+errorCount);
@@ -246,6 +258,18 @@ public class SendEmailFrame extends JFrame implements ActionListener{
 			int res =JOptionPane.showConfirmDialog(this,"确定停止该任务吗？","任务提示",JOptionPane.YES_NO_OPTION);
 			if(res==0)
 				threadCon = false;
+		}else if(btn==emailPwdBtn){
+			String pwd=JOptionPane.showInputDialog("请输入邮箱服务器的密码:");
+			if(pwd!=null) {
+				pwd = pwd.trim();
+				if(!pwd.equals("")) {
+					pwd = AesEncrpytion.AESEncode(pwd);
+					PropProxy.WriteProperties(PencilMain.CPATH, "userPwd", pwd);
+					JOptionPane.showMessageDialog(null, "设置邮箱服务器密码成功");
+				} else {
+					JOptionPane.showMessageDialog(null, "输入不允许为空！");
+				}
+			}	
 		}else if(btn==startBtn){
 			//解析要发送的内容
 			startBtn.setEnabled(false);
@@ -253,7 +277,7 @@ public class SendEmailFrame extends JFrame implements ActionListener{
 			doc = Jsoup.parse(html);
 			content = doc.select("div.note-editable").html();
 			//发送邮件
-			if(studentModel==null){
+			if(emailData==null){
 				startBtn.setEnabled(false);
 				new Thread(
 					new Runnable() {
@@ -306,8 +330,10 @@ public class SendEmailFrame extends JFrame implements ActionListener{
 	        		fileInput.setText("没有选择文件");
 	        	else
 	        		fileInput.setText(fString+" 文件大小："+fileSize+"kb");
-	        }
-	        
+	        } 
 		}
     }
+    public void doDefaultCloseAction() {
+	    dispose();
+	}
 }

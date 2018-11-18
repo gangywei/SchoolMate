@@ -16,6 +16,7 @@ import schoolmate.model.Work;
 public class StudentLog {
 	private static Connection connect=DBConnect.getConnection();
 	private static Statement stmt = null;
+	
 	/* 
 	 * inter：判断是否有这个人信息，存在不导入信息
 	 *     根据 姓名、学院、毕业年份、学历、工作地点、工作职称。count=1 得到学生ID，返回count（推测为同一个人的人数）
@@ -36,7 +37,7 @@ public class StudentLog {
 		return count;
 	}
 	/* 
-	 * inter：根据 姓名、性别、学历不同、毕业年份关系->判断同一个人的不同学历
+	 * inter：根据 姓名、性别、学历不同（不可以为空）、毕业年份关系->判断同一个人的不同学历
 	 * time:2018/03/15
 	 */
 	public static int uniqueStuDegree(Student stu) throws SQLException{
@@ -59,18 +60,37 @@ public class StudentLog {
 		}
 		return count;
 	}
+	
 	/*
-	 * inter: 判断学生的工作信息是否需要更新(姓名、性别、学院、专业、毕业年份) 工作地点、职称不太相同
+	 * 得到数据库中的校友信息总数
+	 */
+	public static int getDataCount() {
+		stmt = DBConnect.getStmt();
+		int count = 0;
+		ResultSet res;
+		try {
+			res = stmt.executeQuery("select count(s_id) totle from student");
+			while (res.next()) {
+				count = res.getInt("totle");
+			}
+			stmt.close();
+		} catch (SQLException e) {}
+		return count;
+	}
+	
+	/*
+	 * inter: 判断学生的工作信息是否需要更新(姓名、性别、学院、专业、毕业年份、学历) 工作地点、职称不太相同
 	 */
 	public static int uniqueStuWork(Student stu) throws SQLException{
+		stmt = DBConnect.getStmt();
 		int count = 0;
 		String condition = "";
 		if(!stu.s_graduate.equals(""))
 			condition = " and s_graduate='"+stu.s_graduate+"'";
 		if(!stu.s_enter.equals(""))
 			condition += " and s_enter='"+stu.s_enter+"'";
-		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_faculty='"+stu.s_faculty+"' and s_major='"+stu.s_major+"' and (s_workspace!='"+stu.s_workspace+"' or s_worktitle!='"+stu.s_worktitle+"') "+condition+" and s_education='"+stu.s_education+"' and s_education!='';";
-		ResultSet res = DBConnect.getStmt().executeQuery(str);
+		String str = "select count(s.s_id) as totle,s.s_id from student s join education e on s.s_id=e.s_id where s_name='"+stu.s_name+"' and s_faculty='"+stu.s_faculty+"' and s_major='"+stu.s_major+"' and (s_workspace!='"+stu.s_workspace+"' or s_worktitle!='"+stu.s_worktitle+"') "+condition+" and s_education='"+stu.s_education+"';";
+		ResultSet res = stmt.executeQuery(str);
 		while (res.next()) {
 			count = res.getInt("totle");
 		}
@@ -118,7 +138,7 @@ public class StudentLog {
 	 * time:2018/03/15
 	 */
 	public static void insertStudent(Student stu) throws SQLException{
-		stmt = connect.createStatement();
+		stmt = DBConnect.getStmt();
 		String sql = "INSERT INTO student "
 				+ "(s_name,s_sex,s_birth,s_person,s_hometown,"
 				+ "s_homephone,s_phone,s_tphone,s_address,s_postcode,"
@@ -141,7 +161,7 @@ public class StudentLog {
 		Work work = new Work("", "", "", "", "", "", "");
 		work.s_id = id;
 		WorkLog.insertWork(work, stmt);
-		String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "+" & ";
+		String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_hometown+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "+" & ";
 		FullsearchLog.insertFullsearch(log, id, stmt);	//检索表
 		connect.commit();
 		stmt.close();
@@ -201,7 +221,7 @@ public class StudentLog {
 			Work work = new Work(stu.s_nation, stu.s_province, stu.s_city, stu.s_work, stu.s_worktitle, stu.s_workspace, stu.s_workphone);
 			work.s_id = id;
 			WorkLog.insertWork(work, stmt);	//学生工作记录
-			String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "
+			String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_hometown+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "
 					+stu.s_work+" "+stu.s_worktitle+" "+stu.s_workspace+" & "+stu.s_class+" "+stu.s_no;
 			FullsearchLog.insertFullsearch(log, id, stmt);	//检索表
 		}catch(Exception e){
@@ -215,7 +235,7 @@ public class StudentLog {
 		String result = stu.judgeStudent();
 		try{
 			if(result==null){
-				stmt = connect.createStatement();
+				stmt = DBConnect.getStmt();
 				//每行5个
 				String sql = "update student set s_name='"+stu.s_name+"',s_sex='"+stu.s_sex+"',s_birth='"+stu.s_birth+"',s_person='"+stu.s_person
 						+"',s_hometown='"+stu.s_hometown+"',s_homephone='"+stu.s_homephone+"',s_phone='"+stu.s_phone+"',s_tphone='"+stu.s_tphone
@@ -224,11 +244,12 @@ public class StudentLog {
 						+"' where s_id='"+sId+"';";
 				int count = stmt.executeUpdate(sql);
 				if(count==1){
-					String log = stu.s_name+" "+stu.s_phone+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email;
+					String log = stu.s_name+" "+stu.s_phone+" "+stu.s_hometown+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email;
 					String str = FullsearchLog.getLog(sId, 0, log, stmt);
 					FullsearchLog.updateFullsearch(str,sId,stmt);
 					connect.commit();
 				}else{
+					stmt.close();
 					throw new Exception("修改用户执行失败");
 				}
 			}else{
@@ -241,7 +262,6 @@ public class StudentLog {
 				return result;
 			}
 		}
-		stmt.close();
 		return null;
 	}
 	/* 在一个事务下刷新学生的修改日期
@@ -256,16 +276,17 @@ public class StudentLog {
 	 */
 	public static String[] SelectRemarks(){
 		String[] str = new String[5];
-		stmt = DBConnect.getStmt();
-		String sql = "select r_title from remark";
-		ResultSet res;
 		try {
+			stmt = DBConnect.getStmt();
+			String sql = "select r_title from remark";
+			ResultSet res;
 			res = stmt.executeQuery(sql);
 			int i = 0;
 			while (res.next()) {
 				str[i] = res.getString("r_title");
 				i++;
 			}
+			stmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -282,15 +303,17 @@ public class StudentLog {
 			connect.commit();
 			stmt.close();
 			return true;
+		}else {
+			stmt.close();
+			return false;
 		}
-		return false;
 	}
 	/* 根据学生的id字段，删除学生记录并删除教育、工作、全文检索记录
 	 * time:2018/03/15
 	 */
 	public static boolean deleteStudent(int sId){
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "delete from student where s_id="+sId;
 			stmt.executeUpdate(sql);
 			EducationLog.deleteEduFS(stmt, sId);
@@ -310,7 +333,7 @@ public class StudentLog {
 	 */
 	public static boolean deleteMany(String str){
 		try {
-			stmt = connect.createStatement();
+			stmt = DBConnect.getStmt();
 			String sql = "delete from student where s_id in ("+str+");";
 			stmt.executeUpdate(sql);
 			EducationLog.deleteManyEdu(stmt, str);
@@ -323,33 +346,6 @@ public class StudentLog {
 			return false;
 		}
 		return true;
-	}
-	/*
-	 * inter:得到所有的职称分类
-	 * time：2018/03/15
-	 */
-	public static String[] allWorkTitle(){
-		int count = 0;
-		try {
-			stmt = connect.createStatement();
-			String sql = "select count( distinct s_worktitle) as totle from student;";
-			ResultSet res = stmt.executeQuery(sql);
-			while (res.next()) {
-				count = res.getInt("totle");
-			}
-			String data[] = new String[count];
-			sql = "select distinct s_worktitle from student;";
-			res = stmt.executeQuery(sql);
-			int i=0;
-			while (res.next()) {
-				data[i] = res.getString("s_worktitle");
-				i++;
-			}
-			return data;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 	
 	//返回table数组
@@ -378,6 +374,8 @@ public class StudentLog {
 				}
 			}
 		}
+		idSet.clear();
+		stmt.close();
 		return info;
 	}
 	
@@ -420,7 +418,6 @@ public class StudentLog {
 			+ "s_remark2,s_remark3,s_remark4,s_remark5 from"+" (select * from student where update_time>="+time+" and update_time<="+eTime+") s join ("
 			+ "select * from education  where update_time>="+time+" and update_time<="+eTime+option+") e on s.s_id=e.s_id left join "
 			+ "(select * from worklog where update_time>="+time+" and update_time<="+eTime+") w on s.s_id=w.s_id order by s.update_time asc;";
-		System.out.println(sql);
 		stmt = DBConnect.getStmt();
 		ResultSet rs = stmt.executeQuery(sql);
 		ResultSetMetaData rsmd=rs.getMetaData();//用于获取关于 ResultSet 对象中列的类型和属性信息的对象

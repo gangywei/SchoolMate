@@ -13,6 +13,7 @@ import java.lang.reflect.Modifier;
 import java.math.BigInteger;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -258,9 +259,9 @@ public class PencilMain extends JFrame{
         desktopPane.add(addWorkLogFrame);
 		addWorkLogFrame.toFront();
 	}
-	public void sendEmail(StudentModel studentModel){
+	public void sendEmail(Vector<Object[]> emailData){
 		if(sendEmailFrame==null){
-        	sendEmailFrame = new SendEmailFrame(studentModel,_this);
+        	sendEmailFrame = new SendEmailFrame(emailData,_this);
     	}
 		sendEmailFrame.toFront();
 	}

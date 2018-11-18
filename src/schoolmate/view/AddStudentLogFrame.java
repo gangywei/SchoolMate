@@ -236,7 +236,7 @@ public class AddStudentLogFrame extends JInternalFrame implements ActionListener
 					JOptionPane.showMessageDialog(this, "添加失败");
 				}
 			}
-			detail.collect.updateTabel(null, "", true, true);
+			detail.collect.updateTabel(null, null, true, true, 1);
 		}else if(btn==resetBtn){
 			this.dispose();
 		}

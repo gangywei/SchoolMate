@@ -2,11 +2,13 @@ package schoolmate.control.tableModel;
 import java.sql.SQLException;
 import java.util.Vector;
 
+import javax.swing.JOptionPane;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import schoolmate.database.StudentLog;
+import schoolmate.view.PencilMain;
 
 public class StudentModel extends DefaultTableModel implements TableModelListener{
 	private static String[] dbCol = {"选择框","导入时间","学号","姓名","性别","出生日期","身份证号","籍贯","学院","专业","班级",
@@ -91,12 +93,16 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 	}
 	
 	public Object getValueAt(int row, int col) {
-		if(this.getRowCount()>0)
-			if(col>=2&&type==0)
-				return data.elementAt(row)[col+1];	//隐藏数据库中的ID字段。
-			else
-				return data.elementAt(row)[col];
-		return "";
+		try {
+			if(this.getRowCount()>0)
+				if(col>=2&&type==0)
+					return data.elementAt(row)[col+1];	//隐藏数据库中的ID字段。
+				else
+					return data.elementAt(row)[col];
+			return "";
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return "";
+		}
 	}
 	
 	public void remove(int index){
@@ -171,7 +177,7 @@ public class StudentModel extends DefaultTableModel implements TableModelListene
 	//对表格的修改操作
     public boolean isCellEditable(int row, int col) {
         if (col < 1) {
-            return true;
+        	return true;
         } else {
             return false;
         }

@@ -60,7 +60,6 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 	private boolean threadCon = true;	//线程正常执行
 	private Thread importThreat;
 	private StudentModel errorModel = new StudentModel(2);
-	public Object[][] data = null;
 	public ArrayList<String[]> errorList = new ArrayList<String[]>();
 	private Workbook workbook;
 	private XSSFWorkbook xwb;
@@ -305,7 +304,6 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     				Student stu = new Student(user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
 							user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
 							user[20], user[21], user[22], user[23], user[24], user[26], user[27], user[25], user[28], user[29],user[30],user[31]);
-    				stu.s_no = user[0];
     				try {
     					String res = null;
     					if(!user[1].trim().equals("")){	//判断名字非空
@@ -352,6 +350,8 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 						break;
 					} catch (InterruptedException e) {
 						e.printStackTrace();
+					} finally {
+						stu = null;
 					}
 				}else{
 					processBar.setString(nowCount+" 跳过空行");// 设置提示信息
@@ -385,7 +385,8 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 			}
         	importPanel.updateUI();
         	pencil.dbControl(true);
-        	pencil.collectDataFrame.updateTabel(null, "", true, true);;
+        	pencil.collectDataFrame.updatePageNum();
+        	pencil.collectDataFrame.updateTabel(null, null, true, true, -1);
     	}
     }
 
@@ -396,6 +397,8 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     		int checkRes = 3;	//默认正常导入
     		if(imtype2.isSelected())
 				type = 1;
+    		else if(imtype3.isSelected())
+    			type = 2;
     		Connection connect=DBConnect.getConnection();
     		Statement stmt = null;
 			try {
@@ -407,7 +410,6 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     		threadCon = true;
     		errorCount = 0;
         	pencil.dbControl(false);
-        	DataFormatter formatter = new DataFormatter();
         	int nowCount = 0;
     		XSSFSheet sheet = xwb.getSheetAt(0);
 	    	int rows = sheet.getLastRowNum() + 1;// 获得行数
@@ -432,7 +434,6 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 					Student stu = new Student(user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9],
 							user[10], user[11], user[12], user[13], user[14], user[15], user[16],user[17], user[18], user[19],
 							user[20], user[21], user[22], user[23], user[24], user[26], user[27], user[25], user[28], user[29],user[30],user[31]);
-					stu.s_no = user[0];
 					try {
 						String res = null;
 						if(!user[1].trim().equals("")){	//判断名字非空
@@ -443,7 +444,7 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
     						if(res==null) {
     							if(type==0)
     								checkRes = StudentLog.checkEducation(stu);
-    							else {
+    							else if(type==1){
     								if(StudentLog.uniqueStu(stu)>0)
     									checkRes = 2;
     								else
@@ -480,6 +481,8 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 						break;
 					} catch (InterruptedException e) {
 						e.printStackTrace();
+					} finally {
+						stu = null;
 					}
 				}else{
 					processBar.setString(nowCount+" 跳过空行");// 设置提示信息
@@ -505,7 +508,8 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 			}
         	importPanel.updateUI();
         	pencil.dbControl(true);
-        	pencil.collectDataFrame.updateTabel(null, null, true, true);
+        	pencil.collectDataFrame.updatePageNum();
+        	pencil.collectDataFrame.updateTabel(null, null, true, true, -1);
     	}
     }
 
@@ -563,11 +567,11 @@ public class ImportExlFrame extends JInternalFrame implements ActionListener{
 			btnControl(4);
 		}else if(btn==downloadBtn){
 			StudentModel downModel = new StudentModel(1);
-			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 			pencil.outputExl(downModel,2,"标准Excel文档");
 		}
     }
     public void doDefaultCloseAction() {
+    	errorModel = null;
 	    dispose();
 	}
 }

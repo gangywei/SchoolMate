@@ -21,6 +21,7 @@ public class AllCityPanel extends TabelPanel implements ActionListener{
 	public void initTable(){
 		try {
 			data = UserLog.dao("select n_name,p_name,c_name from city");
+			
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -57,6 +58,8 @@ public class AllCityPanel extends TabelPanel implements ActionListener{
 				int res =JOptionPane.showConfirmDialog(this,"删除该字段并删除该字段的所有数据，请先做好excel备份","删除信息提示",JOptionPane.YES_NO_OPTION);
 				if(res==0){
 					boolean result = AddressLog.deleteCity(sName,province,nation);
+					collectFrame.updatePageNum();
+					collectFrame.updateTabel(null, null, true, true, -1);
 					if(result)
 						try {
 							model.remove(nowSelect);

@@ -85,20 +85,20 @@ public class BlurSearchFrame extends JInternalFrame implements ActionListener{
 		JButton btn = (JButton)e.getSource();
 		if(btn==searchBtn){
 			if(text.equals(""))
-				collect.updateTabel(null,null,false,false);
+				collect.updateTabel(null,null,false,false,2);
 			else
-				collect.updateTabel(null,text,true,false);
+				collect.updateTabel(null,text,true,false,0);
 		}else if(btn==searchAllBtn){
 			if(text.equals("")){
 				JOptionPane.showMessageDialog(this, "查询不可以为空");
 				return;
 			}
-			collect.updateTabel(null,text,true,false);
+			collect.updateTabel(null,text,true,false,0);
 		}
 	}
 	
 	/**
-     * 从剪贴板中获取文本（粘贴） https://blog.csdn.net/xietansheng/article/details/70478266
+     * 	从剪贴板中获取文本（粘贴） https://blog.csdn.net/xietansheng/article/details/70478266
      */
     public void getClipboardString() {
         // 获取系统剪贴板
