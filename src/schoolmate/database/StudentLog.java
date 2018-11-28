@@ -145,7 +145,7 @@ public class StudentLog {
 				+ "s_email,s_qq,s_remark1,s_weixin,s_remark2,"
 				+ "s_remark3,s_remark4,s_remark5,update_time) "
 				+ "VALUES "
-				+ "('"+stu.s_name+"','"+stu.s_sex+"','"+stu.s_birth+"','"+stu.s_person+"','"+stu.s_hometown+"','"
+				+ "('"+stu.s_name+"','"+stu.s_sex+"','"+stu.s_birth+"','"+stu.s_person+"','"+stu.s_address+"','"
 				+stu.s_homephone+"','"+stu.s_phone+"','"
 				+stu.s_tphone+"','"+stu.s_address+"','"+stu.s_postcode+"','"+stu.s_email+"','"+stu.s_qq+"','"+stu.s_remark1+"','"
 				+stu.s_weixin+"','"+stu.s_remark2+"','"+stu.s_remark3+"'"+ ",'"+stu.s_remark4+"','"+stu.s_remark5+"',"+Helper.dataTime(null)+");";
@@ -161,7 +161,7 @@ public class StudentLog {
 		Work work = new Work("", "", "", "", "", "", "");
 		work.s_id = id;
 		WorkLog.insertWork(work, stmt);
-		String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_hometown+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "+" & ";
+		String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "+" & ";
 		FullsearchLog.insertFullsearch(log, id, stmt);	//检索表
 		connect.commit();
 		stmt.close();
@@ -221,7 +221,7 @@ public class StudentLog {
 			Work work = new Work(stu.s_nation, stu.s_province, stu.s_city, stu.s_work, stu.s_worktitle, stu.s_workspace, stu.s_workphone);
 			work.s_id = id;
 			WorkLog.insertWork(work, stmt);	//学生工作记录
-			String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_hometown+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "
+			String log = stu.s_city+" "+stu.s_name+" "+stu.s_phone+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email+" & "
 					+stu.s_work+" "+stu.s_worktitle+" "+stu.s_workspace+" & "+stu.s_class+" "+stu.s_no;
 			FullsearchLog.insertFullsearch(log, id, stmt);	//检索表
 		}catch(Exception e){
@@ -244,7 +244,7 @@ public class StudentLog {
 						+"' where s_id='"+sId+"';";
 				int count = stmt.executeUpdate(sql);
 				if(count==1){
-					String log = stu.s_name+" "+stu.s_phone+" "+stu.s_hometown+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email;
+					String log = stu.s_name+" "+stu.s_phone+" "+stu.s_address+" "+stu.s_tphone+" "+stu.s_weixin+" "+stu.s_qq+" "+stu.s_email;
 					String str = FullsearchLog.getLog(sId, 0, log, stmt);
 					FullsearchLog.updateFullsearch(str,sId,stmt);
 					connect.commit();

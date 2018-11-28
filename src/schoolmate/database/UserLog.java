@@ -117,7 +117,7 @@ public class UserLog {
 	/* 
 	 * inter: 用户登录，根据用户的ID删除用户，当数据库操作数=1时返回值true，否则事务回滚返回false。
 	 * 判断用户登录时间大于注册时间并小于结束时间，用户使用时间递增更新，当前使用时间少于数据库使用时间，判断软件是否到期。
-	 * time：2018/03/15
+	 * 2018/03/15
 	 */
 	public static String[] getUser(String count,String pwd,long time){
 		ResultSet res = null;
@@ -127,7 +127,7 @@ public class UserLog {
 			stmt = DBConnect.getStmt();
 			sql = "SELECT u_name,u_problem,u_answer,u_role,faculty,u_sign,u_use FROM user where u_count='"+count+"' and u_pwd='"+Helper.EncoderByMd5(pwd)+"';";
 			res = stmt.executeQuery(sql);
-			long begTime = 0;
+			long endTime = 0;
 			long useTime = 0;
 			int number = 0;
 			int role = 0;
@@ -140,11 +140,10 @@ public class UserLog {
 				user[3] = res.getString("faculty");
 				user[4] = res.getInt("u_role")+"";
 				role = res.getInt("u_role");
-				begTime = res.getInt("u_sign");
+				endTime = res.getInt("u_sign");
 				useTime = res.getInt("u_use");
-				System.out.println(res.getInt("u_use"));
 			}
-			long endTime = begTime+31536000;
+			long begTime = endTime-31536000;
 			res.close();
 			if(number==0){
 				JOptionPane.showMessageDialog(null, "用户名或密码错误");

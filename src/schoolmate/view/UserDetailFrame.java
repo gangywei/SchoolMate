@@ -62,6 +62,7 @@ public class UserDetailFrame extends JInternalFrame implements ActionListener{
         nameShow.setText(user.u_name);
         userShow.setText(user.u_count);
         userAns.setText(user.u_answer);
+        userAns.setEnabled(false);
         roleShow.setText(user.getRole());
         facultyShow.setText(user.faculty);
         userPro.setSelectedIndex(user.u_problem);

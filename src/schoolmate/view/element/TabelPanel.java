@@ -2,10 +2,13 @@ package schoolmate.view.element;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.beans.PropertyVetoException;
 import java.util.Vector;
+
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuItem;
@@ -23,9 +26,11 @@ public abstract class TabelPanel extends JPanel{
 	
 	protected MyTable table;
 	public BaseModel model;
+	protected JPanel bottomPanel;
 	protected JScrollPane tableScroll;
 	protected int nowSelect = -1;
 	protected JPopupMenu popupMenu  = new JPopupMenu();
+	protected JButton selectAll,deleteSelect;
 	protected JMenuItem alterItem = new JMenuItem("修改");
 	protected JMenuItem deleteItem = new JMenuItem("删除");	
 	public Vector<Object[]> data = new Vector<Object[]>();
@@ -46,13 +51,17 @@ public abstract class TabelPanel extends JPanel{
 	}
 	
 	public void init(){
+		selectAll = new JButton("选中全部");
+		deleteSelect = new JButton("删除选中");
+		bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT,10,5));
+		bottomPanel.add(selectAll);
+		bottomPanel.add(deleteSelect);
 		setLayout(new BorderLayout());
 		initTable();
 		if(PencilMain.nowUser.u_role>1){
 			popupMenu.add(alterItem);
 			popupMenu.add(deleteItem);
 		}
-		//table.setAutoCreateRowSorter(true);
 		table.setFillsViewportHeight(true);
         tableScroll = new JScrollPane(table);
         tableScroll.setBackground(Color.WHITE);

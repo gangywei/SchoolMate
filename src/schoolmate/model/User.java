@@ -19,7 +19,7 @@ public class User {
 		if(u_role==3){
 			return "系统管理者";
 		}if(u_role==2){
-			return "学员管理者";
+			return "学院管理者";
 		}else{
 			return "普通用户";
 		}

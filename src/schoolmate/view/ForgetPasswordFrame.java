@@ -97,7 +97,7 @@ public class ForgetPasswordFrame extends JInternalFrame implements ActionListene
 			}else if(!upwd.trim().equals(confirmUpwd.trim())){
 				JOptionPane.showMessageDialog(null, "密码不一致");
 				return;
-			}else if(!Helper.matchRegular(upwd.trim(), PencilMain.regular[2])){
+			}else if(!Helper.matchRegular(upwd.trim(), PencilMain.regular[1])){
 				JOptionPane.showMessageDialog(null, "密码格式为6-12位数字或字母");
 				return;
 			}

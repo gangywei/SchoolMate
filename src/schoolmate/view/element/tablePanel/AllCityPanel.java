@@ -1,5 +1,6 @@
 package schoolmate.view.element.tablePanel;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
@@ -21,7 +22,6 @@ public class AllCityPanel extends TabelPanel implements ActionListener{
 	public void initTable(){
 		try {
 			data = UserLog.dao("select n_name,p_name,c_name from city");
-			
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}

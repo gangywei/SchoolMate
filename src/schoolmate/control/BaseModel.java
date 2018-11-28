@@ -2,9 +2,11 @@ package schoolmate.control;
 
 import java.util.Vector;
 
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
-public class BaseModel  extends DefaultTableModel{
+public class BaseModel  extends DefaultTableModel implements TableModelListener{
 	public String[] nowColumn;
 	public Vector<Object[]> data;
 	
@@ -59,9 +61,13 @@ public class BaseModel  extends DefaultTableModel{
 	public void setCell(int row,int col,Object obj){
 		data.elementAt(row)[col] = obj;
 	}
+	
+	public Class getColumnClass(int c) {
+		return getValueAt(0, c).getClass();
+	}
 	//对表格的修改操作
     public boolean isCellEditable(int row, int col) {
-        if (col < 0) {
+        if (col < 1) {
             return true;
         } else {
             return false;
@@ -70,5 +76,10 @@ public class BaseModel  extends DefaultTableModel{
     
     public void setValueAt(Object value, int row, int col) {
     	data.elementAt(row)[col] = value;
-    } 
+    }
+
+	@Override
+	public void tableChanged(TableModelEvent e) {
+		
+	} 
 }

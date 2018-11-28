@@ -197,6 +197,7 @@ public class SelectUpdateFrame extends JInternalFrame implements ActionListener{
 				}
 			}
 		}else if(btn==insertBtn) {
+			ImportExlFrame.importState = 0;
 			try {
 				StudentLog.importExl(DBConnect.getStmt(),stu);
 			} catch (SQLException e1) {
