@@ -61,7 +61,6 @@ public class AddressLog {
 		try {
 			String sql;
 			stmt = DBConnect.getStmt();
-			//不存在修改成为的数据，修改数据;存在删除当前数据。
 			if(!searchNation(now[0])){	
 				sql = "update nation set n_name='"+now[0]+"' where n_name='"+old[0]+"';";
 			}else{
@@ -160,7 +159,7 @@ public class AddressLog {
 		}
 		return res;
 	}
-	//type = 1 修改省份操作，=0 修改市区操作，不进行删除判断
+	//type = 1 修改省份操作，=0 修改市区操作并不进行删除判断
 	public static void updatePLabel(String old[],String now[],int type) throws SQLException{
 		//不存在修改成为的数据，修改数据;存在删除当前数据。
 		if(!searchProvince(now[1],now[0])){	

@@ -7,7 +7,7 @@ import schoolmate.control.Helper;
 public class Student {
 	//学号	姓名	性别	出生日期	身份证号	籍贯	学院	专业	
 	//所在班级	学历/学位	入学年份	毕业年份	工作国家	工作省份	工作市区	工作单位	
-	//职务	职称	办公电话	宅电	手机1	手机2	通讯地址	邮编	
+	//职务	职称	办公电话	宅电	手机1 手机2  通讯地址	邮编	
 	//E-mail	QQ	微信	备注字段	备注字段	备注字段	备注字段	备注字段
 	public Student(String name,String sex,String birth,String person,String hometown,String faculty,String major,
 			String classs,String education,String enter,String graduate,String nation,String province,String city,String workspace,

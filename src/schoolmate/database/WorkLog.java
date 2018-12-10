@@ -33,9 +33,27 @@ public class WorkLog {
 			sql = "update worklog set nation='"+now[0]+"' where nation='"+old[0]+"';";
 			sql2 = "update student set s_nation='"+now[0]+"' where s_nation='"+old[0]+"';";
 		}
+		//updateFullSearch(old,now,stmt,type); //当把省份加入模糊检索时调用的功能
 		stmt.executeUpdate(sql);
 		stmt.executeUpdate(sql2);
 	}
+	//因为省份字段加入模糊检索，所以省份进行修改时更新数据库数据。
+	public static void updateFullSearch(String old[],String now[],Statement stmt,int type)  throws SQLException{
+		String sql = "";
+		String ids = "";
+		if(type==0) {
+			sql = "select group_concat(s_id) as ids from student where s_nation='"+old[0]+"' and s_province='"+old[1]+"' and s_city='"+old[2]+"';";
+		} else {
+			sql = "select group_concat(s_id) as ids from student where s_nation='"+old[0]+"' and s_province='"+old[1]+"';";
+		}
+		ResultSet res = stmt.executeQuery(sql);
+		while (res.next()) {
+			ids = res.getString("ids");
+		}
+		sql = "update fullsearch set fs_content = replace(fs_content,' "+old[1]+" ',' "+now[1]+" ') where s_id in ("+ids+");";
+		stmt.executeUpdate(sql);
+	}
+	
 	//检查是否需要更新数据库字段
 	public static void checkField(String nation,String province,String city) throws SQLException{
 		if(!nation.equals("")){
