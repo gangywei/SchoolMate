@@ -70,6 +70,7 @@ public class MyTextField extends JTextField implements FocusListener{
     	String temp = getText();
     	if(temp.equals("")){
         	state = 0;
+        	index = -1;
         }else{
         	state = 1;
         } 

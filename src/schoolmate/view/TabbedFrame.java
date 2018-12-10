@@ -38,18 +38,20 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 	private String[] condition = new String[8];	//对其他数据库检索的数组
 	private String[] dbCondition = new String[8];	//学生表检索条件的数组
 	private JLabel sexLabel,educationLabel,inLabel,outLabel;
-	private JPanel sexPanel,educationPanel,btnPanel,yearPanel,cityTopPanel,cityMidPanel;
+	private JPanel sexPanel,educationPanel,btnPanel,yearPanel,cityTopPanel,cityMidPanel,
+		provinceTopPanel,provinceMidPanel;
 	private JButton selectPage = new JButton("分页查询");
 	private JButton searchAllBtn = new JButton("查询所有");
 	private JCheckBox[] sexRadio = {new JCheckBox("男"),new JCheckBox("女")};
 	private JCheckBox[] educationBox = {new JCheckBox("专科"),new JCheckBox("本科"),
 			new JCheckBox("硕士"),new JCheckBox("博士")};
-	private JCheckBox[] facultyBox,majorBox,nationBox,provinceBox;
+	private JCheckBox[] facultyBox,majorBox,nationBox;
 	private String[] labelName = {"其他条件","学院","专业","工作国家","工作省份","工作市区"};
-	private MyTextField cityField; //市区的模糊搜索按钮
+	private MyTextField cityField,provinceField; //市区的模糊搜索按钮
 	private JButton cityBtn = new JButton("确认选择");
-	private List<Object> cityList;
-	private ArrayList<JCheckBox> cityBox;
+	private JButton provinceBtn = new JButton("确认选择");
+	private List<Object> cityList,provinceList;
+	private ArrayList<JCheckBox> cityBox,provinceBox;
 	private JTabbedPane jTabbed = new JTabbedPane(JTabbedPane.TOP);
 	private String[] faculty,nation,province,city;
 	String[][] major;
@@ -77,7 +79,7 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
     	GridLayout layout = new GridLayout(15,8);
 		for(int i=0;i<labelName.length;i++){
 			panels[i] = new JPanel();
-			if(i!=0&&i!=5&&i!=2)
+			if(i!=0&&i!=5&&i!=4&&i!=2)
 				panels[i].setLayout(layout);
 			else{
 				panels[i].setLayout(new BorderLayout());
@@ -213,12 +215,12 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 			dbCondition[3]+=')';
 		//省份
 		dbCondition[4] = null;
-		for(i=0;(provinceBox!=null)&&i<provinceBox.length;i++){
-			if(provinceBox[i].isSelected()){
+		for(i=0;(provinceBox!=null)&&i<provinceBox.size();i++){
+			if(provinceBox.get(i).isSelected()){
 				if(dbCondition[4]==null){
-					dbCondition[4] = "(s_province='"+provinceBox[i].getText()+"'";
+					dbCondition[4] = "(s_province='"+provinceBox.get(i).getText()+"'";
 					}else{
-						dbCondition[4] += " or s_province='"+provinceBox[i].getText()+"'";
+						dbCondition[4] += " or s_province='"+provinceBox.get(i).getText()+"'";
 					}
 			}
 		}
@@ -361,17 +363,24 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 				break;
 			case 4:	//省份
 				if(provinceBox==null){
-					provinceBox = null;
-					String str = "";
-					province = AddressLog.allProvince(str);
-					Object[] temp = Helper.arrayUnique(province);
-					int length = temp.length;
-					provinceBox = new JCheckBox[length];
-					for(int i=0;i<length;i++){
-						provinceBox[i] = new JCheckBox((String)temp[i]);
-						provinceBox[i].addItemListener(this);
-						panels[selectIndex].add(provinceBox[i]);
-					}
+					Border titleBorder=BorderFactory.createTitledBorder("搜索的省份字段");
+					provinceBox = new ArrayList<JCheckBox>();
+					provinceBtn.addActionListener(this);
+					provinceBtn.setForeground(Color.WHITE);
+					provinceBtn.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.lightBlue));  
+					provinceMidPanel = new JPanel();
+					provinceMidPanel.setBorder(titleBorder);   
+					provinceField = new MyTextField("请在这里输入检索的省份数据后请点击 -- 确认选择按钮", 15);
+					provinceTopPanel = new JPanel(new BorderLayout());
+					province = AddressLog.allProvince("");
+					provinceList = new ArrayList<Object>();
+					for(int i=1;i<province.length;i++)
+						provinceList.add(province[i]);
+					provinceField.setMenu(provinceList);
+					provinceTopPanel.add(provinceField,BorderLayout.CENTER);
+					provinceTopPanel.add(provinceBtn,BorderLayout.EAST);
+					panels[selectIndex].add(provinceTopPanel,BorderLayout.NORTH);
+					panels[selectIndex].add(provinceMidPanel,BorderLayout.CENTER);
 				}
 				break;
 			case 5:	//市区
@@ -412,6 +421,7 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 			collect.updateTabel(str,null,true,false,0);
 		}else if(btn==cityBtn) {
 			String cityStr = cityField.getText().trim();
+			cityField.setText("");
 			boolean state = false;
 			for(int i=0;i<cityBox.size();i++)
 				if(cityBox.get(i).getText().equals(cityStr)) {
@@ -423,6 +433,24 @@ public class TabbedFrame extends JFrame implements ActionListener,ChangeListener
 				cityBox.add(newBox);
 				for(int i=0;i<cityBox.size();i++) 
 					cityMidPanel.add(cityBox.get(i));
+				this.repaint();
+			}else {
+				JOptionPane.showMessageDialog(this, "检索的数据已存在，请重新选择");
+			}
+		}else if(btn==provinceBtn) {
+			String provinceStr = provinceField.getText().trim();
+			provinceField.setText("");
+			boolean state = false;
+			for(int i=0;i<provinceBox.size();i++)
+				if(provinceBox.get(i).getText().equals(provinceStr)) {
+					state = true;
+					break;
+				}	
+			if(state==false) {
+				JCheckBox newBox = new JCheckBox(provinceStr,true);
+				provinceBox.add(newBox);
+				for(int i=0;i<provinceBox.size();i++) 
+					provinceMidPanel.add(provinceBox.get(i));
 				this.repaint();
 			}else {
 				JOptionPane.showMessageDialog(this, "检索的数据已存在，请重新选择");
